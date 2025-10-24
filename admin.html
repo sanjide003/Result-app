@@ -22,9 +22,9 @@
         .btn-secondary { @apply bg-gradient-to-r from-gray-600 to-gray-700 hover:from-gray-700 hover:to-gray-800 focus:ring-gray-500; }
         .btn-light { @apply bg-white text-gray-700 border border-gray-300 hover:bg-gray-50 focus:ring-indigo-500; }
         .btn-success { @apply bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 focus:ring-green-500; }
-        .btn-sm { @apply px-4 py-1.5 text-sm; } /* Adjusted padding for smaller pill */
-        .btn-icon-only { @apply p-2 rounded-full; } /* Ensure icon only is also rounded */
-        .btn-icon-only i { @apply m-0 h-5 w-5; }
+        .btn-sm { @apply px-4 py-1.5 text-sm; } 
+        .btn-icon-only { @apply p-2 rounded-full w-9 h-9; /* Fixed size for icon only */ } 
+        .btn-icon-only i { @apply m-0 h-4 w-4; /* Adjusted icon size */ }
         
         /* Modern Form & Card Styles */
         .form-input, .form-select, .form-textarea { @apply block w-full px-4 py-2.5 border border-gray-300 rounded-lg bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500; transition: all 0.2s ease-in-out; }
@@ -33,7 +33,7 @@
         .card-header { @apply text-2xl font-bold text-gray-900 mb-6; }
         /* Password input wrapper */
         .password-wrapper { @apply relative; }
-        .password-toggle-btn { @apply absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600 cursor-pointer; }
+        .password-toggle-btn { @apply absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600 cursor-pointer focus:outline-none; } /* Added focus style */
         
         /* Malayalam Instruction Box */
         .info-text { @apply bg-blue-50 text-blue-800 p-4 border border-blue-200 rounded-lg text-sm mb-6; }
@@ -231,7 +231,7 @@
                             <textarea id="homepage-gallery" class="form-textarea" rows="8" placeholder="https://example.com/image1.jpg\nhttps://example.com/image2.jpg"></textarea>
                         </div>
 
-                        {/* NEW: Footer Settings Card */}
+                        {/* Footer Settings Card */}
                         <div class="card mb-6">
                             <h2 class="card-header">Footer Settings</h2>
                             <div class="mb-4">
@@ -268,7 +268,6 @@
 
                 {/* --- Participants Import --- */}
                 <div id="page-participants" class="admin-page hidden">
-                     {/* ... [Participants content unchanged] ... */}
                      <h1 class="text-3xl font-bold text-gray-900 mb-6">Import Participants</h1>
                     <div class="info-text">
                         <strong>നിർദ്ദേശം:</strong> എല്ലാ മത്സരാർത്ഥികളെയും ഒരു CSV (Excel) ഫയൽ വഴി ഇവിടെ ഇമ്പോർട്ട് ചെയ്യാം.
@@ -312,7 +311,6 @@
 
                 {/* --- Programs & Categories --- */}
                 <div id="page-programs" class="admin-page hidden">
-                     {/* ... [Programs content unchanged] ... */}
                      <h1 class="text-3xl font-bold text-gray-900 mb-6">Manage Programs & Categories</h1>
                      <div class="info-text">
                         <strong>നിർദ്ദേശം:</strong> ഇവിടെ മത്സരങ്ങളുടെ കാറ്റഗറികളും (ഉദാ: Junior, Senior) ഓരോ മത്സരങ്ങളും ചേർക്കാം. ആദ്യം കാറ്റഗറികൾ ചേർക്കുക, പിന്നീട് പ്രോഗ്രാമുകൾ ചേർക്കുമ്പോൾ ആ കാറ്റഗറി തിരഞ്ഞെടുക്കാം.
@@ -362,7 +360,6 @@
 
                 {/* --- Manage Teams (Improved UI) --- */}
                 <div id="page-teams" class="admin-page hidden">
-                     {/* ... [Teams content unchanged from v6.2] ... */}
                      <h1 class="text-3xl font-bold text-gray-900 mb-6">Manage Teams</h1>
                     <div class="info-text">
                         <strong>നിർദ്ദേശം:</strong> പുതിയ ടീമുകളെ ചേർക്കാനും നിലവിലുള്ള ടീമുകളുടെ വിവരങ്ങൾ (ലീഡർ, അസിസ്റ്റന്റ് ലീഡർ, ചെസ്റ്റ് നമ്പർ പരിധി) മാറ്റം വരുത്താനും ഇവിടെ സാധിക്കും. ചെസ്റ്റ് നമ്പർ പരിധി (From, To) കൃത്യമായി നൽകുന്നത് റിസൾട്ട് പബ്ലിഷ് ചെയ്യുമ്പോൾ ടീമിനെ ഓട്ടോമാറ്റിക് ആയി കണ്ടെത്താൻ സഹായിക്കും.
@@ -391,7 +388,6 @@
 
                 {/* --- Publish Results --- */}
                 <div id="page-results" class="admin-page hidden">
-                     {/* ... [Results content unchanged] ... */}
                      <h1 class="text-3xl font-bold text-gray-900 mb-6">Publish & Update Results</h1>
                     <div class="info-text">
                         <strong>നിർദ്ദേശം:</strong> ഒരു പ്രോഗ്രാം സെലക്ട് ചെയ്യുക. ശേഷം, വിജയിയുടെ ചെസ്റ്റ് നമ്പർ ടൈപ്പ് ചെയ്യുമ്പോൾ, പേര് ഓട്ടോമാറ്റിക്കായി വലതുവശത്ത് വരും (നിങ്ങൾ "Participants" ടാബിൽ നിന്ന് ഇമ്പോർട്ട് ചെയ്തിട്ടുണ്ടെങ്കിൽ). ഗ്രൂപ്പ് ഐറ്റം ആണെങ്കിൽ, ചെസ്റ്റ് നമ്പറിന് പകരം ടീമിന്റെ പേര് നൽകുക (ഉദാ: BURAQ). ഒന്നിൽ കൂടുതൽ വിജയികൾ ഉണ്ടെങ്കിൽ കോമ (,) ഇട്ട് വേർതിരിക്കുക.
@@ -476,8 +472,8 @@
         // ===================================
         // Navigation Logic 
         // ===================================
-        function openAdminNav() { adminMenuOverlay.style.display = 'block'; setTimeout(() => { adminMenuOverlay.style.opacity = '1'; adminMenuBox.classList.add('open'); }, 10); }
-        function closeAdminNav() { adminMenuOverlay.style.opacity = '0'; adminMenuBox.classList.remove('open'); setTimeout(() => { adminMenuOverlay.style.display = 'none'; }, 300); }
+        function openAdminNav() { if(adminMenuOverlay && adminMenuBox) { adminMenuOverlay.style.display = 'block'; setTimeout(() => { adminMenuOverlay.style.opacity = '1'; adminMenuBox.classList.add('open'); }, 10); } }
+        function closeAdminNav() { if(adminMenuOverlay && adminMenuBox) { adminMenuOverlay.style.opacity = '0'; adminMenuBox.classList.remove('open'); setTimeout(() => { adminMenuOverlay.style.display = 'none'; }, 300); } }
         if(adminMenuBtn) adminMenuBtn.addEventListener('click', openAdminNav);
         if(adminMenuCloseBtn) adminMenuCloseBtn.addEventListener('click', closeAdminNav);
         if(adminMenuOverlay) adminMenuOverlay.addEventListener('click', (e) => { if (e.target === adminMenuOverlay) { closeAdminNav(); } });
@@ -583,7 +579,7 @@
         }
 
         // ===================================
-        // Participants Page
+        // Participants Page (FIXED Undefined Issue Check)
         // ===================================
         const downloadTemplateBtn = document.getElementById('download-template-btn');
         const importForm = document.getElementById('form-import-csv');
@@ -616,7 +612,7 @@
              if(importLog) importLog.textContent = 'Starting import... Please wait.\nDeleting existing participants...\n';
 
              deleteAllParticipants(false) 
-                 .then(() => {
+                 .then(() => { // This .then() block runs only if deletion was successful (or skipped internally)
                      if(importLog) importLog.textContent += 'Existing participants deleted.\nParsing CSV file...\n';
                      Papa.parse(file, {
                          header: true, skipEmptyLines: true,
@@ -648,8 +644,8 @@
                          error: (error) => { if(importLog) importLog.textContent += `\nCSV PARSE ERROR: ${error.message}\n`; }
                      });
                  })
-                 .catch(error => {
-                     if(importLog) importLog.textContent += `\nERROR DELETING OLD DATA: ${error.message}\nImport aborted.\n`;
+                 .catch(error => { // This .catch() block runs if deletion failed or was cancelled
+                     if(importLog) importLog.textContent += `\nERROR: ${error}\nImport aborted.\n`;
                  });
         });
 
@@ -658,34 +654,46 @@
              if (promptUser) {
                  confirmation = prompt('This will delete ALL participants. Type DELETE to confirm.');
              }
-             if (confirmation !== 'DELETE') {
-                 if (promptUser) alert('Deletion cancelled.');
-                 return Promise.reject('Deletion cancelled by user or skipped.'); 
+             // FIXED: Only reject if user explicitly cancels, not if prompt is skipped
+             if (promptUser && confirmation !== 'DELETE') { 
+                 alert('Deletion cancelled.');
+                 return Promise.reject('Deletion cancelled by user.'); 
              }
+             if (!promptUser && confirmation !== 'DELETE') { // Should not happen, but safeguard
+                 return Promise.reject('Internal skip.'); 
+             }
+
              try {
                  if (promptUser) alert('Deleting participants...');
                  const snapshot = await getDocs(collection(db, `artifacts/${appId}/public/data/participants`));
-                 if (snapshot.empty && promptUser) {
-                     alert('No participants found to delete.');
-                     return Promise.resolve(); 
+                 
+                 // If no docs and prompting, inform user. Otherwise resolve silently.
+                 if (snapshot.empty) {
+                     if (promptUser) alert('No participants found to delete.');
+                     return Promise.resolve(); // Successfully did nothing
                  }
+
                  const batch = writeBatch(db);
                  snapshot.docs.forEach(doc => { batch.delete(doc.ref); });
                  await batch.commit();
+                 
                  if (promptUser) alert('All participants have been deleted.');
-                 loadAllParticipants(); 
-                 return Promise.resolve(); 
+                 loadAllParticipants(); // Reload count
+                 return Promise.resolve(); // Success
              } catch (error) {
                  if (promptUser) alert(`Error deleting participants: ${error.message}`);
-                 return Promise.reject(error); 
+                 // Log error even if not prompting
+                 console.error("Error deleting participants:", error);
+                 return Promise.reject(`Error deleting participants: ${error.message}`); // Reject with error
              }
         }
        if(deleteAllParticipantsBtn) deleteAllParticipantsBtn.addEventListener('click', () => deleteAllParticipants(true)); 
 
-
         // ===================================
         // Programs & Categories Page
         // ===================================
+        // ... [Programs & Categories JS Code - Unchanged] ...
+        // ... (Includes creating delete buttons with pill styles) ...
         const categoryForm = document.getElementById('form-add-category');
         const categoryInput = document.getElementById('category-name');
         const categoryList = document.getElementById('category-list');
@@ -705,6 +713,7 @@
                  } else {
                      allCategories.forEach(cat => {
                          if (categoryList) {
+                             // UPDATED: Delete button style
                              categoryList.innerHTML += `
                                  <div class="list-item">
                                      <span class="list-item-name">${cat.name}</span>
@@ -732,6 +741,7 @@
                  } else {
                      allPrograms.forEach(prog => {
                          if (programList) {
+                              // UPDATED: Delete button style
                              programList.innerHTML += `
                                  <div class="list-item">
                                      <div class="list-item-content">
@@ -750,10 +760,10 @@
         if(programForm && programNameInput && programCategorySelect) programForm.addEventListener('submit', async (e) => { e.preventDefault(); const name = programNameInput.value.trim(); const category = programCategorySelect.value; if (!name || !category) return; try { await addDoc(collection(db, `artifacts/${appId}/public/data/programs`), { name, category }); programNameInput.value = ''; programCategorySelect.value = ''; loadPrograms(); } catch (error) { alert(`Error: ${error.message}`); }});
         window.deleteProgram = async (id) => { if (!confirm('Are you sure you want to delete this program?')) return; try { await deleteDoc(doc(db, `artifacts/${appId}/public/data/programs`, id)); await deleteDoc(doc(db, `artifacts/${appId}/public/data/results`, id)); loadPrograms(); } catch (error) { alert(`Error: ${error.message}`); }};
 
-
         // ===================================
         // Results Page
         // ===================================
+        // ... [Results JS Code - Unchanged] ...
         const resultForm = document.getElementById('form-publish-result');
         const resultProgramSelect = document.getElementById('result-program');
         const resultInputs = { 'first': document.getElementById('result-first'), 'second': document.getElementById('result-second'), 'third': document.getElementById('result-third') };
@@ -801,9 +811,7 @@
              clearNamePreviews();
              const progSelect = document.getElementById('result-program');
              if(progSelect) progSelect.value = programId; 
-
             if (!programId) return;
-
             try {
                 const docSnap = await getDoc(doc(db, `artifacts/${appId}/public/data/results`, programId));
                 if (docSnap.exists()) {
@@ -860,6 +868,7 @@
              sortedTeams.forEach(team => {
                  const teamElement = document.createElement('div');
                  teamElement.className = 'border border-gray-200 rounded-lg p-4 mb-4 bg-gray-50'; 
+                 // UPDATED: Buttons use pill styles
                  teamElement.innerHTML = `
                      <h3 class="text-xl font-bold text-gray-800 mb-4">${team.name}</h3>
                      <form class="space-y-4" data-team-id="${team.id}">
@@ -872,7 +881,7 @@
                              <div><label class="form-label">Chest No To</label><input type="number" class="form-input" value="${team.id_to || ''}" data-field="id_to"></div>
                          </div>
                          <div class="flex justify-end gap-3 pt-2">
-                             <button type="button" class="btn btn-danger btn-sm" onclick="deleteTeam('${team.id}')"><i class="fas fa-trash-alt"></i>Delete</button>
+                             <button type="button" class="btn btn-danger btn-sm btn-icon-only" onclick="deleteTeam('${team.id}')"><i class="fas fa-trash-alt"></i></button>
                              <button type="submit" class="btn btn-secondary btn-sm"><i class="fas fa-sync-alt"></i>Update Team</button>
                          </div>
                      </form>`;
@@ -942,7 +951,7 @@
         // ===================================
         const homepageForm = document.getElementById('form-homepage');
         const homepageFields = {
-            header_title: document.getElementById('homepage-header-title'), // NEW
+            header_title: document.getElementById('homepage-header-title'), 
             logo_url: document.getElementById('homepage-logo-url'),
             main_title: document.getElementById('homepage-main-title'),
             subtitle: document.getElementById('homepage-subtitle'),
@@ -953,11 +962,11 @@
             total_participants: document.getElementById('homepage-total-participants'),
             total_categories: document.getElementById('homepage-total-categories'),
             total_teams: document.getElementById('homepage-total-teams'),
-            institution_name: document.getElementById('homepage-institution-name'), // NEW
-            copyright_text: document.getElementById('homepage-copyright-text'), // NEW
-            social_instagram: document.getElementById('homepage-social-instagram'), // NEW
-            social_youtube: document.getElementById('homepage-social-youtube'), // NEW
-            social_facebook: document.getElementById('homepage-social-facebook') // NEW
+            institution_name: document.getElementById('homepage-institution-name'), 
+            copyright_text: document.getElementById('homepage-copyright-text'), 
+            social_instagram: document.getElementById('homepage-social-instagram'), 
+            social_youtube: document.getElementById('homepage-social-youtube'), 
+            social_facebook: document.getElementById('homepage-social-facebook') 
         };
 
         async function loadHomepageContent() {
@@ -965,7 +974,6 @@
                  const docSnap = await getDoc(doc(db, `artifacts/${appId}/public/data/config`, 'homepage'));
                  if (docSnap.exists()) {
                      const data = docSnap.data();
-                     // Add checks for each field before assigning value
                      Object.keys(homepageFields).forEach(key => {
                          if (homepageFields[key]) {
                              if (key === 'gallery') {
