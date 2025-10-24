@@ -4,8 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Team Status & Results 2025</title>
-    <!-- [FONT & ICON LINKS] -->
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Malayalam:wght@400;700&display=swap" rel="stylesheet">
+    <!-- [FONT & ICON LINKS] --><link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Malayalam:wght@400;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Saira:wght@700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
@@ -29,7 +28,7 @@
             --third-place-bg: #fff3e0;
         }
         html { scroll-behavior: smooth; }
-        body { margin: 0; padding: 0; background-color: var(--background-color); font-family: 'Inter', 'Noto Sans Malayalam', sans-serif; color: var(--text-color); padding-top: 90px; }
+        body { margin: 0; padding: 0; background-color: var(--background-color); font-family: 'Inter', 'Noto Sans Malayalam', sans-serif; color: var(--text-color); padding-top: 80px; /* Adjusted padding-top */ }
         * { box-sizing: border-box; }
         .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
         .sticky-header { position: fixed; top: 15px; left: 15px; right: 15px; max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; background-color: var(--card-background); padding: 10px 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); z-index: 1000; border-radius: 12px; transition: top 0.3s ease; }
@@ -59,6 +58,23 @@
         .home-section h2 { font-family: 'Saira', sans-serif; font-size: 2.5em; color: var(--heading-color); text-align: center; margin-bottom: 10px; }
         .home-section .section-subtitle { text-align: center; color: var(--subtle-text); margin-bottom: 40px; font-size: 1.1em; }
         #about-text { min-height: 100px; text-align: left; font-size: 1.1em; line-height: 1.7; }
+        
+        /* UPDATED: About Image Style (FIXED for mobile) */
+        #about-image {
+            width: 100%; /* Full width on mobile */
+            height: auto;
+            max-height: 250px; /* Max height on mobile */
+            object-fit: cover;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px var(--shadow-color);
+            margin: 24px 0;
+        }
+        @media (min-width: 768px) {
+            #about-image {
+                max-height: 400px; /* Larger max height on desktop */
+            }
+        }
+
         .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 20px; margin-top: 30px; }
         .stat-item { background-color: var(--card-background); padding: 20px; border-radius: 12px; box-shadow: 0 2px 8px var(--shadow-color); text-align: center; }
         .stat-item .value { font-size: 2em; font-weight: bold; color: var(--primary-color); }
@@ -78,17 +94,17 @@
             overflow-x: auto; 
             gap: 15px; 
             padding: 10px 0; 
-            min-height: 200px; /* Reduced min-height */
+            min-height: 200px; 
             -webkit-overflow-scrolling: touch; 
         }
         #gallery-container img { 
-            width: 180px;  /* FIXED: Set fixed width */
-            height: 180px; /* FIXED: Set fixed height */
+            width: 180px;  
+            height: 180px; 
             object-fit: cover; 
             border-radius: 12px; 
             box-shadow: 0 4px 12px var(--shadow-color); 
             transition: transform 0.3s; 
-            flex-shrink: 0; /* FIXED: Prevent wrapping */
+            flex-shrink: 0; 
         }
         #gallery-container img:hover { transform: scale(1.03); }
         #gallery-container::-webkit-scrollbar { height: 8px; }
@@ -207,7 +223,7 @@
             .main-tab-button { padding: 8px 12px; font-size: 0.8em; } 
             .header-container{ flex-direction: column; gap: 15px; } 
             .title-container{ text-align: center; }
-            .hero-section { min-height: calc(70vh - 90px); } /* FIXED: Reduced height further */
+            .hero-section { min-height: calc(70vh - 80px); } /* Adjusted based on new padding-top */
         }
         
         #loading-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--background-color); display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 9998; transition: opacity 0.5s ease; }
@@ -218,19 +234,16 @@
 </head>
 <body>
 
-    <!-- Loading Overlay -->
-    <div id="loading-overlay">
+    <!-- Loading Overlay --><div id="loading-overlay">
         <div class="spinner"></div>
         <p>Loading Live Data...</p>
     </div>
 
-    <!-- Header -->
-    <div class="sticky-header">
+    <!-- Header --><div class="sticky-header">
         <span class="header-title">Sadaye Madeena 2k25</span>
         <button class="menu-btn" onclick="openNav()" aria-label="Open menu"><i class="fas fa-bars"></i></button>
     </div>
-    <!-- Menu -->
-    <div id="menu-overlay" class="menu-overlay">
+    <!-- Menu --><div id="menu-overlay" class="menu-overlay">
         <div class="menu-box">
             <div class="menu-header">
                 <span class="header-title">MENU</span>
@@ -247,8 +260,7 @@
     <main id="main-content" style="visibility: hidden;">
         <div id="home-page">
             <div class="hero-section">
-                <!-- UPDATED: Hero section is now dynamic -->
-                <img src="https://placehold.co/150x150/FFFFFF/EFEFEF?text=Logo" alt="Art Fest Logo" class="logo" id="hero-logo" onerror="this.onerror=null;this.src='https://placehold.co/150x150/FFFFFF/EFEFEF?text=Logo';">
+                <!-- UPDATED: Hero section is now dynamic --><img src="https://placehold.co/150x150/FFFFFF/EFEFEF?text=Logo" alt="Art Fest Logo" class="logo" id="hero-logo" onerror="this.onerror=null;this.src='https://placehold.co/150x150/FFFFFF/EFEFEF?text=Logo';">
                 <h1 id="hero-main-title">Loading...</h1>
                 <p id="hero-subtitle">...</p>
                 <button class="primary-btn" onclick="showPage('scoreboard-page'); showMainTab('scoreboard-tab');">View Results</button>
@@ -264,15 +276,12 @@
                  <p class="section-subtitle">Thirunoor'25</p>
                 <p id="about-text" class="text-left text-lg leading-relaxed">Loading...</p>
                 
-                <!-- UPDATED: About image class (FIXED) -->
-                <img src="https://placehold.co/800x400/EFEFEF/CCCCCC?text=Event+Image" 
+                <!-- UPDATED: About image class (FIXED) --><img src="https://placehold.co/800x400/EFEFEF/CCCCCC?text=Event+Image" 
                      alt="About Fest Image" 
                      id="about-image"
-                     class="w-full h-auto max-h-[250px] md:max-h-[400px] object-cover rounded-lg shadow-lg my-6"
                      onerror="this.onerror=null;this.src='https://placehold.co/800x400/EFEFEF/CCCCCC?text=Event+Image';">
                 
-                <!-- UPDATED: Stats are now dynamic from admin text -->
-                <div class="stats-grid">
+                <!-- UPDATED: Stats are now dynamic from admin text --><div class="stats-grid">
                     <div class="stat-item"><div class="value" id="stats-programs-public">...</div><div class="label">Programs</div></div>
                     <div class="stat-item"><div class="value" id="stats-participants-public">...</div><div class="label">Contestants</div></div>
                     <div class="stat-item"><div class="value" id="stats-categories-public">...</div><div class="label">Categories</div></div>
@@ -291,8 +300,7 @@
             <section id="gallery" class="home-section">
                 <h2>Image Gallery</h2>
                 <p class="section-subtitle">Discover and share beautiful moments</p>
-                <!-- UPDATED: Gallery container (CSS handles the scrolling) -->
-                <div id="gallery-container">
+                <!-- UPDATED: Gallery container (CSS handles the scrolling) --><div id="gallery-container">
                     <p id="gallery-placeholder" class="text-gray-500">Loading gallery...</p>
                 </div>
             </section>
@@ -320,8 +328,7 @@
                          <div class="filter-buttons" id="program-filter-buttons"><p class="text-gray-500">Loading filters...</p></div>
                      </div>
                      <div id="program-results-grid">
-                         <!-- Results will be dynamically inserted here -->
-                     </div>
+                         <!-- Results will be dynamically inserted here --></div>
                 </div>
                 <div id="scoreboard-tab" class="main-tab-content">
                     <div class="filter-controls">
@@ -336,8 +343,7 @@
         </div>
     </main>
 
-    <!-- Firebase SDK -->
-    <script type="module">
+    <!-- Firebase SDK --><script type="module">
         // Firebase Config
         const firebaseConfig = {
             apiKey: "AIzaSyDBfnce5gtJhW9u1xwU2FVPQGx2KvG1vw8",
@@ -509,7 +515,7 @@
 
         function generateFilterButtons() { const programFiltersEl = document.getElementById('program-filter-buttons'); const scoreboardFiltersEl = document.getElementById('scoreboard-filter-buttons'); let buttonsHtml = `<button class="filter-btn active" data-filter="all" onclick="filterResults('all')">All</button>`; (dbCategories || []).forEach(cat => { buttonsHtml += `<button class="filter-btn" data-filter="${cat.name}" onclick="filterResults('${cat.name}')">${cat.name}</button>`; }); buttonsHtml += `<button class="filter-btn" data-filter="group" onclick="filterResults('group')">Group</button>`; programFiltersEl.innerHTML = buttonsHtml; let scoreboardButtonsHtml = ''; (dbCategories || []).forEach((cat, index) => { scoreboardButtonsHtml += `<button class="filter-btn ${index === 0 ? 'active' : ''}" data-filter="${cat.name}" onclick="filterScoreboard('${cat.name}')">${cat.name}</button>`; }); scoreboardButtonsHtml += `<button class="filter-btn" data-filter="group" onclick="filterScoreboard('group')">Group</button>`; scoreboardFiltersEl.innerHTML = scoreboardButtonsHtml; }
         function generateTeamCards() { const rankedTeams = Object.values(processedTeamData).sort((a, b) => b.total - a.total); const container = document.getElementById('team-cards-container'); container.innerHTML = ''; const cardClasses = ['champion', 'first-runner-up', 'second-runner-up']; const positionTexts = ['Champions', 'First Runners-up', 'Second Runners-up']; const iconClasses = ['fas fa-crown', 'fas fa-medal', 'fas fa-medal']; rankedTeams.forEach((team, i) => { container.innerHTML += `<div class="team-card ${cardClasses[i] || ''}"><div class="icon"><i class="${iconClasses[i] || 'fas fa-award'}"></i></div><div class="team-name">${team.name}</div><p class="points"><b>${team.total}</b></p><p class="position">${positionTexts[i] || `#${i + 1} Position`}</p></div>`; }); }
-        function generateDetailedRankings() { const container = document.getElementById('detailed-rankings'); const rankedTeams = Object.values(processedTeamData).sort((a, b) => b.total - a.total); const maxScore = rankedTeams.length > 0 ? rankedTeams[0].total : 0; let headerCols = '', gridTemplateCols = '40px 1.5fr'; (dbCategories || []).forEach(cat => { headerCols += `<div>${cat.name}</div>`; gridTemplateCols += ' 0.8fr'; }); headerCols += `<div>Group</div>`; gridTemplateCols += ' 0.8fr 1fr 1fr'; let tableHtml = `<div class="rankings-table-content" style="min-width: ${700 + (dbCategories || []).length * 80}px;"><div class="ranking-header" style="grid-template-columns: ${gridTemplateCols};"><div>Rank</div><div>Team</div>${headerCols}<div>Total</div><div>Progress</div></div>`; rankedTeams.forEach((team, index) => { const rank = index + 1; const progress = maxScore > 0 ? (team.total / maxScore) * 100 : 0; let pointsCols = ''; (dbCategories || []).forEach((cat, i) => { pointsCols += `<div><span class="points-pill default-pill-${(i % 6) + 1}">${team[cat.name] || 0}</span></div>`; }); pointsCols += `<div><span class="points-pill group">${team['group'] || 0}</span></div>`; tableHtml += `<div class="ranking-row" style="grid-template-columns: ${gridTemplateCols};"><div><span class="rank-cell rank-${rank}">${rank}</span></div><div class="team-name-cell">${team.name}</div>${pointsCols}<div class="total-points-cell">${team.total}</div><td><div class="progress-circle-container"><div class="progress-circle" style="--p:${progress};"><span class="progress-circle-text">${Math.round(progress)}%</span></div></div></td></div>`; }); tableHtml += '</div>'; container.innerHTML = `<h2>Detailed Rankings</h2><p>Complete scoreboard with detailed breakdown by category</p>${tableHtml}`; }
+        function generateDetailedRankings() { const container = document.getElementById('detailed-rankings'); const rankedTeams = Object.values(processedTeamData).sort((a, b) => b.total - a.total); const maxScore = rankedTeams.length > 0 ? rankedTeams[0].total : 0; let headerCols = '', gridTemplateCols = '40px 1.5fr'; (dbCategories || []).forEach(cat => { headerCols += `<div>${cat.name}</div>`; gridTemplateCols += ' 0.8fr'; }); headerCols += `<div>Group</div>`; gridTemplateCols += ' 0.8fr 1fr 1fr'; let tableHtml = `<div class="rankings-table-content" style="min-width: ${700 + (dbCategories || []).length * 80}px;"><div class="ranking-header" style="grid-template-columns: ${gridTemplateCols};"><div>Rank</div><div>Team</div>${headerCols}<div>Total</div><div>Progress</div></div>`; rankedTeams.forEach((team, index) => { const rank = index + 1; const progress = maxScore > 0 ? (team.total / maxScore) * 100 : 0; let pointsCols = ''; (dbCategories || []).forEach((cat, i) => { pointsCols += `<div><span class="points-pill default-pill-${(i % 6) + 1}">${team[cat.name] || 0}</span></div>`; }); pointsCols += `<div><span class="points-pill group">${team['group'] || 0}</span></div>`; tableHtml += `<div class="ranking-row" style="grid-template-columns: ${gridTemplateCols};"><div><span class="rank-cell rank-${rank}">#${rank}</span></div><div class="team-name-cell">${team.name}</div>${pointsCols}<div class="total-points-cell">${team.total}</div><td><div class="progress-circle-container"><div class="progress-circle" style="--p:${progress};"><span class="progress-circle-text">${Math.round(progress)}%</span></div></div></td></div>`; }); tableHtml += '</div>'; container.innerHTML = `<h2>Detailed Rankings</h2><p>Complete scoreboard with detailed breakdown by category</p>${tableHtml}`; }
         function renderProgramResults() {
             const grid = document.getElementById('program-results-grid');
             grid.innerHTML = '';
