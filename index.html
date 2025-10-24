@@ -60,7 +60,6 @@
         .home-section .section-subtitle { text-align: center; color: var(--subtle-text); margin-bottom: 40px; font-size: 1.1em; }
         #about-text { min-height: 100px; text-align: left; font-size: 1.1em; line-height: 1.7; }
         
-        /* About Image Style */
         #about-image { width: 100%; height: auto; max-height: 250px; object-fit: cover; border-radius: 12px; box-shadow: 0 4px 12px var(--shadow-color); margin: 24px 0; }
         @media (min-width: 768px) { #about-image { max-height: 400px; } }
 
@@ -77,67 +76,68 @@
         .leader-info div { display: flex; justify-content: space-between; padding: 8px 0; }
         .leader-info div span:first-child { color: var(--subtle-text); }
         
-        /* NEW: Gallery Layout (3 Rows) */
+        /* UPDATED: New Gallery Layout */
         #gallery-rows-container {
             display: flex;
             flex-direction: column;
-            gap: 15px; /* Space between rows */
-            min-height: 200px; 
+            gap: 20px; /* Increased gap between rows */
+            min-height: 350px; /* Adjusted min height */
         }
         .gallery-row { 
             display: flex; 
             overflow-x: auto; 
-            gap: 15px; 
-            padding: 5px 0; /* Add some vertical padding */
+            /* Enable snapping */
+            scroll-snap-type: x mandatory; 
             -webkit-overflow-scrolling: touch; 
+            scroll-behavior: smooth; /* Smooth scrolling animation */
+            padding: 10px 0; /* Add padding for visual spacing */
         }
-        .gallery-row::-webkit-scrollbar { height: 6px; } /* Slightly thinner scrollbar */
+        .gallery-row::-webkit-scrollbar { height: 6px; } 
         .gallery-row::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 3px; }
         .gallery-row::-webkit-scrollbar-thumb:hover { background: #ccc; }
 
         .gallery-item-wrapper {
-            position: relative; /* Needed for absolute positioning of share button */
-            flex-shrink: 0; 
-            display: inline-block; /* Helps with alignment in scroll */
+            position: relative; 
+            flex: 0 0 100%; /* Each item takes full width of the container */
+            max-width: 80%; /* Limit width slightly on larger screens */
+            margin: 0 auto; /* Center the item */
+            scroll-snap-align: center; /* Snap items to the center */
+            display: flex; /* Use flexbox for centering image */
+            justify-content: center;
         }
 
         .gallery-item-wrapper img { 
-            width: 180px;  
-            height: 180px; 
+            width: auto; /* Allow image to determine width based on height */
+            max-width: 100%; /* Ensure image doesn't overflow */
+            height: 300px; /* FIXED: Set a fixed vertical height */
             object-fit: cover; 
-            border-radius: 12px; 
-            box-shadow: 0 4px 12px var(--shadow-color); 
+            border-radius: 16px; /* Slightly larger radius */
+            box-shadow: 0 6px 15px var(--shadow-color); /* Enhanced shadow */
             transition: transform 0.3s; 
-            display: block; /* Remove extra space below image */
         }
-        .gallery-item-wrapper img:hover { transform: scale(1.03); }
+        .gallery-item-wrapper img:hover { transform: scale(1.02); } /* Subtle hover */
 
-        /* NEW: Share Button Style */
         .share-btn {
             position: absolute;
-            top: 8px;
-            right: 8px;
-            background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent background */
+            top: 12px;
+            right: 12px;
+            background-color: rgba(0, 0, 0, 0.5); 
             color: white;
             border: none;
             border-radius: 50%;
-            width: 32px;
-            height: 32px;
+            width: 36px; /* Slightly larger */
+            height: 36px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 0.9em;
+            font-size: 1em; /* Adjusted size */
             cursor: pointer;
             transition: background-color 0.2s;
-            z-index: 2; /* Make sure it's above the image */
+            z-index: 2; 
         }
-        .share-btn:hover {
-            background-color: rgba(0, 0, 0, 0.7);
-        }
-        .share-btn i {
-            pointer-events: none; /* Make icon unclickable */
-        }
-
+        .share-btn:hover { background-color: rgba(0, 0, 0, 0.7); }
+        .share-btn i { pointer-events: none; }
+        
         #scoreboard-page { display: none; }
         /* ... [Rest of the CSS styles remain unchanged] ... */
         .main-tab-buttons-wrapper { background: var(--card-background); padding: 15px; border-radius: 16px; margin-bottom: 25px; box-shadow: 0 4px 12px var(--shadow-color); }
@@ -244,7 +244,7 @@
         @media (min-width: 992px) { .card-container { flex-wrap: nowrap; align-items: flex-end; gap: 10px; } .team-card { width: 33%; } .team-card.champion { order: 2; transform: scale(1.1) translateY(-10px); } .team-card.first-runner-up { order: 1; } .team-card.second-runner-up { order: 3; } .team-card:hover { transform: scale(1.05) translateY(-6px); } .team-card.champion:hover { transform: scale(1.15) translateY(-16px); } }
         @media (min-width: 768px) and (max-width: 991px) { .card-container { max-width: 700px; margin-left: auto; margin-right: auto; } }
         
-        /* UPDATED: Mobile responsive rules */
+        /* Mobile responsive rules */
         @media(max-width: 600px) { 
             .container { padding: 10px; } 
             .main-tab-buttons { gap: 5px; } 
@@ -252,6 +252,9 @@
             .header-container{ flex-direction: column; gap: 15px; } 
             .title-container{ text-align: center; }
             .hero-section { min-height: calc(70vh - 80px); } 
+            /* Gallery adjustments for mobile */
+            .gallery-item-wrapper { max-width: 90%; } /* Slightly wider on mobile */
+            .gallery-item-wrapper img { height: 250px; } /* Slightly shorter images on mobile */
         }
         
         #loading-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--background-color); display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 9998; transition: opacity 0.5s ease; }
@@ -299,7 +302,8 @@
 <img src="https://placehold.co/150x150/FFFFFF/EFEFEF?text=Logo" alt="Art Fest Logo" class="logo" id="hero-logo" onerror="this.onerror=null;this.src='https://placehold.co/150x150/FFFFFF/EFEFEF?text=Logo';">
                 <h1 id="hero-main-title">Loading...</h1>
                 <p id="hero-subtitle">...</p>
-                <button class="primary-btn" onclick="showPage('scoreboard-page'); showMainTab('scoreboard-tab');">View Results</button>
+                <!-- UPDATED: Button onclick -->
+                <button class="primary-btn" onclick="showPage('scoreboard-page'); showMainTab('program-tab');">View Results</button>
                 <div class="home-nav">
                     <a href="#about">About</a>
                     <a href="#leaders">Leaders</a>
@@ -449,7 +453,6 @@
             if (chestNumberMatch) {
                 const chestNumber = parseInt(chestNumberMatch[0], 10);
                 for (const team of Object.values(dbTeams)) {
-                    // Check if id_from and id_to are defined and are numbers before comparing
                     const idFrom = parseInt(team.id_from, 10);
                     const idTo = parseInt(team.id_to, 10);
                     if (!isNaN(idFrom) && !isNaN(idTo) && chestNumber >= idFrom && chestNumber <= idTo) {
@@ -556,7 +559,7 @@
             renderProgramResults();
             generateTalentList();
             generateScoreboard();
-            generateStaticContent(); // This will now render the 3-row gallery
+            generateStaticContent(); // This will now render the new gallery
             updateResultCounts();
             if (dbCategories.length > 0) filterScoreboard(dbCategories[0].name); else filterScoreboard('group');
             // Hide Loading Overlay
@@ -661,13 +664,16 @@
                     const rowIndex = index % 3; // Distribute images into 3 rows
                     const galleryItemHTML = `
                         <div class="gallery-item-wrapper">
-                            <img src="${imgUrl}" alt="Gallery Image ${index + 1}" loading="lazy" onerror="this.onerror=null;this.src='https://placehold.co/180x180/EFEFEF/CCCCCC?text=Image';">
+                            <img src="${imgUrl}" alt="Gallery Image ${index + 1}" loading="lazy" onerror="this.onerror=null;this.src='https://placehold.co/200x300/EFEFEF/CCCCCC?text=Image';">
                             <button class="share-btn" data-url="${imgUrl}" aria-label="Share image">
                                 <i class="fas fa-share-alt"></i>
                             </button>
                         </div>
                     `;
-                    galleryRowContainers[rowIndex].innerHTML += galleryItemHTML;
+                    // Ensure the row container exists before appending
+                    if (galleryRowContainers[rowIndex]) {
+                        galleryRowContainers[rowIndex].innerHTML += galleryItemHTML;
+                    }
                 });
             } else if (galleryPlaceholder) {
                 galleryPlaceholder.textContent = "Gallery images will appear here.";
@@ -682,7 +688,7 @@
         }
         
         // ===================================================================================
-        // UI & Event Handling (UPDATED for Share)
+        // UI & Event Handling (UPDATED for Share & Menu State)
         // ===================================================================================
         window.openNav = function() { document.getElementById("menu-overlay").style.display = "flex"; document.getElementById("main-content").style.filter = 'blur(4px)'; setTimeout(() => document.getElementById("menu-overlay").style.opacity = '1', 10); }
         window.closeNav = function() { document.getElementById("menu-overlay").style.opacity = '0'; setTimeout(() => document.getElementById("menu-overlay").style.display = "none", 300); document.getElementById("main-content").style.filter = 'none'; }
@@ -693,7 +699,29 @@
         window.updateResultCounts = function() { const el = document.getElementById('team-results-count'); if (el) el.innerText = `Team point status after ${publishedResultsCount} results`; }
         window.getTrophyIconsHTML = function(positions) { if (!positions || positions.length === 0) return ''; return positions.map(pos => { if (pos === 1) return '<i class="fas fa-trophy trophy-icon gold"></i>'; if (pos === 2) return '<i class="fas fa-trophy trophy-icon silver"></i>'; if (pos === 3) return '<i class="fas fa-trophy trophy-icon bronze"></i>'; return ''; }).join(''); }
         window.toggleTalentDropdown = function(listId, button) { const list = document.getElementById(listId); list.classList.toggle('open'); button.textContent = list.classList.contains('open') ? 'Show Less' : 'Show More'; }
-        window.updateMenuActiveState = function() { const homePageVisible = document.getElementById('home-page').style.display !== 'none'; document.querySelectorAll('.menu-link').forEach(link => link.classList.remove('active')); if (homePageVisible) { document.querySelector('.menu-link[data-target="home-page"]').classList.add('active'); } else { const activeTab = document.querySelector('#scoreboard-page .main-tab-button.active'); if (activeTab) { const tabId = activeTab.getAttribute('onclick').match(/'([^']+)'/)[1]; const activeMenuLink = document.querySelector(`.menu-link[data-target="${tabId}"]`); if (activeMenuLink) activeMenuLink.classList.add('active'); } } }
+        
+        // UPDATED: updateMenuActiveState ensures HOME is active correctly
+        window.updateMenuActiveState = function() { 
+            const homePageVisible = document.getElementById('home-page').style.display !== 'none'; 
+            document.querySelectorAll('.menu-link').forEach(link => link.classList.remove('active')); 
+            
+            if (homePageVisible) { 
+                const homeLink = document.querySelector('.menu-link[data-target="home-page"]');
+                if (homeLink) homeLink.classList.add('active'); 
+            } else { 
+                const activeTabButton = document.querySelector('#scoreboard-page .main-tab-button.active'); 
+                if (activeTabButton) { 
+                    const tabId = activeTabButton.getAttribute('onclick').match(/'([^']+)'/)[1]; 
+                    const activeMenuLink = document.querySelector(`.menu-link[data-target="${tabId}"]`); 
+                    if (activeMenuLink) activeMenuLink.classList.add('active'); 
+                } else {
+                    // Fallback if no tab button is active (shouldn't happen often)
+                    const programLink = document.querySelector('.menu-link[data-target="program-tab"]');
+                    if (programLink) programLink.classList.add('active');
+                }
+            } 
+        }
+
         window.fireTeamConfetti = function() { if (!window.confetti) return; const end = Date.now() + (2 * 1000); (function frame() { if (Date.now() > end) return; confetti({ particleCount: 2, angle: 60, spread: 55, origin: { x: 0 } }); confetti({ particleCount: 2, angle: 120, spread: 55, origin: { x: 1 } }); requestAnimationFrame(frame); }()); }
 
         // NEW: Share Functionality
@@ -708,25 +736,19 @@
                     console.log('Image shared successfully');
                 } catch (err) {
                     console.error('Error sharing image:', err);
-                    // Fallback maybe?
-                    alert('Sharing failed. You can copy the link manually.');
+                    alert('Sharing failed.');
                 }
             } else {
-                // Fallback for browsers that don't support navigator.share
                 try {
-                    // Try copying URL to clipboard
-                    // Note: This might not work in all contexts (e.g., if not HTTPS or user denies permission)
-                    // Using document.execCommand as navigator.clipboard might fail in iframe
                     const textArea = document.createElement("textarea");
                     textArea.value = imageUrl;
-                    textArea.style.position = "fixed"; // Avoid scrolling to bottom
+                    textArea.style.position = "fixed"; 
                     document.body.appendChild(textArea);
                     textArea.focus();
                     textArea.select();
                     document.execCommand('copy');
                     document.body.removeChild(textArea);
                     alert('Sharing not supported, but image link copied to clipboard!');
-
                 } catch (err) {
                     alert('Sharing is not supported on this browser. Please copy the link manually.');
                     console.error('Fallback copy failed:', err);
@@ -734,11 +756,14 @@
             }
         }
 
-        // Add event listener for share buttons (using event delegation)
+        // Add event listener for share buttons (using event delegation on the gallery section)
         document.getElementById('gallery').addEventListener('click', function(event) {
-            if (event.target.classList.contains('share-btn')) {
-                const imageUrl = event.target.dataset.url;
+            // Find the closest share button ancestor
+            const shareButton = event.target.closest('.share-btn');
+            if (shareButton) {
+                const imageUrl = shareButton.dataset.url;
                 if (imageUrl) {
+                    event.stopPropagation(); // Prevent other clicks if needed
                     shareImage(imageUrl);
                 }
             }
@@ -772,8 +797,9 @@
         onSnapshot(query(collection(db, `artifacts/${appId}/public/data/participants`)), (snapshot) => { dbParticipants = {}; snapshot.docs.forEach(doc => { dbParticipants[doc.id] = doc.data(); }); loadStatus.participants = true; checkAllDataLoaded(); }, (e) => { console.error("Error loading participants: ", e); dbParticipants = {}; loadStatus.participants = true; checkAllDataLoaded(); });
         
         window.onload = function() {
-            showPage('home-page');
-            showMainTab('team-tab');
+            showPage('home-page'); // Start on home page
+            updateMenuActiveState(); // Ensure home menu link is active on load
+            showMainTab('team-tab'); // Set default active tab for scoreboard page (though it's hidden initially)
         };
 
     </script>
