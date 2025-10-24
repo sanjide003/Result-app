@@ -4,7 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Team Status & Results 2025</title>
-    <!-- [FONT & ICON LINKS] --><link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Malayalam:wght@400;700&display=swap" rel="stylesheet">
+    <!-- [FONT & ICON LINKS] -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Malayalam:wght@400;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Saira:wght@700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
@@ -28,7 +29,7 @@
             --third-place-bg: #fff3e0;
         }
         html { scroll-behavior: smooth; }
-        body { margin: 0; padding: 0; background-color: var(--background-color); font-family: 'Inter', 'Noto Sans Malayalam', sans-serif; color: var(--text-color); padding-top: 80px; /* Adjusted padding-top */ }
+        body { margin: 0; padding: 0; background-color: var(--background-color); font-family: 'Inter', 'Noto Sans Malayalam', sans-serif; color: var(--text-color); padding-top: 80px; }
         * { box-sizing: border-box; }
         .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
         .sticky-header { position: fixed; top: 15px; left: 15px; right: 15px; max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; background-color: var(--card-background); padding: 10px 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); z-index: 1000; border-radius: 12px; transition: top 0.3s ease; }
@@ -59,21 +60,9 @@
         .home-section .section-subtitle { text-align: center; color: var(--subtle-text); margin-bottom: 40px; font-size: 1.1em; }
         #about-text { min-height: 100px; text-align: left; font-size: 1.1em; line-height: 1.7; }
         
-        /* UPDATED: About Image Style (FIXED for mobile) */
-        #about-image {
-            width: 100%; /* Full width on mobile */
-            height: auto;
-            max-height: 250px; /* Max height on mobile */
-            object-fit: cover;
-            border-radius: 12px;
-            box-shadow: 0 4px 12px var(--shadow-color);
-            margin: 24px 0;
-        }
-        @media (min-width: 768px) {
-            #about-image {
-                max-height: 400px; /* Larger max height on desktop */
-            }
-        }
+        /* About Image Style */
+        #about-image { width: 100%; height: auto; max-height: 250px; object-fit: cover; border-radius: 12px; box-shadow: 0 4px 12px var(--shadow-color); margin: 24px 0; }
+        @media (min-width: 768px) { #about-image { max-height: 400px; } }
 
         .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 20px; margin-top: 30px; }
         .stat-item { background-color: var(--card-background); padding: 20px; border-radius: 12px; box-shadow: 0 2px 8px var(--shadow-color); text-align: center; }
@@ -88,30 +77,69 @@
         .leader-info div { display: flex; justify-content: space-between; padding: 8px 0; }
         .leader-info div span:first-child { color: var(--subtle-text); }
         
-        /* UPDATED: Gallery Style (FIXED) */
-        #gallery-container { 
+        /* NEW: Gallery Layout (3 Rows) */
+        #gallery-rows-container {
+            display: flex;
+            flex-direction: column;
+            gap: 15px; /* Space between rows */
+            min-height: 200px; 
+        }
+        .gallery-row { 
             display: flex; 
             overflow-x: auto; 
             gap: 15px; 
-            padding: 10px 0; 
-            min-height: 200px; 
+            padding: 5px 0; /* Add some vertical padding */
             -webkit-overflow-scrolling: touch; 
         }
-        #gallery-container img { 
+        .gallery-row::-webkit-scrollbar { height: 6px; } /* Slightly thinner scrollbar */
+        .gallery-row::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 3px; }
+        .gallery-row::-webkit-scrollbar-thumb:hover { background: #ccc; }
+
+        .gallery-item-wrapper {
+            position: relative; /* Needed for absolute positioning of share button */
+            flex-shrink: 0; 
+            display: inline-block; /* Helps with alignment in scroll */
+        }
+
+        .gallery-item-wrapper img { 
             width: 180px;  
             height: 180px; 
             object-fit: cover; 
             border-radius: 12px; 
             box-shadow: 0 4px 12px var(--shadow-color); 
             transition: transform 0.3s; 
-            flex-shrink: 0; 
+            display: block; /* Remove extra space below image */
         }
-        #gallery-container img:hover { transform: scale(1.03); }
-        #gallery-container::-webkit-scrollbar { height: 8px; }
-        #gallery-container::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 4px; }
-        #gallery-container::-webkit-scrollbar-thumb:hover { background: #ccc; }
-        
+        .gallery-item-wrapper img:hover { transform: scale(1.03); }
+
+        /* NEW: Share Button Style */
+        .share-btn {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent background */
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9em;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            z-index: 2; /* Make sure it's above the image */
+        }
+        .share-btn:hover {
+            background-color: rgba(0, 0, 0, 0.7);
+        }
+        .share-btn i {
+            pointer-events: none; /* Make icon unclickable */
+        }
+
         #scoreboard-page { display: none; }
+        /* ... [Rest of the CSS styles remain unchanged] ... */
         .main-tab-buttons-wrapper { background: var(--card-background); padding: 15px; border-radius: 16px; margin-bottom: 25px; box-shadow: 0 4px 12px var(--shadow-color); }
         .main-tab-buttons { display: flex; justify-content: center; gap: 5px; flex-wrap: wrap; }
         .main-tab-button { padding: 8px 16px; background: #f1f5f9; border: none; border-radius: 50px; font-size: 0.9em; font-weight: bold; color: var(--subtle-text); cursor: pointer; transition: all 0.3s ease; }
@@ -223,7 +251,7 @@
             .main-tab-button { padding: 8px 12px; font-size: 0.8em; } 
             .header-container{ flex-direction: column; gap: 15px; } 
             .title-container{ text-align: center; }
-            .hero-section { min-height: calc(70vh - 80px); } /* Adjusted based on new padding-top */
+            .hero-section { min-height: calc(70vh - 80px); } 
         }
         
         #loading-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--background-color); display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 9998; transition: opacity 0.5s ease; }
@@ -234,16 +262,22 @@
 </head>
 <body>
 
-    <!-- Loading Overlay --><div id="loading-overlay">
+    
+
+<div id="loading-overlay">
         <div class="spinner"></div>
         <p>Loading Live Data...</p>
     </div>
 
-    <!-- Header --><div class="sticky-header">
+    
+
+<div class="sticky-header">
         <span class="header-title">Sadaye Madeena 2k25</span>
         <button class="menu-btn" onclick="openNav()" aria-label="Open menu"><i class="fas fa-bars"></i></button>
     </div>
-    <!-- Menu --><div id="menu-overlay" class="menu-overlay">
+    
+
+<div id="menu-overlay" class="menu-overlay">
         <div class="menu-box">
             <div class="menu-header">
                 <span class="header-title">MENU</span>
@@ -260,7 +294,9 @@
     <main id="main-content" style="visibility: hidden;">
         <div id="home-page">
             <div class="hero-section">
-                <!-- UPDATED: Hero section is now dynamic --><img src="https://placehold.co/150x150/FFFFFF/EFEFEF?text=Logo" alt="Art Fest Logo" class="logo" id="hero-logo" onerror="this.onerror=null;this.src='https://placehold.co/150x150/FFFFFF/EFEFEF?text=Logo';">
+                
+
+<img src="https://placehold.co/150x150/FFFFFF/EFEFEF?text=Logo" alt="Art Fest Logo" class="logo" id="hero-logo" onerror="this.onerror=null;this.src='https://placehold.co/150x150/FFFFFF/EFEFEF?text=Logo';">
                 <h1 id="hero-main-title">Loading...</h1>
                 <p id="hero-subtitle">...</p>
                 <button class="primary-btn" onclick="showPage('scoreboard-page'); showMainTab('scoreboard-tab');">View Results</button>
@@ -276,12 +312,16 @@
                  <p class="section-subtitle">Thirunoor'25</p>
                 <p id="about-text" class="text-left text-lg leading-relaxed">Loading...</p>
                 
-                <!-- UPDATED: About image class (FIXED) --><img src="https://placehold.co/800x400/EFEFEF/CCCCCC?text=Event+Image" 
+                
+
+<img src="https://placehold.co/800x400/EFEFEF/CCCCCC?text=Event+Image" 
                      alt="About Fest Image" 
                      id="about-image"
                      onerror="this.onerror=null;this.src='https://placehold.co/800x400/EFEFEF/CCCCCC?text=Event+Image';">
                 
-                <!-- UPDATED: Stats are now dynamic from admin text --><div class="stats-grid">
+                
+
+<div class="stats-grid">
                     <div class="stat-item"><div class="value" id="stats-programs-public">...</div><div class="label">Programs</div></div>
                     <div class="stat-item"><div class="value" id="stats-participants-public">...</div><div class="label">Contestants</div></div>
                     <div class="stat-item"><div class="value" id="stats-categories-public">...</div><div class="label">Categories</div></div>
@@ -300,9 +340,15 @@
             <section id="gallery" class="home-section">
                 <h2>Image Gallery</h2>
                 <p class="section-subtitle">Discover and share beautiful moments</p>
-                <!-- UPDATED: Gallery container (CSS handles the scrolling) --><div id="gallery-container">
+                
+                <!-- NEW: 3 Gallery Rows Structure -->
+                <div id="gallery-rows-container">
+                    <div class="gallery-row" id="gallery-row-0"></div>
+                    <div class="gallery-row" id="gallery-row-1"></div>
+                    <div class="gallery-row" id="gallery-row-2"></div>
                     <p id="gallery-placeholder" class="text-gray-500">Loading gallery...</p>
                 </div>
+
             </section>
         </div>
 
@@ -328,7 +374,9 @@
                          <div class="filter-buttons" id="program-filter-buttons"><p class="text-gray-500">Loading filters...</p></div>
                      </div>
                      <div id="program-results-grid">
-                         <!-- Results will be dynamically inserted here --></div>
+                         
+
+</div>
                 </div>
                 <div id="scoreboard-tab" class="main-tab-content">
                     <div class="filter-controls">
@@ -343,7 +391,9 @@
         </div>
     </main>
 
-    <!-- Firebase SDK --><script type="module">
+    
+
+<script type="module">
         // Firebase Config
         const firebaseConfig = {
             apiKey: "AIzaSyDBfnce5gtJhW9u1xwU2FVPQGx2KvG1vw8",
@@ -399,13 +449,17 @@
             if (chestNumberMatch) {
                 const chestNumber = parseInt(chestNumberMatch[0], 10);
                 for (const team of Object.values(dbTeams)) {
-                    if (team.id_from && team.id_to && chestNumber >= team.id_from && chestNumber <= team.id_to) {
+                    // Check if id_from and id_to are defined and are numbers before comparing
+                    const idFrom = parseInt(team.id_from, 10);
+                    const idTo = parseInt(team.id_to, 10);
+                    if (!isNaN(idFrom) && !isNaN(idTo) && chestNumber >= idFrom && chestNumber <= idTo) {
                         return team.name;
                     }
                 }
             }
             return null;
         }
+
 
         function initializeTeamData() { 
             const data = {}; 
@@ -491,7 +545,7 @@
         }
 
         // ===================================================================================
-        // Rendering Functions (No Changes)
+        // Rendering Functions (UPDATED generateStaticContent)
         // ===================================================================================
         
         function renderAllComponents() {
@@ -502,7 +556,7 @@
             renderProgramResults();
             generateTalentList();
             generateScoreboard();
-            generateStaticContent();
+            generateStaticContent(); // This will now render the 3-row gallery
             updateResultCounts();
             if (dbCategories.length > 0) filterScoreboard(dbCategories[0].name); else filterScoreboard('group');
             // Hide Loading Overlay
@@ -570,15 +624,23 @@
             });
         }
         function generateScoreboard() { const container = document.getElementById('scoreboard-table-content'); let scoreboardHtml = ''; for (const eventName in processedScoreboardData.eventPoints) { const eventData = processedScoreboardData.eventPoints[eventName]; scoreboardHtml += `<div class="scoreboard-card" data-category="${eventData.category}" data-event-name="${eventName}"><div class="scoreboard-event-header"><span>Program Name:</span><span>${eventName.replace('________NO ONE','')}</span></div>${TEAM_NAMES.map(team => `<div class="scoreboard-team-row"><span>${team}:</span><span>${eventData[team].points} ${getTrophyIconsHTML(eventData[team].positions)}</span></div>`).join('')}</div>`; } scoreboardHtml += `<div class="scoreboard-card total-card" id="scoreboard-total-card"><h3>TOTALS</h3><p id="scoreboard-category-count" class="category-count-text"></p>${TEAM_NAMES.map(team => `<div class="scoreboard-team-row"><span>${team}:</span> <span data-team="${team}">0</span></div>`).join('')}</div><div class="scoreboard-legend"><span><i class="fas fa-trophy gold"></i> Gold</span> <span><i class="fas fa-trophy silver"></i> Silver</span> <span><i class="fas fa-trophy bronze"></i> Bronze</span></div>`; container.innerHTML = scoreboardHtml; }
+        
+        // UPDATED: generateStaticContent for 3-row gallery and share buttons
         function generateStaticContent() {
             if (dbHomepage == null || dbTeams == null) return; // Guard
             const leaderContainer = document.getElementById('leader-cards-container');
-            const galleryContainer = document.getElementById('gallery-container');
-            const leaderPlaceholder = document.getElementById('leader-placeholder');
             const galleryPlaceholder = document.getElementById('gallery-placeholder');
+            const galleryRowContainers = [
+                document.getElementById('gallery-row-0'),
+                document.getElementById('gallery-row-1'),
+                document.getElementById('gallery-row-2')
+            ];
+            const leaderPlaceholder = document.getElementById('leader-placeholder');
+            
             document.getElementById('hero-logo').src = dbHomepage.logo_url || 'https://placehold.co/150x150/FFFFFF/EFEFEF?text=Logo';
             document.getElementById('hero-main-title').innerText = dbHomepage.main_title || 'Event Title';
             document.getElementById('hero-subtitle').innerText = dbHomepage.subtitle || 'Event Subtitle';
+            
             const rankedTeams = Object.values(processedTeamData).sort((a,b) => b.total - a.total);
             if (rankedTeams.length > 0 && Object.keys(dbTeams).length > 0) {
                 if(leaderPlaceholder) leaderPlaceholder.style.display = 'none';
@@ -589,15 +651,28 @@
             } else if (leaderPlaceholder) {
                 leaderPlaceholder.textContent = "Team leaders will appear here once teams are added in admin panel.";
             }
-            galleryContainer.innerHTML = '';
+
+            // Clear previous gallery content
+            galleryRowContainers.forEach(row => row.innerHTML = ''); 
+
             if (dbHomepage.gallery && dbHomepage.gallery.length > 0) {
                 if(galleryPlaceholder) galleryPlaceholder.style.display = 'none';
-                dbHomepage.gallery.forEach(imgUrl => {
-                    galleryContainer.innerHTML += `<img src="${imgUrl}" alt="Gallery Image" onerror="this.onerror=null;this.src='https://placehold.co/300x200/EFEFEF/CCCCCC?text=Image';">`;
+                dbHomepage.gallery.forEach((imgUrl, index) => {
+                    const rowIndex = index % 3; // Distribute images into 3 rows
+                    const galleryItemHTML = `
+                        <div class="gallery-item-wrapper">
+                            <img src="${imgUrl}" alt="Gallery Image ${index + 1}" loading="lazy" onerror="this.onerror=null;this.src='https://placehold.co/180x180/EFEFEF/CCCCCC?text=Image';">
+                            <button class="share-btn" data-url="${imgUrl}" aria-label="Share image">
+                                <i class="fas fa-share-alt"></i>
+                            </button>
+                        </div>
+                    `;
+                    galleryRowContainers[rowIndex].innerHTML += galleryItemHTML;
                 });
             } else if (galleryPlaceholder) {
                 galleryPlaceholder.textContent = "Gallery images will appear here.";
             }
+            
             document.getElementById('about-text').innerText = dbHomepage.about || 'About text will be updated soon.';
             document.getElementById('about-image').src = dbHomepage.about_image_url || 'https://placehold.co/800x400/EFEFEF/CCCCCC?text=Event+Image';
             document.getElementById('stats-programs-public').textContent = dbHomepage.total_programs || '...';
@@ -607,7 +682,7 @@
         }
         
         // ===================================================================================
-        // UI & Event Handling (No Changes)
+        // UI & Event Handling (UPDATED for Share)
         // ===================================================================================
         window.openNav = function() { document.getElementById("menu-overlay").style.display = "flex"; document.getElementById("main-content").style.filter = 'blur(4px)'; setTimeout(() => document.getElementById("menu-overlay").style.opacity = '1', 10); }
         window.closeNav = function() { document.getElementById("menu-overlay").style.opacity = '0'; setTimeout(() => document.getElementById("menu-overlay").style.display = "none", 300); document.getElementById("main-content").style.filter = 'none'; }
@@ -620,6 +695,55 @@
         window.toggleTalentDropdown = function(listId, button) { const list = document.getElementById(listId); list.classList.toggle('open'); button.textContent = list.classList.contains('open') ? 'Show Less' : 'Show More'; }
         window.updateMenuActiveState = function() { const homePageVisible = document.getElementById('home-page').style.display !== 'none'; document.querySelectorAll('.menu-link').forEach(link => link.classList.remove('active')); if (homePageVisible) { document.querySelector('.menu-link[data-target="home-page"]').classList.add('active'); } else { const activeTab = document.querySelector('#scoreboard-page .main-tab-button.active'); if (activeTab) { const tabId = activeTab.getAttribute('onclick').match(/'([^']+)'/)[1]; const activeMenuLink = document.querySelector(`.menu-link[data-target="${tabId}"]`); if (activeMenuLink) activeMenuLink.classList.add('active'); } } }
         window.fireTeamConfetti = function() { if (!window.confetti) return; const end = Date.now() + (2 * 1000); (function frame() { if (Date.now() > end) return; confetti({ particleCount: 2, angle: 60, spread: 55, origin: { x: 0 } }); confetti({ particleCount: 2, angle: 120, spread: 55, origin: { x: 1 } }); requestAnimationFrame(frame); }()); }
+
+        // NEW: Share Functionality
+        async function shareImage(imageUrl) {
+            if (navigator.share) {
+                try {
+                    await navigator.share({
+                        title: 'Sadaye Madeena 2k25 Gallery Image',
+                        text: 'Check out this image from the fest!',
+                        url: imageUrl // Share the direct image URL
+                    });
+                    console.log('Image shared successfully');
+                } catch (err) {
+                    console.error('Error sharing image:', err);
+                    // Fallback maybe?
+                    alert('Sharing failed. You can copy the link manually.');
+                }
+            } else {
+                // Fallback for browsers that don't support navigator.share
+                try {
+                    // Try copying URL to clipboard
+                    // Note: This might not work in all contexts (e.g., if not HTTPS or user denies permission)
+                    // Using document.execCommand as navigator.clipboard might fail in iframe
+                    const textArea = document.createElement("textarea");
+                    textArea.value = imageUrl;
+                    textArea.style.position = "fixed"; // Avoid scrolling to bottom
+                    document.body.appendChild(textArea);
+                    textArea.focus();
+                    textArea.select();
+                    document.execCommand('copy');
+                    document.body.removeChild(textArea);
+                    alert('Sharing not supported, but image link copied to clipboard!');
+
+                } catch (err) {
+                    alert('Sharing is not supported on this browser. Please copy the link manually.');
+                    console.error('Fallback copy failed:', err);
+                }
+            }
+        }
+
+        // Add event listener for share buttons (using event delegation)
+        document.getElementById('gallery').addEventListener('click', function(event) {
+            if (event.target.classList.contains('share-btn')) {
+                const imageUrl = event.target.dataset.url;
+                if (imageUrl) {
+                    shareImage(imageUrl);
+                }
+            }
+        });
+
 
         // ===================================================================================
         // Application Initialization (FIXED v6.3)
@@ -635,64 +759,17 @@
             participants: false
         };
 
-        // This function now handles both initial load and updates
         function checkAllDataLoaded() {
-            // If already loaded, just re-process the data
-            if (allDataLoaded) {
-                processAllData(dbResults);
-                return;
-            }
-
-            // If not loaded, check if all flags are set
-            if (loadStatus.results && loadStatus.programs && loadStatus.teams && loadStatus.homepage && loadStatus.categories && loadStatus.participants) {
-                allDataLoaded = true;
-                console.log("All data loaded. Processing...");
-                processAllData(dbResults);
-            }
+            if (allDataLoaded) { processAllData(dbResults); return; }
+            if (loadStatus.results && loadStatus.programs && loadStatus.teams && loadStatus.homepage && loadStatus.categories && loadStatus.participants) { allDataLoaded = true; console.log("All data loaded. Processing..."); processAllData(dbResults); }
         }
 
-        // --- Listeners (FIXED v6.3) ---
-        // I am initializing the data variables to empty {} or [] first.
-        
-        onSnapshot(query(collection(db, `artifacts/${appId}/public/data/results`)), (snapshot) => { 
-            dbResults = {}; 
-            snapshot.docs.forEach(doc => { dbResults[doc.id] = doc.data(); }); 
-            loadStatus.results = true; 
-            checkAllDataLoaded();
-        }, (e) => { console.error("Error loading results: ", e); dbResults = {}; loadStatus.results = true; checkAllDataLoaded(); });
-        
-        onSnapshot(query(collection(db, `artifacts/${appId}/public/data/programs`)), (snapshot) => { 
-            dbPrograms = {}; 
-            snapshot.docs.forEach(doc => { dbPrograms[doc.id] = doc.data(); }); 
-            loadStatus.programs = true; 
-            checkAllDataLoaded();
-        }, (e) => { console.error("Error loading programs: ", e); dbPrograms = {}; loadStatus.programs = true; checkAllDataLoaded(); });
-        
-        onSnapshot(query(collection(db, `artifacts/${appId}/public/data/teams`)), (snapshot) => { 
-            dbTeams = {}; 
-            snapshot.docs.forEach(doc => { dbTeams[doc.id] = doc.data(); }); 
-            loadStatus.teams = true; 
-            checkAllDataLoaded();
-        }, (e) => { console.error("Error loading teams: ", e); dbTeams = {}; loadStatus.teams = true; checkAllDataLoaded(); });
-        
-        onSnapshot(doc(db, `artifacts/${appId}/public/data/config`, 'homepage'), (docSnap) => { 
-            dbHomepage = docSnap.exists() ? docSnap.data() : {}; 
-            loadStatus.homepage = true; 
-            checkAllDataLoaded();
-        }, (e) => { console.error("Error loading homepage: ", e); dbHomepage = {}; loadStatus.homepage = true; checkAllDataLoaded(); });
-        
-        onSnapshot(query(collection(db, `artifacts/${appId}/public/data/categories`)), (snapshot) => { 
-            dbCategories = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })).sort((a,b) => a.name.localeCompare(b.name)); 
-            loadStatus.categories = true; 
-            checkAllDataLoaded();
-        }, (e) => { console.error("Error loading categories: ", e); dbCategories = []; loadStatus.categories = true; checkAllDataLoaded(); });
-        
-        onSnapshot(query(collection(db, `artifacts/${appId}/public/data/participants`)), (snapshot) => { 
-            dbParticipants = {}; 
-            snapshot.docs.forEach(doc => { dbParticipants[doc.id] = doc.data(); }); 
-            loadStatus.participants = true; 
-            checkAllDataLoaded();
-        }, (e) => { console.error("Error loading participants: ", e); dbParticipants = {}; loadStatus.participants = true; checkAllDataLoaded(); });
+        onSnapshot(query(collection(db, `artifacts/${appId}/public/data/results`)), (snapshot) => { dbResults = {}; snapshot.docs.forEach(doc => { dbResults[doc.id] = doc.data(); }); loadStatus.results = true; checkAllDataLoaded(); }, (e) => { console.error("Error loading results: ", e); dbResults = {}; loadStatus.results = true; checkAllDataLoaded(); });
+        onSnapshot(query(collection(db, `artifacts/${appId}/public/data/programs`)), (snapshot) => { dbPrograms = {}; snapshot.docs.forEach(doc => { dbPrograms[doc.id] = doc.data(); }); loadStatus.programs = true; checkAllDataLoaded(); }, (e) => { console.error("Error loading programs: ", e); dbPrograms = {}; loadStatus.programs = true; checkAllDataLoaded(); });
+        onSnapshot(query(collection(db, `artifacts/${appId}/public/data/teams`)), (snapshot) => { dbTeams = {}; snapshot.docs.forEach(doc => { dbTeams[doc.id] = doc.data(); }); loadStatus.teams = true; checkAllDataLoaded(); }, (e) => { console.error("Error loading teams: ", e); dbTeams = {}; loadStatus.teams = true; checkAllDataLoaded(); });
+        onSnapshot(doc(db, `artifacts/${appId}/public/data/config`, 'homepage'), (docSnap) => { dbHomepage = docSnap.exists() ? docSnap.data() : {}; loadStatus.homepage = true; checkAllDataLoaded(); }, (e) => { console.error("Error loading homepage: ", e); dbHomepage = {}; loadStatus.homepage = true; checkAllDataLoaded(); });
+        onSnapshot(query(collection(db, `artifacts/${appId}/public/data/categories`)), (snapshot) => { dbCategories = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })).sort((a,b) => a.name.localeCompare(b.name)); loadStatus.categories = true; checkAllDataLoaded(); }, (e) => { console.error("Error loading categories: ", e); dbCategories = []; loadStatus.categories = true; checkAllDataLoaded(); });
+        onSnapshot(query(collection(db, `artifacts/${appId}/public/data/participants`)), (snapshot) => { dbParticipants = {}; snapshot.docs.forEach(doc => { dbParticipants[doc.id] = doc.data(); }); loadStatus.participants = true; checkAllDataLoaded(); }, (e) => { console.error("Error loading participants: ", e); dbParticipants = {}; loadStatus.participants = true; checkAllDataLoaded(); });
         
         window.onload = function() {
             showPage('home-page');
