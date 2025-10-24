@@ -23,14 +23,14 @@
         .btn-light { @apply bg-white text-gray-700 border border-gray-300 hover:bg-gray-50 focus:ring-indigo-500; }
         .btn-success { @apply bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 focus:ring-green-500; }
         .btn-sm { @apply px-3 py-1.5 text-sm; }
-        .btn-icon-only { @apply p-2; /* Adjusted padding */ }
+        .btn-icon-only { @apply p-2; }
         .btn-icon-only i { @apply m-0 h-5 w-5; }
         
         /* Modern Form & Card Styles */
         .form-input, .form-select, .form-textarea { @apply block w-full px-4 py-2.5 border border-gray-300 rounded-lg bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500; transition: all 0.2s ease-in-out; }
         .form-label { @apply block text-sm font-medium text-gray-700 mb-1.5; }
-        .card { @apply bg-white shadow-xl rounded-2xl p-6 md:p-8; /* Increased padding */ }
-        .card-header { @apply text-2xl font-bold text-gray-900 mb-6; /* Increased margin */ }
+        .card { @apply bg-white shadow-xl rounded-2xl p-6 md:p-8; }
+        .card-header { @apply text-2xl font-bold text-gray-900 mb-6; }
         
         /* Malayalam Instruction Box */
         .info-text { @apply bg-blue-50 text-blue-800 p-4 border border-blue-200 rounded-lg text-sm mb-6; }
@@ -138,11 +138,12 @@
             </header>
             
             <!-- Page Content Area -->
-            <main class="p-4 md:p-8 lg:p-10 max-w-4xl mx-auto"> {/* Centered content */}
+            <main class="p-4 md:p-8 lg:p-10 max-w-4xl mx-auto"> 
                 
                 {/* --- Home Page Settings --- */}
                 <div id="page-dashboard" class="admin-page">
-                    <h1 class="text-3xl font-bold text-gray-900 mb-6">Home Page Settings</h1>
+                    {/* ... [Home page content unchanged] ... */}
+                     <h1 class="text-3xl font-bold text-gray-900 mb-6">Home Page Settings</h1>
                     <div class="info-text">
                        <strong>നിർദ്ദേശം:</strong> വെബ്സൈറ്റിന്റെ പ്രധാന പേജിൽ (ഹോം പേജ്) കാണിക്കേണ്ട വിവരങ്ങൾ ഇവിടെ നൽകുക. ലോഗോ, പ്രധാന തലക്കെട്ട്, ഉപ തലക്കെട്ട്, എബൗട്ട് വിവരണം, എബൗട്ട് ചിത്രം, ഗാലറി ചിത്രങ്ങൾ, സ്ഥിതിവിവരക്കണക്കുകൾ (ടെക്സ്റ്റ്) എന്നിവ ഇവിടെ മാറ്റം വരുത്താം. ചിത്രങ്ങളുടെ URL (ലിങ്ക്) ആണ് നൽകേണ്ടത്.
                     </div>
@@ -214,7 +215,8 @@
 
                 {/* --- Participants Import --- */}
                 <div id="page-participants" class="admin-page hidden">
-                    <h1 class="text-3xl font-bold text-gray-900 mb-6">Import Participants</h1>
+                     {/* ... [Participants content unchanged] ... */}
+                     <h1 class="text-3xl font-bold text-gray-900 mb-6">Import Participants</h1>
                     <div class="info-text">
                         <strong>നിർദ്ദേശം:</strong> എല്ലാ മത്സരാർത്ഥികളെയും ഒരു CSV (Excel) ഫയൽ വഴി ഇവിടെ ഇമ്പോർട്ട് ചെയ്യാം.
                         <br>1. ആദ്യം <strong>"Download Template"</strong> ബട്ടൺ ക്ലിക്ക് ചെയ്ത് ഫയൽ ഡൗൺലോഡ് ചെയ്യുക.
@@ -257,6 +259,7 @@
 
                 {/* --- Programs & Categories --- */}
                 <div id="page-programs" class="admin-page hidden">
+                    {/* ... [Programs content unchanged] ... */}
                      <h1 class="text-3xl font-bold text-gray-900 mb-6">Manage Programs & Categories</h1>
                      <div class="info-text">
                         <strong>നിർദ്ദേശം:</strong> ഇവിടെ മത്സരങ്ങളുടെ കാറ്റഗറികളും (ഉദാ: Junior, Senior) ഓരോ മത്സരങ്ങളും ചേർക്കാം. ആദ്യം കാറ്റഗറികൾ ചേർക്കുക, പിന്നീട് പ്രോഗ്രാമുകൾ ചേർക്കുമ്പോൾ ആ കാറ്റഗറി തിരഞ്ഞെടുക്കാം.
@@ -304,9 +307,10 @@
                      </div>
                 </div>
 
-                {/* --- Manage Teams (UPDATED UI) --- */}
+                {/* --- Manage Teams (Improved UI) --- */}
                 <div id="page-teams" class="admin-page hidden">
-                    <h1 class="text-3xl font-bold text-gray-900 mb-6">Manage Teams</h1>
+                    {/* ... [Teams content with improved UI from v6.2] ... */}
+                     <h1 class="text-3xl font-bold text-gray-900 mb-6">Manage Teams</h1>
                     <div class="info-text">
                         <strong>നിർദ്ദേശം:</strong> പുതിയ ടീമുകളെ ചേർക്കാനും നിലവിലുള്ള ടീമുകളുടെ വിവരങ്ങൾ (ലീഡർ, അസിസ്റ്റന്റ് ലീഡർ, ചെസ്റ്റ് നമ്പർ പരിധി) മാറ്റം വരുത്താനും ഇവിടെ സാധിക്കും. ചെസ്റ്റ് നമ്പർ പരിധി (From, To) കൃത്യമായി നൽകുന്നത് റിസൾട്ട് പബ്ലിഷ് ചെയ്യുമ്പോൾ ടീമിനെ ഓട്ടോമാറ്റിക് ആയി കണ്ടെത്താൻ സഹായിക്കും.
                     </div>
@@ -358,26 +362,27 @@
 
                 {/* --- Publish Results --- */}
                 <div id="page-results" class="admin-page hidden">
-                    <h1 class="text-3xl font-bold text-gray-900 mb-6">Publish & Update Results</h1>
+                     {/* ... [Results content unchanged] ... */}
+                     <h1 class="text-3xl font-bold text-gray-900 mb-6">Publish & Update Results</h1>
                     <div class="info-text">
                         <strong>നിർദ്ദേശം:</strong> ഒരു പ്രോഗ്രാം സെലക്ട് ചെയ്യുക. ശേഷം, വിജയിയുടെ ചെസ്റ്റ് നമ്പർ ടൈപ്പ് ചെയ്യുമ്പോൾ, പേര് ഓട്ടോമാറ്റിക്കായി വലതുവശത്ത് വരും (നിങ്ങൾ "Participants" ടാബിൽ നിന്ന് ഇമ്പോർട്ട് ചെയ്തിട്ടുണ്ടെങ്കിൽ). ഗ്രൂപ്പ് ഐറ്റം ആണെങ്കിൽ, ചെസ്റ്റ് നമ്പറിന് പകരം ടീമിന്റെ പേര് നൽകുക (ഉദാ: BURAQ). ഒന്നിൽ കൂടുതൽ വിജയികൾ ഉണ്ടെങ്കിൽ കോമ (,) ഇട്ട് വേർതിരിക്കുക.
                     </div>
                     <div class="card mb-6">
                         <form id="form-publish-result">
-                            <div class="mb-6"> {/* Increased margin */}
+                            <div class="mb-6"> 
                                 <label for="result-program" class="form-label">Select Program</label>
                                 <select id="result-program" class="form-select" required>
                                     <option value="">Loading programs...</option>
                                 </select>
                             </div>
                             
-                            <div class="space-y-6"> {/* Added space between winner sections */}
+                            <div class="space-y-6"> 
                                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 items-start">
                                     <div>
                                         <label for="result-first" class="form-label">1st Place (Chest No/Team)</label>
                                         <input type="text" id="result-first" class="form-input" placeholder="e.g., 101 or BURAQ">
                                     </div>
-                                    <div class="pt-1 md:pt-7"> {/* Align name preview */}
+                                    <div class="pt-1 md:pt-7"> 
                                         <span id="name-first" class="text-sm font-medium text-indigo-600 block h-5"></span>
                                     </div>
                                 </div>
@@ -401,7 +406,7 @@
                                 </div>
                             </div>
                            
-                            <div class="flex justify-end mt-8"> {/* Increased top margin */}
+                            <div class="flex justify-end mt-8"> 
                                 <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i>Publish Result</button>
                             </div>
                         </form>
@@ -414,7 +419,7 @@
 
     <!-- Firebase SDK & Admin Logic -->
     <script type="module">
-        // Firebase Config (v6.1 - Ensure measurementId exists if getAnalytics is called)
+        // Firebase Config
         const firebaseConfig = {
             apiKey: "AIzaSyDBfnce5gtJhW9u1xwU2FVPQGx2KvG1vw8",
             authDomain: "result25.firebaseapp.com",
@@ -422,7 +427,7 @@
             storageBucket: "result25.firebasestorage.app",
             messagingSenderId: "1099340945335",
             appId: "1:1099340945335:web:4fdc63db6bf6b40a30ba32",
-            measurementId: "G-S4BJW3N642" // Make sure this line exists
+            measurementId: "G-S4BJW3N642" 
         };
         
         // Canvas Env Vars
@@ -434,23 +439,25 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js";
         import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-auth.js";
         import { getFirestore, doc, setDoc, addDoc, getDoc, getDocs, deleteDoc, collection, onSnapshot, query, writeBatch, updateDoc } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-firestore.js";
-        // import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-analytics.js"; // Optional: Only if you need analytics
-
+        
         // Initialize Firebase
         const app = initializeApp(finalFirebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
-        // const analytics = getAnalytics(app); // Optional
 
-        // --- [JavaScript Logic - Mostly unchanged from v6, includes Participants, Results with names, etc.] ---
+        // --- [JavaScript Logic - RESTORED Authentication & other logic] ---
         // Global state
         let allPrograms = [];
         let allCategories = [];
-        let allParticipants = {}; // Stores participant data { "101": { name: "...", team: "..." } }
-        let allTeamsAdmin = {}; // Stores team data for admin editing
+        let allParticipants = {}; 
+        let allTeamsAdmin = {}; 
 
-        // DOM Elements (Add new ones as needed)
-        // ... (loginPage, adminPanel, loginForm, etc.) ...
+        // DOM Elements
+        const loginPage = document.getElementById('login-page');
+        const adminPanel = document.getElementById('admin-panel');
+        const loginForm = document.getElementById('login-form');
+        const registerForm = document.getElementById('register-form');
+        const logoutButton = document.getElementById('logout-button');
         const adminEmail = document.getElementById('admin-email');
         const pages = document.querySelectorAll('.admin-page');
         const adminMenuOverlay = document.getElementById('admin-menu-overlay');
@@ -460,7 +467,7 @@
         const navLinks = document.querySelectorAll('.menu-link');
 
         // ===================================
-        // Navigation Logic
+        // Navigation Logic 
         // ===================================
         function openAdminNav() { adminMenuOverlay.style.display = 'block'; setTimeout(() => { adminMenuOverlay.style.opacity = '1'; adminMenuBox.classList.add('open'); }, 10); }
         function closeAdminNav() { adminMenuOverlay.style.opacity = '0'; adminMenuBox.classList.remove('open'); setTimeout(() => { adminMenuOverlay.style.display = 'none'; }, 300); }
@@ -478,7 +485,6 @@
                 navLinks.forEach(nav => nav.classList.remove('active'));
                 link.classList.add('active');
                 closeAdminNav();
-                // Load data for the activated page
                 loadDataForPage(targetId);
             });
         });
@@ -493,32 +499,90 @@
         }
 
         // ===================================
-        // Authentication
+        // Authentication (RESTORED)
         // ===================================
-        const loginPage = document.getElementById('login-page');
-        const adminPanel = document.getElementById('admin-panel');
-        const loginForm = document.getElementById('login-form');
-        const registerForm = document.getElementById('register-form');
-        const logoutButton = document.getElementById('logout-button');
-
         onAuthStateChanged(auth, (user) => {
             if (user) {
-                loginPage.style.display = 'none'; adminPanel.style.display = 'block';
+                loginPage.style.display = 'none'; 
+                adminPanel.style.display = 'block';
                 adminEmail.textContent = user.email;
-                loadDataForPage('page-dashboard'); // Load default page data
+                // Activate the default page and load its data
+                const defaultPageId = 'page-dashboard';
+                pages.forEach(page => page.classList.add('hidden'));
+                document.getElementById(defaultPageId).classList.remove('hidden');
+                navLinks.forEach(nav => nav.classList.remove('active'));
+                document.querySelector(`.menu-link[data-target="${defaultPageId}"]`).classList.add('active');
+                loadDataForPage(defaultPageId); // Load default page data
                 loadAllParticipants(); // Load participants data on login
             } else {
-                loginPage.style.display = 'flex'; adminPanel.style.display = 'none';
+                loginPage.style.display = 'flex'; 
+                adminPanel.style.display = 'none';
             }
         });
-        loginForm.addEventListener('submit', async (e) => { e.preventDefault(); try { await signInWithEmailAndPassword(auth, document.getElementById('login-email').value, document.getElementById('login-password').value); } catch (error) { alert(`Login Failed: ${error.message}`); }});
-        registerForm.addEventListener('submit', async (e) => { e.preventDefault(); try { await createUserWithEmailAndPassword(auth, document.getElementById('register-email').value, document.getElementById('register-password').value); alert('Admin user registered! Please login.'); registerForm.reset(); } catch (error) { alert(`Registration Failed: ${error.message}`); }});
-        logoutButton.addEventListener('click', async () => { await signOut(auth); });
+        
+        // RESTORED: Login Form Event Listener
+        if(loginForm) {
+            loginForm.addEventListener('submit', async (e) => { 
+                e.preventDefault(); 
+                const email = document.getElementById('login-email').value;
+                const password = document.getElementById('login-password').value;
+                if (!email || !password) {
+                    alert("Please enter both email and password.");
+                    return;
+                }
+                try { 
+                    await signInWithEmailAndPassword(auth, email, password); 
+                    // onAuthStateChanged will handle UI changes
+                } catch (error) { 
+                    alert(`Login Failed: ${error.message}`); 
+                }
+            });
+        } else {
+            console.error("Login form not found!");
+        }
+
+        // RESTORED: Register Form Event Listener
+        if(registerForm) {
+            registerForm.addEventListener('submit', async (e) => { 
+                e.preventDefault(); 
+                 const email = document.getElementById('register-email').value;
+                 const password = document.getElementById('register-password').value;
+                 if (!email || !password) {
+                     alert("Please enter both email and password.");
+                     return;
+                 }
+                try { 
+                    await createUserWithEmailAndPassword(auth, email, password); 
+                    alert('Admin user registered! Please login.'); 
+                    registerForm.reset(); 
+                } catch (error) { 
+                    alert(`Registration Failed: ${error.message}`); 
+                }
+            });
+        } else {
+             console.error("Register form not found!");
+        }
+
+        // RESTORED: Logout Button Event Listener
+        if(logoutButton) {
+            logoutButton.addEventListener('click', async () => { 
+                try {
+                    await signOut(auth);
+                    // onAuthStateChanged will handle UI changes
+                } catch(error) {
+                    alert(`Logout Failed: ${error.message}`);
+                }
+            });
+        } else {
+             console.error("Logout button not found!");
+        }
+
 
         // ===================================
         // Participants Page
         // ===================================
-        const downloadTemplateBtn = document.getElementById('download-template-btn');
+        // ... [Participants JS Code - Unchanged] ...
+         const downloadTemplateBtn = document.getElementById('download-template-btn');
         const importForm = document.getElementById('form-import-csv');
         const fileInput = document.getElementById('csv-file-input');
         const fileNameEl = document.getElementById('csv-filename');
@@ -586,18 +650,15 @@
                  });
         });
 
-        // Modified function to allow skipping prompt
         async function deleteAllParticipants(promptUser = true) {
              let confirmation = 'DELETE'; // Assume confirmation if promptUser is false
              if (promptUser) {
                  confirmation = prompt('This will delete ALL participants. Type DELETE to confirm.');
              }
-
              if (confirmation !== 'DELETE') {
                  if (promptUser) alert('Deletion cancelled.');
                  return Promise.reject('Deletion cancelled by user or skipped.'); // Return a rejected promise
              }
-
              try {
                  if (promptUser) alert('Deleting participants...');
                  const snapshot = await getDocs(collection(db, `artifacts/${appId}/public/data/participants`));
@@ -622,7 +683,8 @@
         // ===================================
         // Programs & Categories Page
         // ===================================
-        const categoryForm = document.getElementById('form-add-category');
+        // ... [Programs & Categories JS Code - Unchanged] ...
+         const categoryForm = document.getElementById('form-add-category');
         const categoryInput = document.getElementById('category-name');
         const categoryList = document.getElementById('category-list');
         const programForm = document.getElementById('form-add-program');
@@ -678,10 +740,12 @@
         programForm.addEventListener('submit', async (e) => { e.preventDefault(); const name = programNameInput.value.trim(); const category = programCategorySelect.value; if (!name || !category) return; try { await addDoc(collection(db, `artifacts/${appId}/public/data/programs`), { name, category }); programNameInput.value = ''; programCategorySelect.value = ''; loadPrograms(); } catch (error) { alert(`Error: ${error.message}`); }});
         window.deleteProgram = async (id) => { if (!confirm('Are you sure you want to delete this program?')) return; try { await deleteDoc(doc(db, `artifacts/${appId}/public/data/programs`, id)); // Also delete result if exists await deleteDoc(doc(db, `artifacts/${appId}/public/data/results`, id)); loadPrograms(); } catch (error) { alert(`Error: ${error.message}`); }};
 
+
         // ===================================
         // Results Page
         // ===================================
-        const resultForm = document.getElementById('form-publish-result');
+        // ... [Results JS Code - Unchanged] ...
+         const resultForm = document.getElementById('form-publish-result');
         const resultProgramSelect = document.getElementById('result-program');
         const resultInputs = { 'first': document.getElementById('result-first'), 'second': document.getElementById('result-second'), 'third': document.getElementById('result-third') };
         const nameSpans = { 'first': document.getElementById('name-first'), 'second': document.getElementById('name-second'), 'third': document.getElementById('name-third') };
@@ -724,7 +788,8 @@
         // ===================================
         // Teams Page (Admin)
         // ===================================
-        const teamForm = document.getElementById('form-add-team');
+        // ... [Teams JS Code - Unchanged] ...
+         const teamForm = document.getElementById('form-add-team');
         const teamListAdmin = document.getElementById('team-list-admin');
 
         async function loadTeamsForAdmin() {
@@ -740,13 +805,10 @@
                  teamListAdmin.innerHTML = '<p class="text-gray-500 italic">No teams added yet.</p>';
                  return;
              }
-
-             // Sort teams alphabetically by name before rendering
              const sortedTeams = Object.values(allTeamsAdmin).sort((a, b) => a.name.localeCompare(b.name));
-
              sortedTeams.forEach(team => {
                  const teamElement = document.createElement('div');
-                 teamElement.className = 'border border-gray-200 rounded-lg p-4 mb-4 bg-gray-50'; // Card-like appearance
+                 teamElement.className = 'border border-gray-200 rounded-lg p-4 mb-4 bg-gray-50'; 
                  teamElement.innerHTML = `
                      <h3 class="text-xl font-bold text-gray-800 mb-4">${team.name}</h3>
                      <form class="space-y-4" data-team-id="${team.id}">
@@ -777,30 +839,24 @@
                      </form>
                  `;
                  teamListAdmin.appendChild(teamElement);
-
-                 // Add submit listener for each update form
                  const updateForm = teamElement.querySelector('form');
                  updateForm.addEventListener('submit', handleUpdateTeam);
              });
         }
 
-
         teamForm.addEventListener('submit', async (e) => {
              e.preventDefault();
-             const name = document.getElementById('team-name').value.trim().toUpperCase(); // Ensure uppercase
+             const name = document.getElementById('team-name').value.trim().toUpperCase(); 
              const leader = document.getElementById('team-leader').value.trim();
              const asst = document.getElementById('team-asst').value.trim();
              const id_from = document.getElementById('team-id-from').value;
              const id_to = document.getElementById('team-id-to').value;
-
              if (!name) { alert("Team Name is required."); return; }
-
              const teamData = { name, leader, asst };
              if (id_from) teamData.id_from = parseInt(id_from, 10);
              if (id_to) teamData.id_to = parseInt(id_to, 10);
-
              try {
-                 await setDoc(doc(db, `artifacts/${appId}/public/data/teams`, name), teamData); // Use name as ID
+                 await setDoc(doc(db, `artifacts/${appId}/public/data/teams`, name), teamData); 
                  alert(`Team ${name} added successfully!`);
                  teamForm.reset();
                  loadTeamsForAdmin(); // Refresh list
@@ -810,46 +866,39 @@
         async function handleUpdateTeam(e) {
              e.preventDefault();
              const form = e.target;
-             const teamId = form.dataset.teamId; // This is the team name (used as ID)
+             const teamId = form.dataset.teamId; 
              if (!teamId) return;
-
-             const updatedData = {
-                 name: teamId // Name doesn't change, it's the ID
-             };
+             const updatedData = { name: teamId };
              form.querySelectorAll('input[data-field]').forEach(input => {
                  const field = input.dataset.field;
                  let value = input.value.trim();
-                 // Convert number fields
                  if (field === 'id_from' || field === 'id_to') {
-                     value = value ? parseInt(value, 10) : null; // Store as number or null
+                     value = value ? parseInt(value, 10) : null; 
                  }
                  updatedData[field] = value;
              });
-
              try {
                  await setDoc(doc(db, `artifacts/${appId}/public/data/teams`, teamId), updatedData);
                  alert(`Team ${teamId} updated successfully!`);
-                 allTeamsAdmin[teamId] = { id: teamId, ...updatedData }; // Update local cache
-                 // No need to re-render the whole list, just provide feedback
+                 allTeamsAdmin[teamId] = { id: teamId, ...updatedData }; 
              } catch (error) { alert(`Error updating team: ${error.message}`); }
         }
-
 
         window.deleteTeam = async (id) => {
              if (!confirm(`Are you sure you want to delete team ${id}? This cannot be undone.`)) return;
              try {
                  await deleteDoc(doc(db, `artifacts/${appId}/public/data/teams`, id));
                  alert(`Team ${id} deleted successfully!`);
-                 delete allTeamsAdmin[id]; // Remove from local cache
-                 renderAdminTeamList(); // Re-render the list
+                 delete allTeamsAdmin[id]; 
+                 renderAdminTeamList(); 
              } catch (error) { alert(`Error deleting team: ${error.message}`); }
         };
-
 
         // ===================================
         // Home Page Content (Admin)
         // ===================================
-        const homepageForm = document.getElementById('form-homepage');
+        // ... [Homepage JS Code - Unchanged] ...
+         const homepageForm = document.getElementById('form-homepage');
         const homepageFields = {
             logo_url: document.getElementById('homepage-logo-url'),
             main_title: document.getElementById('homepage-main-title'),
