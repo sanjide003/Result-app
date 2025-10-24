@@ -9,26 +9,56 @@
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
     <style>
         body { font-family: 'Roboto', sans-serif; }
-        .sidebar { transition: width 0.3s ease; }
-        .sidebar-link .link-text { transition: opacity 0.3s ease, transform 0.3s ease; }
-        .sidebar-collapsed .link-text { opacity: 0; transform: translateX(-10px); pointer-events: none; }
-        .sidebar-collapsed .sidebar-link { justify-content: center; }
-        .sidebar-collapsed .sidebar-link i { margin-right: 0; }
-        .sidebar-link { display: flex; align-items: center; padding: 0.75rem 1rem; border-radius: 0.5rem; transition: all 0.3s ease; }
-        .sidebar-link i { width: 1.5rem; margin-right: 0.75rem; text-align: center; }
-        .sidebar-link:hover, .sidebar-link.active { background-color: #4f46e5; color: white; }
         
-        .main-content { transition: margin-left 0.3s ease; }
-
+        /* New Button Styles */
+        .btn { 
+            @apply px-5 py-2.5 rounded-lg font-semibold text-white shadow-lg focus:outline-none focus:ring-2 focus:ring-opacity-75 transition-all duration-300 ease-in-out; 
+            transform: translateZ(0); /* For GPU acceleration */
+        }
+        .btn:hover {
+            @apply shadow-xl -translate-y-0.5;
+        }
+        .btn:active {
+            @apply shadow-md translate-y-0;
+        }
+        .btn-primary { 
+            @apply bg-gradient-to-r from-indigo-600 to-purple-600 focus:ring-indigo-500; 
+        }
+        .btn-danger { 
+            @apply bg-gradient-to-r from-red-600 to-pink-600 focus:ring-red-500; 
+        }
+        .btn-secondary {
+             @apply bg-gradient-to-r from-gray-600 to-gray-700 focus:ring-gray-500;
+        }
+        .btn-sm { @apply px-3 py-1.5 text-sm; }
+        
+        /* Form & Card Styles */
         .form-input { @apply w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500; }
         .form-label { @apply block text-sm font-medium text-gray-700 mb-1; }
         .form-select { @apply w-full px-3 py-2 border border-gray-300 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500; }
-        .btn { @apply px-4 py-2 rounded-lg font-semibold text-white shadow-md focus:outline-none focus:ring-2 focus:ring-opacity-75; }
-        .btn-primary { @apply bg-indigo-600 hover:bg-indigo-700 focus:ring-indigo-500; }
-        .btn-secondary { @apply bg-gray-600 hover:bg-gray-700 focus:ring-gray-500; }
-        .btn-danger { @apply bg-red-600 hover:bg-red-700 focus:ring-red-500; }
-        .btn-sm { @apply px-2 py-1 text-sm; }
         .card { @apply bg-white shadow-xl rounded-2xl p-6; }
+        
+        /* New Menu Overlay Styles */
+        .menu-overlay { 
+            @apply fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm z-40 hidden; 
+            transition: opacity 0.3s ease;
+        }
+        .menu-box {
+            @apply fixed top-0 left-0 h-full w-72 bg-gray-900 text-gray-300 shadow-2xl z-50 flex flex-col p-4;
+            transform: translateX(-100%);
+            transition: transform 0.3s ease-in-out;
+        }
+        .menu-box.open {
+            transform: translateX(0);
+        }
+        .menu-link { 
+            @apply flex items-center p-3 rounded-lg text-lg;
+            transition: all 0.3s ease; 
+        }
+        .menu-link i { @apply w-6 mr-3 text-center; }
+        .menu-link:hover, .menu-link.active { 
+            @apply bg-indigo-600 text-white; 
+        }
     </style>
 </head>
 <body class="bg-gray-100">
@@ -48,7 +78,7 @@
                 </div>
                 <button type="submit" class="btn btn-primary w-full">Login</button>
             </form>
-            <!-- Registration form (can be hidden after first use) -->
+            <!-- Registration form -->
             <form id="register-form" class="mt-4 border-t pt-4">
                  <h3 class="text-lg font-semibold text-center text-gray-700 mb-4">Register New Admin (First Use Only)</h3>
                  <div class="mb-4">
@@ -66,32 +96,34 @@
 
     <!-- Admin Panel (Hidden by default) -->
     <div id="admin-panel" class="hidden min-h-screen">
-        <!-- Sidebar -->
-        <nav id="sidebar" class="sidebar w-64 bg-gray-900 text-gray-300 flex flex-col shadow-lg fixed top-0 left-0 h-full z-20 overflow-x-hidden">
-            <div class="text-center p-6 border-b border-gray-700">
-                <h1 class="text-2xl font-bold text-white"><span class="link-text">Admin Panel</span></h1>
+        
+        <!-- New Menu Overlay -->
+        <div id="admin-menu-overlay" class="menu-overlay" onclick="closeAdminNav()"></div>
+        <nav id="admin-menu-box" class="menu-box">
+            <div class="flex justify-between items-center p-4 border-b border-gray-700 mb-4">
+                <h1 class="text-2xl font-bold text-white">Admin Menu</h1>
+                <button id="admin-menu-close-btn" class="text-gray-400 hover:text-white text-3xl">&times;</button>
             </div>
-            <div class="flex-grow p-4">
-                <a href="#dashboard" data-target="page-dashboard" class="sidebar-link active"><i class="fas fa-tachometer-alt"></i><span class="link-text">Dashboard</span></a>
-                <a href="#programs" data-target="page-programs" class="sidebar-link mt-2"><i class="fas fa-calendar-alt"></i><span class="link-text">Programs & Cats</span></a>
-                <a href="#results" data-target="page-results" class="sidebar-link mt-2"><i class="fas fa-poll"></i><span class="link-text">Results</span></a>
-                <a href="#teams" data-target="page-teams" class="sidebar-link mt-2"><i class="fas fa-users"></i><span class="link-text">Teams</span></a>
-                <a href="#homepage" data-target="page-homepage" class="sidebar-link mt-2"><i class="fas fa-home"></i><span class="link-text">Home Page</span></a>
-            </div>
-            <div class="p-4 border-t border-gray-700">
-                <button id="logout-button" class="w-full btn btn-danger"><i class="fas fa-sign-out-alt"></i><span class="link-text">Logout</span></button>
+            <a href="#dashboard" data-target="page-dashboard" class="menu-link active"><i class="fas fa-tachometer-alt"></i>Dashboard</a>
+            <a href="#programs" data-target="page-programs" class="menu-link mt-2"><i class="fas fa-calendar-alt"></i>Programs & Cats</a>
+            <a href="#results" data-target="page-results" class="menu-link mt-2"><i class="fas fa-poll"></i>Results</a>
+            <a href="#teams" data-target="page-teams" class="menu-link mt-2"><i class="fas fa-users"></i>Teams</a>
+            <a href="#homepage" data-target="page-homepage" class="menu-link mt-2"><i class="fas fa-home"></i>Home Page</a>
+            <div class="mt-auto p-4 border-t border-gray-700">
+                <button id="logout-button" class="w-full btn btn-danger"><i class="fas fa-sign-out-alt mr-2"></i>Logout</button>
             </div>
         </nav>
 
         <!-- Main Content -->
-        <div id="main-content" class="main-content ml-64">
+        <div id="main-content">
             <!-- Top Bar -->
             <header class="bg-white shadow-md sticky top-0 z-10">
                 <div class="flex justify-between items-center p-4">
-                    <button id="sidebar-toggle" class="text-gray-700 text-xl focus:outline-none">
+                    <button id="admin-menu-btn" class="text-gray-700 text-xl focus:outline-none">
                         <i class="fas fa-bars"></i>
                     </button>
-                    <div class="text-gray-600" id="admin-email"></div>
+                    <div class="text-lg font-semibold text-indigo-700">Sadaye Madeena 2k25</div>
+                    <div class="text-gray-600 text-sm" id="admin-email"></div>
                 </div>
             </header>
             
@@ -120,11 +152,10 @@
                     </div>
                 </div>
 
-                <!-- Page: Manage Programs & Categories (UPDATED) -->
+                <!-- Page: Manage Programs & Categories -->
                 <div id="page-programs" class="admin-page hidden">
                     <h1 class="text-4xl font-bold text-gray-800 mb-6">Manage Programs & Categories</h1>
                     
-                    <!-- Manage Categories (NEW) -->
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                         <div class="card">
                             <h2 class="text-2xl font-semibold text-gray-800 mb-4">Add New Category</h2>
@@ -143,13 +174,11 @@
                         <div class="card">
                              <h2 class="text-2xl font-semibold text-gray-800 mb-4">Existing Categories</h2>
                              <div id="categories-list" class="flex flex-wrap gap-2">
-                                <!-- Categories will be loaded here -->
                                 <p class="text-gray-500">Loading categories...</p>
                              </div>
                         </div>
                     </div>
 
-                    <!-- Add Program (UPDATED) -->
                     <div class="card mb-6">
                         <h2 class="text-2xl font-semibold text-gray-800 mb-4">Add New Program</h2>
                         <form id="form-add-program">
@@ -171,7 +200,6 @@
                         </form>
                     </div>
 
-                    <!-- Existing Programs List -->
                     <div class="card">
                         <h2 class="text-2xl font-semibold text-gray-800 mb-4">Existing Programs</h2>
                         <div class="overflow-x-auto">
@@ -224,11 +252,10 @@
                     </div>
                 </div>
 
-                <!-- Page: Manage Teams (UPDATED) -->
+                <!-- Page: Manage Teams -->
                 <div id="page-teams" class="admin-page hidden">
                     <h1 class="text-4xl font-bold text-gray-800 mb-6">Manage Teams & Leaders</h1>
                     
-                    <!-- Add New Team Form (UPDATED) -->
                     <div class="card mb-6">
                         <h2 class="text-2xl font-semibold text-gray-800 mb-4">Add New Team</h2>
                         <form id="form-add-team">
@@ -262,15 +289,13 @@
                         </form>
                     </div>
 
-                    <!-- Existing Teams List -->
                     <h2 class="text-3xl font-bold text-gray-800 mb-6">Edit Existing Teams</h2>
                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="teams-list-admin">
                         <!-- Team editor cards will be inserted here -->
                     </div>
                 </div>
 
-
-                <!-- Page: Manage Home Page (UPDATED) -->
+                <!-- Page: Manage Home Page -->
                 <div id="page-homepage" class="admin-page hidden">
                     <h1 class="text-4xl font-bold text-gray-800 mb-6">Manage Home Page Content</h1>
                     <div class="card">
@@ -320,28 +345,11 @@
         const finalFirebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : firebaseConfig;
         finalFirebaseConfig.projectId = appId;
 
-        // Firebase Imports (using v12.4.0)
+        // Firebase Imports
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js";
         import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-analytics.js";
-        import { 
-            getAuth, 
-            signInWithEmailAndPassword, 
-            createUserWithEmailAndPassword, 
-            onAuthStateChanged, 
-            signOut 
-        } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-auth.js";
-        import { 
-            getFirestore, 
-            doc, 
-            setDoc, 
-            addDoc, 
-            getDoc, 
-            getDocs, 
-            deleteDoc, 
-            collection, 
-            onSnapshot,
-            query
-        } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-firestore.js";
+        import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-auth.js";
+        import { getFirestore, doc, setDoc, addDoc, getDoc, getDocs, deleteDoc, collection, onSnapshot, query } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-firestore.js";
 
         // Initialize Firebase
         const app = initializeApp(finalFirebaseConfig);
@@ -361,30 +369,36 @@
         const logoutButton = document.getElementById('logout-button');
         const adminEmail = document.getElementById('admin-email');
         const pages = document.querySelectorAll('.admin-page');
-        const navLinks = document.querySelectorAll('.sidebar-link');
-        const sidebar = document.getElementById('sidebar');
-        const mainContent = document.getElementById('main-content');
-        const sidebarToggle = document.getElementById('sidebar-toggle');
+        
+        // NEW Navigation Elements
+        const adminMenuOverlay = document.getElementById('admin-menu-overlay');
+        const adminMenuBox = document.getElementById('admin-menu-box');
+        const adminMenuBtn = document.getElementById('admin-menu-btn');
+        const adminMenuCloseBtn = document.getElementById('admin-menu-close-btn');
+        const navLinks = document.querySelectorAll('.menu-link');
 
         // ===================================
-        // New Sidebar Toggle Logic
+        // New Navigation Logic
         // ===================================
-        sidebarToggle.addEventListener('click', () => {
-            sidebar.classList.toggle('w-64');
-            sidebar.classList.toggle('w-20'); // Collapsed width
-            sidebar.classList.toggle('sidebar-collapsed');
-            mainContent.classList.toggle('ml-64');
-            mainContent.classList.toggle('ml-20'); // Collapsed margin
-            
-            const icon = sidebarToggle.querySelector('i');
-            if (sidebar.classList.contains('sidebar-collapsed')) {
-                icon.classList.remove('fa-bars');
-                icon.classList.add('fa-bars-staggered');
-            } else {
-                icon.classList.remove('fa-bars-staggered');
-                icon.classList.add('fa-bars');
-            }
-        });
+        function openAdminNav() {
+            adminMenuOverlay.style.display = 'block';
+            setTimeout(() => {
+                adminMenuOverlay.style.opacity = '1';
+                adminMenuBox.classList.add('open');
+            }, 10);
+        }
+
+        function closeAdminNav() {
+            adminMenuOverlay.style.opacity = '0';
+            adminMenuBox.classList.remove('open');
+            setTimeout(() => {
+                adminMenuOverlay.style.display = 'none';
+            }, 300);
+        }
+
+        adminMenuBtn.addEventListener('click', openAdminNav);
+        adminMenuCloseBtn.addEventListener('click', closeAdminNav);
+        adminMenuOverlay.addEventListener('click', closeAdminNav);
 
         // ===================================
         // Page Navigation
@@ -400,12 +414,11 @@
                 navLinks.forEach(nav => nav.classList.remove('active'));
                 link.classList.add('active');
                 
+                closeAdminNav(); // Close menu on navigation
+                
                 // Load data for the activated page
                 if (targetId === 'page-dashboard') loadDashboardStats();
-                if (targetId === 'page-programs') {
-                    loadCategories(); 
-                    loadPrograms();
-                }
+                if (targetId === 'page-programs') { loadCategories(); loadPrograms(); }
                 if (targetId === 'page-results') loadProgramsForResults();
                 if (targetId === 'page-teams') loadTeamsForAdmin();
                 if (targetId === 'page-homepage') loadHomepageContent();
@@ -413,20 +426,16 @@
         });
 
         // ===================================
-        // Authentication
+        // Authentication (No Changes)
         // ===================================
         onAuthStateChanged(auth, (user) => {
             if (user) {
-                // User is logged in
                 loginPage.style.display = 'none';
                 adminPanel.style.display = 'block';
                 adminEmail.textContent = user.email;
-                // Load initial page data
                 loadDashboardStats();
-                // Pre-load categories
                 loadCategories();
             } else {
-                // User is logged out
                 loginPage.style.display = 'flex';
                 adminPanel.style.display = 'none';
             }
@@ -437,22 +446,19 @@
         logoutButton.addEventListener('click', async () => { await signOut(auth); });
 
         // ===================================
-        // Dashboard Page
+        // Dashboard Page (No Changes)
         // ===================================
         async function loadDashboardStats() {
-            const programsCol = collection(db, `artifacts/${appId}/public/data/programs`);
-            const resultsCol = collection(db, `artifacts/${appId}/public/data/results`);
-            const teamsCol = collection(db, `artifacts/${appId}/public/data/teams`);
-            const programsSnap = await getDocs(programsCol);
-            const resultsSnap = await getDocs(resultsCol);
-            const teamsSnap = await getDocs(teamsCol);
+            const programsSnap = await getDocs(collection(db, `artifacts/${appId}/public/data/programs`));
+            const resultsSnap = await getDocs(collection(db, `artifacts/${appId}/public/data/results`));
+            const teamsSnap = await getDocs(collection(db, `artifacts/${appId}/public/data/teams`));
             document.getElementById('stats-programs').textContent = programsSnap.size;
             document.getElementById('stats-results').textContent = resultsSnap.size;
             document.getElementById('stats-teams').textContent = teamsSnap.size;
         }
 
         // ===================================
-        // Programs & Categories Page (UPDATED)
+        // Programs & Categories Page (No Changes)
         // ===================================
         const categoryForm = document.getElementById('form-add-category');
         const categoryListEl = document.getElementById('categories-list');
@@ -460,19 +466,12 @@
         const programListEl = document.getElementById('programs-list');
         const programCategorySelect = document.getElementById('program-category');
 
-        // NEW: Load Categories
         async function loadCategories() {
-            const categoriesCol = collection(db, `artifacts/${appId}/public/data/categories`);
-            const snapshot = await getDocs(query(categoriesCol)); // Add orderBy if needed
+            const snapshot = await getDocs(query(collection(db, `artifacts/${appId}/public/data/categories`)));
+            allCategories = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })).sort((a,b) => a.name.localeCompare(b.name));
             
-            allCategories = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-            allCategories.sort((a,b) => a.name.localeCompare(b.name));
-
-            // Populate category list for management
             categoryListEl.innerHTML = '';
-            if(allCategories.length === 0) {
-                categoryListEl.innerHTML = `<p class="text-gray-500">No categories added yet.</p>`;
-            }
+            if(allCategories.length === 0) categoryListEl.innerHTML = `<p class="text-gray-500">No categories added yet.</p>`;
             allCategories.forEach(cat => {
                 categoryListEl.innerHTML += `
                     <span class="bg-indigo-100 text-indigo-800 text-sm font-medium me-2 px-2.5 py-0.5 rounded flex items-center gap-1.5">
@@ -481,68 +480,45 @@
                     </span>`;
             });
 
-            // Populate category dropdown for adding programs
             programCategorySelect.innerHTML = '<option value="">Select Category</option>';
             allCategories.forEach(cat => {
                 programCategorySelect.innerHTML += `<option value="${cat.name}">${cat.name}</option>`;
             });
         }
 
-        // NEW: Add Category
         categoryForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             const name = document.getElementById('category-name').value;
-            const categoriesCol = collection(db, `artifacts/${appId}/public/data/categories`);
             try {
-                await addDoc(categoriesCol, { name });
-                alert('Category added!');
-                categoryForm.reset();
-                loadCategories(); // Refresh list and dropdown
-            } catch (error) {
-                alert(`Error: ${error.message}`);
-            }
+                await addDoc(collection(db, `artifacts/${appId}/public/data/categories`), { name });
+                alert('Category added!'); categoryForm.reset(); loadCategories();
+            } catch (error) { alert(`Error: ${error.message}`); }
         });
 
-        // NEW: Delete Category
         categoryListEl.addEventListener('click', async (e) => {
             if (e.target.tagName === 'BUTTON' && e.target.dataset.id) {
-                const id = e.target.dataset.id;
-                if (confirm('Are you sure you want to delete this category?')) {
+                if (confirm('Are you sure?')) {
                     try {
-                        await deleteDoc(doc(db, `artifacts/${appId}/public/data/categories`, id));
-                        alert('Category deleted.');
-                        loadCategories(); // Refresh list and dropdown
-                    } catch (error) {
-                        alert(`Error: ${error.message}`);
-                    }
+                        await deleteDoc(doc(db, `artifacts/${appId}/public/data/categories`, e.target.dataset.id));
+                        alert('Category deleted.'); loadCategories();
+                    } catch (error) { alert(`Error: ${error.message}`); }
                 }
             }
         });
 
-        // Add Program (No changes to logic)
         programForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             const name = document.getElementById('program-name').value;
             const category = programCategorySelect.value;
-            if (!category) {
-                alert("Please select a valid category.");
-                return;
-            }
-            const programsCol = collection(db, `artifacts/${appId}/public/data/programs`);
+            if (!category) { alert("Please select a valid category."); return; }
             try {
-                await addDoc(programsCol, { name, category });
-                alert('Program added successfully!');
-                programForm.reset();
-                loadPrograms(); // Refresh list
-            } catch (error) {
-                alert(`Error: ${error.message}`);
-            }
+                await addDoc(collection(db, `artifacts/${appId}/public/data/programs`), { name, category });
+                alert('Program added!'); programForm.reset(); loadPrograms();
+            } catch (error) { alert(`Error: ${error.message}`); }
         });
 
-        // Load Programs (No changes to logic)
         async function loadPrograms() {
-            const programsCol = collection(db, `artifacts/${appId}/public/data/programs`);
-            const snapshot = await getDocs(query(programsCol));
+            const snapshot = await getDocs(query(collection(db, `artifacts/${appId}/public/data/programs`)));
             allPrograms = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
             programListEl.innerHTML = '';
             allPrograms.sort((a,b) => a.name.localeCompare(b.name)).forEach(program => {
@@ -557,41 +533,31 @@
             });
         }
 
-        // Delete Program (No changes to logic)
         programListEl.addEventListener('click', async (e) => {
             if (e.target.closest('button') && e.target.closest('button').dataset.id) {
-                const id = e.target.closest('button').dataset.id;
-                if (confirm('Are you sure you want to delete this program?')) {
+                if (confirm('Are you sure?')) {
                     try {
-                        await deleteDoc(doc(db, `artifacts/${appId}/public/data/programs`, id));
-                        alert('Program deleted.');
-                        loadPrograms();
-                    } catch (error) {
-                        alert(`Error: ${error.message}`);
-                    }
+                        await deleteDoc(doc(db, `artifacts/${appId}/public/data/programs`, e.target.closest('button').dataset.id));
+                        alert('Program deleted.'); loadPrograms();
+                    } catch (error) { alert(`Error: ${error.message}`); }
                 }
             }
         });
 
-
         // ===================================
-        // Results Page (UPDATED)
+        // Results Page (No Changes)
         // ===================================
         const resultForm = document.getElementById('form-publish-result');
         const resultProgramSelect = document.getElementById('result-program');
 
-        // UPDATED: Now loads from `allPrograms` variable
         async function loadProgramsForResults() {
-            if (allPrograms.length === 0) {
-                await loadPrograms(); // Ensure programs are loaded
-            }
+            if (allPrograms.length === 0) await loadPrograms();
             resultProgramSelect.innerHTML = '<option value="">Select a Program</option>';
-            allPrograms.forEach(program => { // Already sorted
+            allPrograms.forEach(program => {
                 resultProgramSelect.innerHTML += `<option value="${program.id}">${program.name} (${program.category})</option>`;
             });
         }
 
-        // Logic remains the same
         resultProgramSelect.addEventListener('change', async (e) => {
             const programId = e.target.value;
             if (!programId) { resultForm.reset(); return; }
@@ -607,37 +573,28 @@
             }
         });
 
-        // Logic remains the same
         resultForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             const programId = resultProgramSelect.value;
             if (!programId) { alert('Please select a program.'); return; }
             const cleanInput = (id) => document.getElementById(id).value.split(',').map(s => s.trim()).filter(Boolean);
-            const resultData = {
-                first: cleanInput('result-first'),
-                second: cleanInput('result-second'),
-                third: cleanInput('result-third')
-            };
+            const resultData = { first: cleanInput('result-first'), second: cleanInput('result-second'), third: cleanInput('result-third') };
             try {
                 await setDoc(doc(db, `artifacts/${appId}/public/data/results`, programId), resultData);
-                alert('Result published successfully!');
-            } catch (error) {
-                alert(`Error: ${error.message}`);
-            }
+                alert('Result published!');
+            } catch (error) { alert(`Error: ${error.message}`); }
         });
 
         // ===================================
-        // Teams Page (UPDATED)
+        // Teams Page (No Changes)
         // ===================================
         const teamsListAdmin = document.getElementById('teams-list-admin');
         const teamAddForm = document.getElementById('form-add-team');
 
-        // UPDATED: Handle Add Team with ID range
         teamAddForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             const teamId = document.getElementById('team-name').value.toUpperCase().trim();
             if (!teamId) { alert("Please enter a team name."); return; }
-
             const data = {
                 name: teamId,
                 leader: document.getElementById('team-leader').value,
@@ -645,72 +602,39 @@
                 id_from: parseInt(document.getElementById('team-id-from').value),
                 id_to: parseInt(document.getElementById('team-id-to').value)
             };
-            
-            if (!data.id_from || !data.id_to || data.id_from > data.id_to) {
-                alert("Please enter a valid ID range.");
-                return;
-            }
-
+            if (!data.id_from || !data.id_to || data.id_from > data.id_to) { alert("Please enter a valid ID range."); return; }
             try {
-                const teamDoc = doc(db, `artifacts/${appId}/public/data/teams`, teamId);
-                await setDoc(teamDoc, data);
-                alert(`Team ${teamId} added successfully!`);
-                teamAddForm.reset();
-                loadTeamsForAdmin(); // Refresh the list
-            } catch (error) {
-                alert(`Error adding team: ${error.message}`);
-            }
+                await setDoc(doc(db, `artifacts/${appId}/public/data/teams`, teamId), data);
+                alert(`Team ${teamId} added!`); teamAddForm.reset(); loadTeamsForAdmin();
+            } catch (error) { alert(`Error: ${error.message}`); }
         });
         
-        // UPDATED: Load Teams for admin (shows ID range)
         async function loadTeamsForAdmin() {
-            const teamsCol = collection(db, `artifacts/${appId}/public/data/teams`);
-            const snapshot = await getDocs(snapshot.docs.sort((a,b) => a.data().name.localeCompare(b.data().name)));
-            
+            const snapshot = await getDocs(query(collection(db, `artifacts/${appId}/public/data/teams`)));
             teamsListAdmin.innerHTML = '';
-            if (snapshot.empty) {
-                teamsListAdmin.innerHTML = `<p class="text-gray-500 col-span-3">No teams found. Use the form above to add your teams.</p>`;
-                return;
-            }
-
-            snapshot.docs.forEach(doc => {
+            if (snapshot.empty) { teamsListAdmin.innerHTML = `<p class="text-gray-500 col-span-3">No teams found.</p>`; return; }
+            snapshot.docs.sort((a,b) => a.data().name.localeCompare(b.data().name)).forEach(doc => {
                 const team = { id: doc.id, ...doc.data() };
-                const card = document.createElement('div');
-                card.className = 'card';
-                card.innerHTML = `
-                    <h3 class="text-2xl font-bold text-indigo-700 mb-4">${team.id}</h3>
-                    <form class="team-update-form" data-id="${team.id}">
-                        <div class="mb-4">
-                            <label class="form-label">Leader</label>
-                            <input type="text" class="form-input leader-input" value="${team.leader || ''}">
-                        </div>
-                        <div class="mb-4">
-                            <label class="form-label">Asst. Leader</label>
-                            <input type="text" class="form-input asst-input" value="${team.asst || ''}">
-                        </div>
-                        <div class="grid grid-cols-2 gap-2 mb-4">
-                            <div>
-                                <label class="form-label">ID From</label>
-                                <input type="number" class="form-input id-from-input" value="${team.id_from || ''}">
+                teamsListAdmin.innerHTML += `
+                    <div class="card">
+                        <h3 class="text-2xl font-bold text-indigo-700 mb-4">${team.id}</h3>
+                        <form class="team-update-form" data-id="${team.id}">
+                            <div class="mb-4"><label class="form-label">Leader</label><input type="text" class="form-input leader-input" value="${team.leader || ''}"></div>
+                            <div class="mb-4"><label class="form-label">Asst. Leader</label><input type="text" class="form-input asst-input" value="${team.asst || ''}"></div>
+                            <div class="grid grid-cols-2 gap-2 mb-4">
+                                <div><label class="form-label">ID From</label><input type="number" class="form-input id-from-input" value="${team.id_from || ''}"></div>
+                                <div><label class="form-label">ID To</label><input type="number" class="form-input id-to-input" value="${team.id_to || ''}"></div>
                             </div>
-                            <div>
-                                <label class="form-label">ID To</label>
-                                <input type="number" class="form-input id-to-input" value="${team.id_to || ''}">
-                            </div>
-                        </div>
-                        <button type="submit" class="btn btn-primary w-full">Update Team</button>
-                    </form>
-                `;
-                teamsListAdmin.appendChild(card);
+                            <button type="submit" class="btn btn-primary w-full">Update Team</button>
+                        </form>
+                    </div>`;
             });
         }
         
-        // UPDATED: Handle team update (with ID range)
         teamsListAdmin.addEventListener('submit', async (e) => {
             if (e.target.classList.contains('team-update-form')) {
                 e.preventDefault();
-                const teamId = e.target.dataset.id;
-                const form = e.target;
+                const teamId = e.target.dataset.id; const form = e.target;
                 const data = {
                     name: teamId,
                     leader: form.querySelector('.leader-input').value,
@@ -718,28 +642,20 @@
                     id_from: parseInt(form.querySelector('.id-from-input').value),
                     id_to: parseInt(form.querySelector('.id-to-input').value)
                 };
-
                 try {
-                    const teamDoc = doc(db, `artifacts/${appId}/public/data/teams`, teamId);
-                    await setDoc(teamDoc, data, { merge: true });
+                    await setDoc(doc(db, `artifacts/${appId}/public/data/teams`, teamId), data, { merge: true });
                     alert(`Team ${teamId} updated!`);
-                } catch (error) {
-                    alert(`Error: ${error.message}`);
-                }
+                } catch (error) { alert(`Error: ${error.message}`); }
             }
         });
 
-
         // ===================================
-        // Home Page Content (UPDATED)
+        // Home Page Content (No Changes)
         // ===================================
         const homepageForm = document.getElementById('form-homepage-content');
         
-        // UPDATED: Load total_participants
         async function loadHomepageContent() {
-            const homepageDoc = doc(db, `artifacts/${appId}/public/data/config`, 'homepage');
-            const docSnap = await getDoc(homepageDoc);
-            
+            const docSnap = await getDoc(doc(db, `artifacts/${appId}/public/data/config`, 'homepage'));
             if (docSnap.exists()) {
                 const data = docSnap.data();
                 document.getElementById('homepage-about').value = data.about || '';
@@ -748,7 +664,6 @@
             }
         }
 
-        // UPDATED: Save total_participants
         homepageForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             const data = {
@@ -756,14 +671,10 @@
                 total_participants: document.getElementById('homepage-participants').value,
                 gallery: document.getElementById('homepage-gallery').value.split('\n').map(s => s.trim()).filter(Boolean)
             };
-
             try {
-                const homepageDoc = doc(db, `artifacts/${appId}/public/data/config`, 'homepage');
-                await setDoc(homepageDoc, data);
+                await setDoc(doc(db, `artifacts/${appId}/public/data/config`, 'homepage'), data);
                 alert('Home page content updated!');
-            } catch (error) {
-                alert(`Error: ${error.message}`);
-            }
+            } catch (error) { alert(`Error: ${error.message}`); }
         });
 
     </script>
