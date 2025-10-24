@@ -29,7 +29,7 @@
             --third-place-bg: #fff3e0;
         }
         html { scroll-behavior: smooth; }
-        body { margin: 0; padding: 0; background-color: var(--background-color); font-family: 'Inter', 'Noto Sans Malayalam', sans-serif; color: var(--text-color); padding-top: 80px; }
+        body { margin: 0; padding: 0; background-color: var(--background-color); font-family: 'Inter', 'Noto Sans Malayalam', sans-serif; color: var(--text-color); padding-top: 80px; /* Removed bottom padding */ }
         * { box-sizing: border-box; }
         .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
         .sticky-header { position: fixed; top: 15px; left: 15px; right: 15px; max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; background-color: var(--card-background); padding: 10px 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); z-index: 1000; border-radius: 12px; transition: top 0.3s ease; }
@@ -45,7 +45,7 @@
         .menu-link:hover { background-color: #f1f5f9; }
         .menu-link.active { background-color: var(--primary-color); color: white; font-weight: bold; }
         #home-page { text-align: center; }
-        main { transition: filter 0.3s ease-in-out; }
+        main { transition: filter 0.3s ease-in-out; padding-bottom: 20px; /* Add some space before footer */ }
         .hero-section { min-height: calc(100vh - 90px); display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 20px; }
         .hero-section .logo { width: 150px; height: 150px; object-fit: contain; margin-bottom: 20px; }
         .hero-section h1 { font-family: 'Saira', sans-serif; font-size: clamp(2rem, 6vw, 3.5rem); color: var(--heading-color); margin: 0; }
@@ -76,65 +76,14 @@
         .leader-info div { display: flex; justify-content: space-between; padding: 8px 0; }
         .leader-info div span:first-child { color: var(--subtle-text); }
         
-        /* UPDATED: New Gallery Layout */
-        #gallery-rows-container {
-            display: flex;
-            flex-direction: column;
-            gap: 20px; /* Increased gap between rows */
-            min-height: 350px; /* Adjusted min height */
-        }
-        .gallery-row { 
-            display: flex; 
-            overflow-x: auto; 
-            /* Enable snapping */
-            scroll-snap-type: x mandatory; 
-            -webkit-overflow-scrolling: touch; 
-            scroll-behavior: smooth; /* Smooth scrolling animation */
-            padding: 10px 0; /* Add padding for visual spacing */
-        }
-        .gallery-row::-webkit-scrollbar { height: 6px; } 
-        .gallery-row::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 3px; }
-        .gallery-row::-webkit-scrollbar-thumb:hover { background: #ccc; }
-
-        .gallery-item-wrapper {
-            position: relative; 
-            flex: 0 0 100%; /* Each item takes full width of the container */
-            max-width: 80%; /* Limit width slightly on larger screens */
-            margin: 0 auto; /* Center the item */
-            scroll-snap-align: center; /* Snap items to the center */
-            display: flex; /* Use flexbox for centering image */
-            justify-content: center;
-        }
-
-        .gallery-item-wrapper img { 
-            width: auto; /* Allow image to determine width based on height */
-            max-width: 100%; /* Ensure image doesn't overflow */
-            height: 300px; /* FIXED: Set a fixed vertical height */
-            object-fit: cover; 
-            border-radius: 16px; /* Slightly larger radius */
-            box-shadow: 0 6px 15px var(--shadow-color); /* Enhanced shadow */
-            transition: transform 0.3s; 
-        }
-        .gallery-item-wrapper img:hover { transform: scale(1.02); } /* Subtle hover */
-
-        .share-btn {
-            position: absolute;
-            top: 12px;
-            right: 12px;
-            background-color: rgba(0, 0, 0, 0.5); 
-            color: white;
-            border: none;
-            border-radius: 50%;
-            width: 36px; /* Slightly larger */
-            height: 36px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1em; /* Adjusted size */
-            cursor: pointer;
-            transition: background-color 0.2s;
-            z-index: 2; 
-        }
+        #gallery-rows-container { display: flex; flex-direction: column; gap: 20px; min-height: 350px; }
+        .gallery-row { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch; scroll-behavior: smooth; padding: 10px 0; gap: 15px; }
+        .gallery-row::-webkit-scrollbar { display: none; }
+        .gallery-row { -ms-overflow-style: none; scrollbar-width: none; }
+        .gallery-item-wrapper { position: relative; flex: 0 0 auto; width: 200px; scroll-snap-align: center; display: flex; justify-content: center; }
+        .gallery-item-wrapper img { width: 100%; height: auto; aspect-ratio: 7 / 9; object-fit: cover; border-radius: 16px; box-shadow: 0 6px 15px var(--shadow-color); transition: transform 0.3s; display: block; }
+        .gallery-item-wrapper img:hover { transform: scale(1.02); } 
+        .share-btn { position: absolute; top: 12px; right: 12px; background-color: rgba(0, 0, 0, 0.5); color: white; border: none; border-radius: 50%; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; font-size: 1em; cursor: pointer; transition: background-color 0.2s; z-index: 2; }
         .share-btn:hover { background-color: rgba(0, 0, 0, 0.7); }
         .share-btn i { pointer-events: none; }
         
@@ -240,21 +189,83 @@
         .gold { color: var(--champion-gold); }
         .silver { color: var(--runner-up-silver); }
         .bronze { color: var(--second-runner-up-bronze); }
+        
+        /* UPDATED: Footer Styles (Static & New Layout) */
+        footer {
+            background-color: var(--card-background);
+            color: var(--subtle-text);
+            text-align: center;
+            padding: 20px 15px; /* Added more padding back */
+            border-top: 1px solid var(--border-color);
+            margin-top: 40px; /* Add space above footer */
+            /* Removed position: fixed */
+        }
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px; /* Adjusted gap */
+        }
+        .institution-name {
+             font-weight: bold;
+             color: var(--heading-color);
+             margin: 5px 0;
+        }
+        .social-icons a {
+            color: var(--subtle-text);
+            font-size: 1.4em; /* Slightly larger icons */
+            margin: 0 10px; 
+            transition: color 0.2s;
+        }
+        .social-icons a:hover { color: var(--primary-color); }
+        .footer-content .copyright {
+            margin-top: 5px; /* Add margin above copyright */
+            font-size: 0.85em; /* Slightly larger copyright text */
+        }
+        
+        /* UPDATED: Scroll-to-Top Button Styles */
+        #scrollTopBtn {
+            position: fixed;
+            bottom: 30px; /* Position relative to viewport bottom */
+            right: 20px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 45px;
+            height: 45px;
+            font-size: 1.2em;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+            z-index: 1000;
+            display: none; 
+            opacity: 0;
+            transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out;
+            visibility: hidden;
+        }
+        #scrollTopBtn.show { display: flex; align-items: center; justify-content: center; opacity: 1; visibility: visible; }
+        #scrollTopBtn:hover { background-color: #3a7ac2; }
+
+
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         @media (min-width: 992px) { .card-container { flex-wrap: nowrap; align-items: flex-end; gap: 10px; } .team-card { width: 33%; } .team-card.champion { order: 2; transform: scale(1.1) translateY(-10px); } .team-card.first-runner-up { order: 1; } .team-card.second-runner-up { order: 3; } .team-card:hover { transform: scale(1.05) translateY(-6px); } .team-card.champion:hover { transform: scale(1.15) translateY(-16px); } }
         @media (min-width: 768px) and (max-width: 991px) { .card-container { max-width: 700px; margin-left: auto; margin-right: auto; } }
         
         /* Mobile responsive rules */
         @media(max-width: 600px) { 
+            body { padding-bottom: 0; /* Remove body padding, footer adds space */ }
             .container { padding: 10px; } 
             .main-tab-buttons { gap: 5px; } 
             .main-tab-button { padding: 8px 12px; font-size: 0.8em; } 
             .header-container{ flex-direction: column; gap: 15px; } 
             .title-container{ text-align: center; }
             .hero-section { min-height: calc(70vh - 80px); } 
-            /* Gallery adjustments for mobile */
-            .gallery-item-wrapper { max-width: 90%; } /* Slightly wider on mobile */
-            .gallery-item-wrapper img { height: 250px; } /* Slightly shorter images on mobile */
+            .gallery-item-wrapper { width: 70vw; } 
+            .footer-content { font-size: 0.8em; } 
+            .social-icons a { font-size: 1.2em; margin: 0 6px;}
+            #scrollTopBtn { bottom: 20px; /* Adjust scroll top button position */ width: 40px; height: 40px; font-size: 1em;}
         }
         
         #loading-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--background-color); display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 9998; transition: opacity 0.5s ease; }
@@ -302,7 +313,7 @@
 <img src="https://placehold.co/150x150/FFFFFF/EFEFEF?text=Logo" alt="Art Fest Logo" class="logo" id="hero-logo" onerror="this.onerror=null;this.src='https://placehold.co/150x150/FFFFFF/EFEFEF?text=Logo';">
                 <h1 id="hero-main-title">Loading...</h1>
                 <p id="hero-subtitle">...</p>
-                <!-- UPDATED: Button onclick -->
+                
                 <button class="primary-btn" onclick="showPage('scoreboard-page'); showMainTab('program-tab');">View Results</button>
                 <div class="home-nav">
                     <a href="#about">About</a>
@@ -345,7 +356,7 @@
                 <h2>Image Gallery</h2>
                 <p class="section-subtitle">Discover and share beautiful moments</p>
                 
-                <!-- NEW: 3 Gallery Rows Structure -->
+                
                 <div id="gallery-rows-container">
                     <div class="gallery-row" id="gallery-row-0"></div>
                     <div class="gallery-row" id="gallery-row-1"></div>
@@ -394,6 +405,24 @@
             </div>
         </div>
     </main>
+    
+    <!-- UPDATED: Footer Structure & Content -->
+    <footer>
+        <div class="footer-content">
+            <div class="social-icons">
+                <a href="#" target="_blank" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                <a href="#" target="_blank" aria-label="YouTube"><i class="fab fa-youtube"></i></a>
+                <a href="#" target="_blank" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+            </div>
+            <p class="institution-name">Noorul Islam madrasa devathiyal</p>
+            <p class="copyright">&copy; 2025 Thirunoor Media Team. All rights reserved.</p>
+        </div>
+    </footer>
+
+    
+    <button id="scrollTopBtn" title="Go to top" onclick="scrollToTop()">
+        <i class="fas fa-arrow-up"></i>
+    </button>
 
     
 
@@ -561,7 +590,10 @@
             generateScoreboard();
             generateStaticContent(); // This will now render the new gallery
             updateResultCounts();
-            if (dbCategories.length > 0) filterScoreboard(dbCategories[0].name); else filterScoreboard('group');
+            // Default scoreboard filter
+            const defaultScoreboardFilter = (dbCategories && dbCategories.length > 0) ? dbCategories[0].name : 'group';
+            filterScoreboard(defaultScoreboardFilter);
+            
             // Hide Loading Overlay
             document.getElementById('loading-overlay').style.opacity = '0';
             setTimeout(() => { 
@@ -569,6 +601,7 @@
                 document.getElementById('main-content').style.visibility = 'visible'; 
             }, 500);
         }
+
 
         function generateFilterButtons() { const programFiltersEl = document.getElementById('program-filter-buttons'); const scoreboardFiltersEl = document.getElementById('scoreboard-filter-buttons'); let buttonsHtml = `<button class="filter-btn active" data-filter="all" onclick="filterResults('all')">All</button>`; (dbCategories || []).forEach(cat => { buttonsHtml += `<button class="filter-btn" data-filter="${cat.name}" onclick="filterResults('${cat.name}')">${cat.name}</button>`; }); buttonsHtml += `<button class="filter-btn" data-filter="group" onclick="filterResults('group')">Group</button>`; programFiltersEl.innerHTML = buttonsHtml; let scoreboardButtonsHtml = ''; (dbCategories || []).forEach((cat, index) => { scoreboardButtonsHtml += `<button class="filter-btn ${index === 0 ? 'active' : ''}" data-filter="${cat.name}" onclick="filterScoreboard('${cat.name}')">${cat.name}</button>`; }); scoreboardButtonsHtml += `<button class="filter-btn" data-filter="group" onclick="filterScoreboard('group')">Group</button>`; scoreboardFiltersEl.innerHTML = scoreboardButtonsHtml; }
         function generateTeamCards() { const rankedTeams = Object.values(processedTeamData).sort((a, b) => b.total - a.total); const container = document.getElementById('team-cards-container'); container.innerHTML = ''; const cardClasses = ['champion', 'first-runner-up', 'second-runner-up']; const positionTexts = ['Champions', 'First Runners-up', 'Second Runners-up']; const iconClasses = ['fas fa-crown', 'fas fa-medal', 'fas fa-medal']; rankedTeams.forEach((team, i) => { container.innerHTML += `<div class="team-card ${cardClasses[i] || ''}"><div class="icon"><i class="${iconClasses[i] || 'fas fa-award'}"></i></div><div class="team-name">${team.name}</div><p class="points"><b>${team.total}</b></p><p class="position">${positionTexts[i] || `#${i + 1} Position`}</p></div>`; }); }
@@ -656,7 +689,7 @@
             }
 
             // Clear previous gallery content
-            galleryRowContainers.forEach(row => row.innerHTML = ''); 
+            galleryRowContainers.forEach(row => { if(row) row.innerHTML = ''; }); 
 
             if (dbHomepage.gallery && dbHomepage.gallery.length > 0) {
                 if(galleryPlaceholder) galleryPlaceholder.style.display = 'none';
@@ -664,7 +697,7 @@
                     const rowIndex = index % 3; // Distribute images into 3 rows
                     const galleryItemHTML = `
                         <div class="gallery-item-wrapper">
-                            <img src="${imgUrl}" alt="Gallery Image ${index + 1}" loading="lazy" onerror="this.onerror=null;this.src='https://placehold.co/200x300/EFEFEF/CCCCCC?text=Image';">
+                            <img src="${imgUrl}" alt="Gallery Image ${index + 1}" loading="lazy" onerror="this.onerror=null;this.src='https://placehold.co/200x${Math.round(200 * 9 / 7)}/EFEFEF/CCCCCC?text=Image';">
                             <button class="share-btn" data-url="${imgUrl}" aria-label="Share image">
                                 <i class="fas fa-share-alt"></i>
                             </button>
@@ -676,7 +709,8 @@
                     }
                 });
             } else if (galleryPlaceholder) {
-                galleryPlaceholder.textContent = "Gallery images will appear here.";
+                 galleryPlaceholder.textContent = "Gallery images will appear here.";
+                 galleryPlaceholder.style.display = 'block'; // Make sure placeholder is visible if no images
             }
             
             document.getElementById('about-text').innerText = dbHomepage.about || 'About text will be updated soon.';
@@ -688,11 +722,25 @@
         }
         
         // ===================================================================================
-        // UI & Event Handling (UPDATED for Share & Menu State)
+        // UI & Event Handling (UPDATED for Share, Menu State, Scroll Top)
         // ===================================================================================
         window.openNav = function() { document.getElementById("menu-overlay").style.display = "flex"; document.getElementById("main-content").style.filter = 'blur(4px)'; setTimeout(() => document.getElementById("menu-overlay").style.opacity = '1', 10); }
         window.closeNav = function() { document.getElementById("menu-overlay").style.opacity = '0'; setTimeout(() => document.getElementById("menu-overlay").style.display = "none", 300); document.getElementById("main-content").style.filter = 'none'; }
-        window.showPage = function(pageId) { document.getElementById('home-page').style.display = pageId === 'home-page' ? 'block' : 'none'; document.getElementById('scoreboard-page').style.display = pageId === 'scoreboard-page' ? 'block' : 'none'; updateMenuActiveState(); }
+        window.showPage = function(pageId) { 
+            const homeVisible = pageId === 'home-page';
+            document.getElementById('home-page').style.display = homeVisible ? 'block' : 'none'; 
+            document.getElementById('scoreboard-page').style.display = homeVisible ? 'none' : 'block'; 
+            // Show/hide scroll button based on page
+            const scrollTopBtn = document.getElementById('scrollTopBtn');
+            if (scrollTopBtn) {
+                 if (homeVisible) {
+                     handleScroll(); // Check if button should be shown based on scroll position
+                 } else {
+                     scrollTopBtn.classList.remove('show'); // Always hide on other pages
+                 }
+            }
+            updateMenuActiveState(); 
+        }
         window.showMainTab = function(tabId) { const currentActiveButton = document.querySelector('#scoreboard-page .main-tab-button.active'); const clickedButton = document.querySelector(`.main-tab-button[onclick*="'${tabId}'"]`); if (clickedButton && clickedButton.isSameNode(currentActiveButton)) return; if (currentActiveButton) currentActiveButton.classList.remove('active'); document.querySelectorAll('.main-tab-content').forEach(tab => tab.classList.remove('active')); document.getElementById(tabId).classList.add('active'); if (clickedButton) clickedButton.classList.add('active'); updateMenuActiveState(); if (tabId === 'team-tab') fireTeamConfetti(); }
         window.filterResults = function(category = 'all') { document.querySelectorAll('#program-tab .filter-btn').forEach(btn => btn.classList.remove('active')); document.querySelector(`#program-tab .filter-btn[data-filter="${category}"]`).classList.add('active'); const searchTerm = document.getElementById('search-input').value.toLowerCase(); document.querySelectorAll('.event-result-card').forEach(card => { const categoryMatch = (category === 'all' || card.dataset.category === category); const searchMatch = (card.dataset.searchText.includes(searchTerm)); card.style.display = (categoryMatch && searchMatch) ? 'block' : 'none'; }); }
         window.filterScoreboard = function(category) { if (!category) return; document.querySelectorAll('#scoreboard-filter-buttons .filter-btn').forEach(btn => btn.classList.remove('active')); const activeButton = document.querySelector(`#scoreboard-filter-buttons .filter-btn[data-filter="${category}"]`); if (activeButton) activeButton.classList.add('active'); const totalsToShow = processedScoreboardData.categoryTotals[category]; const totalCard = document.getElementById('scoreboard-total-card'); const countElement = document.getElementById('scoreboard-category-count'); if (totalCard && totalsToShow) { TEAM_NAMES.forEach(team => { const teamSpan = totalCard.querySelector(`span[data-team="${team}"]`); if (teamSpan) teamSpan.textContent = totalsToShow[team] || 0; }); } if (countElement) { const count = processedScoreboardData.categoryCounts[category] || 0; countElement.textContent = `Published Results: ${count}`; } document.querySelectorAll('#scoreboard-container .scoreboard-card:not(.total-card)').forEach(card => { const eventName = card.dataset.eventName; const eventData = eventName ? processedScoreboardData.eventPoints[eventName] : undefined; if (!eventData) { card.style.display = 'none'; return; } const isGroup = groupEvents.includes(eventName); const eventCategory = isGroup ? 'group' : eventData.category; card.style.display = (category === eventCategory) ? 'block' : 'none'; }); }
@@ -715,7 +763,7 @@
                     const activeMenuLink = document.querySelector(`.menu-link[data-target="${tabId}"]`); 
                     if (activeMenuLink) activeMenuLink.classList.add('active'); 
                 } else {
-                    // Fallback if no tab button is active (shouldn't happen often)
+                    // Fallback if no tab button is active (e.g., direct link to results)
                     const programLink = document.querySelector('.menu-link[data-target="program-tab"]');
                     if (programLink) programLink.classList.add('active');
                 }
@@ -768,6 +816,26 @@
                 }
             }
         });
+        
+        // NEW: Scroll to Top Functionality
+        const scrollTopBtn = document.getElementById('scrollTopBtn');
+
+        function handleScroll() {
+            // Show button only if on home page and scrolled down
+            const homePageVisible = document.getElementById('home-page').style.display !== 'none';
+            if (homePageVisible && window.scrollY > 300) {
+                 if(scrollTopBtn) scrollTopBtn.classList.add('show');
+            } else {
+                 if(scrollTopBtn) scrollTopBtn.classList.remove('show');
+            }
+        }
+
+        window.scrollToTop = function() {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+        
+        // Add scroll listener
+        window.addEventListener('scroll', handleScroll);
 
 
         // ===================================================================================
