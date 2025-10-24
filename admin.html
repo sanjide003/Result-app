@@ -16,7 +16,7 @@
         .btn { @apply inline-flex items-center justify-center px-5 py-2.5 rounded-lg font-semibold text-white shadow-lg focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-opacity-75 transition-all duration-300 ease-in-out; transform: translateZ(0); }
         .btn:hover { @apply shadow-xl -translate-y-0.5; }
         .btn:active { @apply shadow-md translate-y-0; }
-        .btn i { @apply mr-2 -ml-1 h-5 w-5; } /* Icon spacing */
+        .btn i:not(.password-toggle-icon) { @apply mr-2 -ml-1 h-5 w-5; } /* Icon spacing, exclude toggle */
         .btn-primary { @apply bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 focus:ring-indigo-500; }
         .btn-danger { @apply bg-gradient-to-r from-red-600 to-pink-600 hover:from-red-700 hover:to-pink-700 focus:ring-red-500; }
         .btn-secondary { @apply bg-gradient-to-r from-gray-600 to-gray-700 hover:from-gray-700 hover:to-gray-800 focus:ring-gray-500; }
@@ -31,6 +31,9 @@
         .form-label { @apply block text-sm font-medium text-gray-700 mb-1.5; }
         .card { @apply bg-white shadow-xl rounded-2xl p-6 md:p-8; }
         .card-header { @apply text-2xl font-bold text-gray-900 mb-6; }
+        /* Password input wrapper */
+        .password-wrapper { @apply relative; }
+        .password-toggle-btn { @apply absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600 cursor-pointer; }
         
         /* Malayalam Instruction Box */
         .info-text { @apply bg-blue-50 text-blue-800 p-4 border border-blue-200 rounded-lg text-sm mb-6; }
@@ -68,6 +71,7 @@
     <!-- Login Page -->
     <div id="login-page" class="min-h-screen flex items-center justify-center bg-gray-200 p-4">
         <div class="w-full max-w-md">
+            <!-- Login Card -->
             <div class="card mb-6">
                 <h2 class="card-header text-center">Admin Panel Login</h2>
                 <form id="login-form">
@@ -77,11 +81,18 @@
                     </div>
                     <div class="mb-6">
                         <label for="login-password" class="form-label">Password</label>
-                        <input type="password" id="login-password" class="form-input" required placeholder="••••••••">
+                        <div class="password-wrapper">
+                            <input type="password" id="login-password" class="form-input pr-10" required placeholder="••••••••">
+                            <button type="button" class="password-toggle-btn" onclick="togglePasswordVisibility('login-password', this)">
+                                <i class="fas fa-eye password-toggle-icon"></i>
+                            </button>
+                        </div>
                     </div>
+                    <!-- UPDATED: Button Style -->
                     <button type="submit" class="btn btn-primary w-full"><i class="fas fa-sign-in-alt"></i>Login</button>
                 </form>
             </div>
+            <!-- Register Card -->
             <div class="card">
                 <h2 class="card-header text-center text-xl">Register New Admin <span class="text-sm font-normal text-gray-500">(First Use Only)</span></h2>
                  <form id="register-form">
@@ -91,8 +102,14 @@
                     </div>
                     <div class="mb-6">
                         <label for="register-password" class="form-label">Password</label>
-                        <input type="password" id="register-password" class="form-input" required placeholder="Choose a strong password">
+                         <div class="password-wrapper">
+                            <input type="password" id="register-password" class="form-input pr-10" required placeholder="Choose a strong password">
+                            <button type="button" class="password-toggle-btn" onclick="togglePasswordVisibility('register-password', this)">
+                                <i class="fas fa-eye password-toggle-icon"></i>
+                            </button>
+                        </div>
                     </div>
+                     <!-- UPDATED: Button Style -->
                     <button type="submit" class="btn btn-secondary w-full"><i class="fas fa-user-plus"></i>Register</button>
                 </form>
             </div>
@@ -115,7 +132,7 @@
                 <a href="#teams" data-target="page-teams" class="menu-link"><i class="fas fa-users"></i>Manage Teams</a>
                 <a href="#results" data-target="page-results" class="menu-link"><i class="fas fa-poll"></i>Publish Results</a>
                 <div class="mt-6 border-t pt-4">
-                     <button id="logout-button" class="w-full btn btn-danger"><i class="fas fa-sign-out-alt mr-2"></i>Logout</button>
+                     <button id="logout-button" class="w-full btn btn-danger"><i class="fas fa-sign-out-alt"></i>Logout</button>
                 </div>
             </div>
         </div>
@@ -445,7 +462,7 @@
         const auth = getAuth(app);
         const db = getFirestore(app);
 
-        // --- [JavaScript Logic - RESTORED Authentication & other logic] ---
+        // --- [JavaScript Logic - Includes RESTORED Auth + Previous Features] ---
         // Global state
         let allPrograms = [];
         let allCategories = [];
@@ -499,7 +516,7 @@
         }
 
         // ===================================
-        // Authentication (RESTORED)
+        // Authentication (FIXED & COMPLETE)
         // ===================================
         onAuthStateChanged(auth, (user) => {
             if (user) {
@@ -509,9 +526,13 @@
                 // Activate the default page and load its data
                 const defaultPageId = 'page-dashboard';
                 pages.forEach(page => page.classList.add('hidden'));
-                document.getElementById(defaultPageId).classList.remove('hidden');
+                 const defaultPageElement = document.getElementById(defaultPageId);
+                 if (defaultPageElement) defaultPageElement.classList.remove('hidden');
+
                 navLinks.forEach(nav => nav.classList.remove('active'));
-                document.querySelector(`.menu-link[data-target="${defaultPageId}"]`).classList.add('active');
+                const defaultNavLink = document.querySelector(`.menu-link[data-target="${defaultPageId}"]`);
+                 if (defaultNavLink) defaultNavLink.classList.add('active');
+
                 loadDataForPage(defaultPageId); // Load default page data
                 loadAllParticipants(); // Load participants data on login
             } else {
@@ -520,63 +541,53 @@
             }
         });
         
-        // RESTORED: Login Form Event Listener
         if(loginForm) {
             loginForm.addEventListener('submit', async (e) => { 
                 e.preventDefault(); 
                 const email = document.getElementById('login-email').value;
                 const password = document.getElementById('login-password').value;
-                if (!email || !password) {
-                    alert("Please enter both email and password.");
-                    return;
-                }
+                if (!email || !password) { alert("Please enter both email and password."); return; }
                 try { 
                     await signInWithEmailAndPassword(auth, email, password); 
-                    // onAuthStateChanged will handle UI changes
-                } catch (error) { 
-                    alert(`Login Failed: ${error.message}`); 
-                }
+                } catch (error) { alert(`Login Failed: ${error.message}`); }
             });
-        } else {
-            console.error("Login form not found!");
-        }
+        } else { console.error("Login form not found!"); }
 
-        // RESTORED: Register Form Event Listener
         if(registerForm) {
             registerForm.addEventListener('submit', async (e) => { 
                 e.preventDefault(); 
                  const email = document.getElementById('register-email').value;
                  const password = document.getElementById('register-password').value;
-                 if (!email || !password) {
-                     alert("Please enter both email and password.");
-                     return;
-                 }
+                 if (!email || !password) { alert("Please enter both email and password."); return; }
                 try { 
                     await createUserWithEmailAndPassword(auth, email, password); 
                     alert('Admin user registered! Please login.'); 
                     registerForm.reset(); 
-                } catch (error) { 
-                    alert(`Registration Failed: ${error.message}`); 
-                }
+                } catch (error) { alert(`Registration Failed: ${error.message}`); }
             });
-        } else {
-             console.error("Register form not found!");
-        }
+        } else { console.error("Register form not found!"); }
 
-        // RESTORED: Logout Button Event Listener
         if(logoutButton) {
             logoutButton.addEventListener('click', async () => { 
-                try {
-                    await signOut(auth);
-                    // onAuthStateChanged will handle UI changes
-                } catch(error) {
-                    alert(`Logout Failed: ${error.message}`);
-                }
+                try { await signOut(auth); } 
+                catch(error) { alert(`Logout Failed: ${error.message}`); }
             });
-        } else {
-             console.error("Logout button not found!");
-        }
+        } else { console.error("Logout button not found!"); }
 
+        // NEW: Password Toggle Functionality
+        window.togglePasswordVisibility = function(inputId, button) {
+            const input = document.getElementById(inputId);
+            const icon = button.querySelector('i');
+            if (input.type === "password") {
+                input.type = "text";
+                icon.classList.remove("fa-eye");
+                icon.classList.add("fa-eye-slash");
+            } else {
+                input.type = "password";
+                icon.classList.remove("fa-eye-slash");
+                icon.classList.add("fa-eye");
+            }
+        }
 
         // ===================================
         // Participants Page
@@ -611,11 +622,9 @@
              importLogContainer.style.display = 'block';
              importLog.textContent = 'Starting import... Please wait.\nDeleting existing participants...\n';
 
-             // First, delete existing participants
-             deleteAllParticipants(false) // Pass false to skip confirmation prompt
+             deleteAllParticipants(false) 
                  .then(() => {
                      importLog.textContent += 'Existing participants deleted.\nParsing CSV file...\n';
-                     // Now parse and import new data
                      Papa.parse(file, {
                          header: true, skipEmptyLines: true,
                          complete: async (results) => {
@@ -627,10 +636,10 @@
                              try {
                                  const batch = writeBatch(db); let importedCount = 0; let skippedCount = 0;
                                  data.forEach(row => {
-                                     const chestNo = row["Chest No"] ? String(row["Chest No"]).trim() : null; // Ensure ChestNo is string
+                                     const chestNo = row["Chest No"] ? String(row["Chest No"]).trim() : null; 
                                      const name = row["Name"] ? row["Name"].trim() : null;
                                      const team = row["Team"] ? row["Team"].trim() : null;
-                                     if (chestNo && name && team && /^\d+$/.test(chestNo)) { // Validate chestNo is numeric string
+                                     if (chestNo && name && team && /^\d+$/.test(chestNo)) { 
                                          const docRef = doc(db, `artifacts/${appId}/public/data/participants`, chestNo);
                                          batch.set(docRef, { name: name, team: team.toUpperCase() }); importedCount++;
                                      } else {
@@ -651,34 +660,33 @@
         });
 
         async function deleteAllParticipants(promptUser = true) {
-             let confirmation = 'DELETE'; // Assume confirmation if promptUser is false
+             let confirmation = 'DELETE'; 
              if (promptUser) {
                  confirmation = prompt('This will delete ALL participants. Type DELETE to confirm.');
              }
              if (confirmation !== 'DELETE') {
                  if (promptUser) alert('Deletion cancelled.');
-                 return Promise.reject('Deletion cancelled by user or skipped.'); // Return a rejected promise
+                 return Promise.reject('Deletion cancelled by user or skipped.'); 
              }
              try {
                  if (promptUser) alert('Deleting participants...');
                  const snapshot = await getDocs(collection(db, `artifacts/${appId}/public/data/participants`));
                  if (snapshot.empty && promptUser) {
                      alert('No participants found to delete.');
-                     return Promise.resolve(); // Return a resolved promise
+                     return Promise.resolve(); 
                  }
                  const batch = writeBatch(db);
                  snapshot.docs.forEach(doc => { batch.delete(doc.ref); });
                  await batch.commit();
                  if (promptUser) alert('All participants have been deleted.');
-                 loadAllParticipants(); // Reload count
-                 return Promise.resolve(); // Return a resolved promise on success
+                 loadAllParticipants(); 
+                 return Promise.resolve(); 
              } catch (error) {
                  if (promptUser) alert(`Error deleting participants: ${error.message}`);
-                 return Promise.reject(error); // Return a rejected promise on error
+                 return Promise.reject(error); 
              }
         }
-        deleteAllParticipantsBtn.addEventListener('click', () => deleteAllParticipants(true)); // Call with prompt
-
+        deleteAllParticipantsBtn.addEventListener('click', () => deleteAllParticipants(true)); 
 
         // ===================================
         // Programs & Categories Page
@@ -893,6 +901,7 @@
                  renderAdminTeamList(); 
              } catch (error) { alert(`Error deleting team: ${error.message}`); }
         };
+
 
         // ===================================
         // Home Page Content (Admin)
