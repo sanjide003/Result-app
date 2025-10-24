@@ -72,26 +72,9 @@
         .leader-info div { display: flex; justify-content: space-between; padding: 8px 0; }
         .leader-info div span:first-child { color: var(--subtle-text); }
         
-        /* UPDATED: Gallery Styles */
-        #gallery-container {
-            display: flex;
-            overflow-x: auto;
-            gap: 15px;
-            padding: 10px 0;
-            min-height: 220px;
-            -webkit-overflow-scrolling: touch; /* Smooth scroll on mobile */
-        }
-        #gallery-container img {
-            width: auto; /* Let height dominate */
-            height: 200px; /* Fixed height */
-            object-fit: cover;
-            border-radius: 12px;
-            box-shadow: 0 4px 12px var(--shadow-color);
-            transition: transform 0.3s;
-            flex-shrink: 0; /* Prevent images from shrinking */
-        }
+        #gallery-container { display: flex; overflow-x: auto; gap: 15px; padding: 10px 0; min-height: 220px; -webkit-overflow-scrolling: touch; }
+        #gallery-container img { width: auto; height: 200px; object-fit: cover; border-radius: 12px; box-shadow: 0 4px 12px var(--shadow-color); transition: transform 0.3s; flex-shrink: 0; }
         #gallery-container img:hover { transform: scale(1.03); }
-        /* Hide scrollbar but keep functionality */
         #gallery-container::-webkit-scrollbar { height: 8px; }
         #gallery-container::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 4px; }
         #gallery-container::-webkit-scrollbar-thumb:hover { background: #ccc; }
@@ -132,7 +115,6 @@
         .rank-3 { background-color: #d9895a; }
         .team-name-cell { font-weight: bold; font-size: 1.2em; color: var(--heading-color); }
         .points-pill { padding: 5px 10px; border-radius: 15px; font-weight: bold; text-align: center; }
-        /* Dynamic pill colors */
         .points-pill.default-pill-1 { background-color: #fce4ec; color: #d81b60; }
         .points-pill.default-pill-2 { background-color: #ede7f6; color: #5e35b1; }
         .points-pill.default-pill-3 { background-color: #e4f8f0; color: #1a9c68; }
@@ -358,7 +340,7 @@
         try { await signInAnonymously(auth); } catch(error) { console.error("Anonymous sign-in failed: ", error); }
 
         // ===================================================================================
-        // Data Configuration (v6)
+        // Data Configuration
         // ===================================================================================
         let TEAM_NAMES = [];
         const POINTS = { STANDARD: { first: 5, second: 3, third: 1 }, GROUP: { first: 10, second: 8, third: 5 } };
@@ -366,23 +348,20 @@
 
         // Global variables
         let processedTeamData = {}, processedProgramData = [], processedTalentData = {}, processedScoreboardData = {};
-        let publishedResultsCount = 0, dbPrograms = {}, dbTeams = {}, dbCategories = [], dbHomepage = {}, dbParticipants = {}; // NEW: dbParticipants
+        let publishedResultsCount = 0;
+        let dbPrograms = null, dbTeams = null, dbCategories = null, dbHomepage = null, dbParticipants = null;
+        let dbResults = null; 
 
         // ===================================================================================
-        // Data Processing (v6 - UPDATED)
+        // Data Processing
         // ===================================================================================
 
         function getTeamFromChest(chestNo) {
             if (!chestNo || typeof chestNo !== 'string') return null;
-            // First, check if the chestNo is a team name (for group items)
+            if (dbTeams == null || dbParticipants == null) return null; // Data not ready
+            
             for (const teamName of TEAM_NAMES) { if (chestNo.toUpperCase() === teamName) return teamName; }
-            
-            // Second, check participant data (if available)
-            if (dbParticipants[chestNo] && dbParticipants[chestNo].team) {
-                return dbParticipants[chestNo].team;
-            }
-            
-            // Fallback: check team ID range (old method)
+            if (dbParticipants[chestNo] && dbParticipants[chestNo].team) { return dbParticipants[chestNo].team; }
             const chestNumberMatch = chestNo.match(/^\d+/);
             if (chestNumberMatch) {
                 const chestNumber = parseInt(chestNumberMatch[0], 10);
@@ -395,11 +374,26 @@
             return null;
         }
 
-        function initializeTeamData() { const data = {}; TEAM_NAMES = Object.keys(dbTeams); TEAM_NAMES.forEach(team => { data[team] = { name: team, total: 0 }; dbCategories.forEach(cat => { data[team][cat.name] = 0; }); data[team]['group'] = 0; }); return data; }
+        function initializeTeamData() { 
+            const data = {}; 
+            if (dbTeams == null || dbCategories == null) return data; // Data not ready
+            
+            TEAM_NAMES = Object.keys(dbTeams); 
+            TEAM_NAMES.forEach(team => { 
+                data[team] = { name: team, total: 0 }; 
+                dbCategories.forEach(cat => { data[team][cat.name] = 0; }); 
+                data[team]['group'] = 0; 
+            }); 
+            return data; 
+        }
 
-        function processAllData(dbResults) {
-            // Wait until essential data is loaded
-            if (dbCategories.length === 0 || Object.keys(dbTeams).length === 0) return;
+        // UPDATED: Removed the faulty guard
+        function processAllData(currentResults) {
+            // This is the *real* guard. Wait until all data is available (not null).
+            if (dbCategories == null || dbTeams == null || dbHomepage == null || dbParticipants == null || dbPrograms == null || currentResults == null) {
+                console.warn("processAllData called, but essential data is null. Waiting...");
+                return;
+            }
             
             processedTeamData = initializeTeamData();
             processedProgramData = [];
@@ -410,26 +404,21 @@
             categoryNames.push('group');
             categoryNames.forEach(catName => { processedScoreboardData.categoryTotals[catName] = {}; TEAM_NAMES.forEach(team => { processedScoreboardData.categoryTotals[catName][team] = 0; }); processedScoreboardData.categoryCounts[catName] = 0; });
             
-            for (const programId in dbResults) {
+            for (const programId in currentResults) {
                 const program = dbPrograms[programId];
                 if (!program) continue;
-                const eventName = program.name, categoryName = program.category, winners = dbResults[programId];
-                
-                // Check if there are any winners at all
+                const eventName = program.name, categoryName = program.category, winners = currentResults[programId];
                 if (!((winners.first && winners.first.length > 0) || (winners.second && winners.second.length > 0) || (winners.third && winners.third.length > 0))) continue;
                 resultsCount++;
-                
                 const isGroupEvent = groupEvents.includes(eventName);
                 const currentPoints = isGroupEvent ? POINTS.GROUP : POINTS.STANDARD;
                 const filterCategory = isGroupEvent ? 'group' : categoryName;
                 const eventScore = { category: categoryName };
                 TEAM_NAMES.forEach(team => { eventScore[team] = { points: 0, positions: [] }; });
-
                 for (const position of ['first', 'second', 'third']) {
                     if (winners[position] && winners[position].length > 0) {
-                        // UPDATED: 'winner' is now an object {chest: "101", name: "Aamir"}
                         winners[position].forEach(winner => {
-                            const team = getTeamFromChest(winner.chest); // Get team from chest number
+                            const team = getTeamFromChest(winner.chest);
                             if (team) {
                                 const pointValue = currentPoints[position];
                                 processedTeamData[team].total += pointValue;
@@ -437,10 +426,8 @@
                                 if (processedTeamData[team][pointCategoryKey] !== undefined) {
                                    processedTeamData[team][pointCategoryKey] += pointValue;
                                 }
-                                
-                                // UPDATED: Talent points logic
                                 if (!isGroupEvent) {
-                                    const winnerIdentifier = `${winner.chest} ${winner.name}`; // e.g., "101 Aamir Khan"
+                                    const winnerIdentifier = `${winner.chest} ${winner.name}`;
                                     if (!talentPoints[winnerIdentifier]) talentPoints[winnerIdentifier] = { points: 0, category: categoryName };
                                     talentPoints[winnerIdentifier].points += pointValue;
                                 }
@@ -460,10 +447,10 @@
             }
             
             processedTalentData = {};
-            for (const studentKey in talentPoints) { // studentKey is "101 Aamir Khan"
+            for (const studentKey in talentPoints) {
                 const { points, category } = talentPoints[studentKey];
                 if (!processedTalentData[category]) processedTalentData[category] = [];
-                processedTalentData[category].push({ name: studentKey, points }); // name is "101 Aamir Khan"
+                processedTalentData[category].push({ name: studentKey, points });
             }
             for (const category in processedTalentData) { processedTalentData[category].sort((a, b) => b.points - a.points); }
             
@@ -472,28 +459,31 @@
         }
 
         // ===================================================================================
-        // Rendering Functions (v6 - UPDATED)
+        // Rendering Functions (No Changes)
         // ===================================================================================
         
         function renderAllComponents() {
+            if (dbCategories == null) return; // Guard if data is still null
             generateFilterButtons();
             generateTeamCards();
             generateDetailedRankings();
-            renderProgramResults(); // Updated
-            generateTalentList(); // Updated
+            renderProgramResults();
+            generateTalentList();
             generateScoreboard();
-            generateStaticContent(); // Updated
+            generateStaticContent();
             updateResultCounts();
             if (dbCategories.length > 0) filterScoreboard(dbCategories[0].name); else filterScoreboard('group');
+            // Hide Loading Overlay
             document.getElementById('loading-overlay').style.opacity = '0';
-            setTimeout(() => { document.getElementById('loading-overlay').style.display = 'none'; document.getElementById('main-content').style.visibility = 'visible'; }, 500);
+            setTimeout(() => { 
+                document.getElementById('loading-overlay').style.display = 'none'; 
+                document.getElementById('main-content').style.visibility = 'visible'; 
+            }, 500);
         }
 
-        function generateFilterButtons() { const programFiltersEl = document.getElementById('program-filter-buttons'); const scoreboardFiltersEl = document.getElementById('scoreboard-filter-buttons'); let buttonsHtml = `<button class="filter-btn active" data-filter="all" onclick="filterResults('all')">All</button>`; dbCategories.forEach(cat => { buttonsHtml += `<button class="filter-btn" data-filter="${cat.name}" onclick="filterResults('${cat.name}')">${cat.name}</button>`; }); buttonsHtml += `<button class="filter-btn" data-filter="group" onclick="filterResults('group')">Group</button>`; programFiltersEl.innerHTML = buttonsHtml; let scoreboardButtonsHtml = ''; dbCategories.forEach((cat, index) => { scoreboardButtonsHtml += `<button class="filter-btn ${index === 0 ? 'active' : ''}" data-filter="${cat.name}" onclick="filterScoreboard('${cat.name}')">${cat.name}</button>`; }); scoreboardButtonsHtml += `<button class="filter-btn" data-filter="group" onclick="filterScoreboard('group')">Group</button>`; scoreboardFiltersEl.innerHTML = scoreboardButtonsHtml; }
+        function generateFilterButtons() { const programFiltersEl = document.getElementById('program-filter-buttons'); const scoreboardFiltersEl = document.getElementById('scoreboard-filter-buttons'); let buttonsHtml = `<button class="filter-btn active" data-filter="all" onclick="filterResults('all')">All</button>`; (dbCategories || []).forEach(cat => { buttonsHtml += `<button class="filter-btn" data-filter="${cat.name}" onclick="filterResults('${cat.name}')">${cat.name}</button>`; }); buttonsHtml += `<button class="filter-btn" data-filter="group" onclick="filterResults('group')">Group</button>`; programFiltersEl.innerHTML = buttonsHtml; let scoreboardButtonsHtml = ''; (dbCategories || []).forEach((cat, index) => { scoreboardButtonsHtml += `<button class="filter-btn ${index === 0 ? 'active' : ''}" data-filter="${cat.name}" onclick="filterScoreboard('${cat.name}')">${cat.name}</button>`; }); scoreboardButtonsHtml += `<button class="filter-btn" data-filter="group" onclick="filterScoreboard('group')">Group</button>`; scoreboardFiltersEl.innerHTML = scoreboardButtonsHtml; }
         function generateTeamCards() { const rankedTeams = Object.values(processedTeamData).sort((a, b) => b.total - a.total); const container = document.getElementById('team-cards-container'); container.innerHTML = ''; const cardClasses = ['champion', 'first-runner-up', 'second-runner-up']; const positionTexts = ['Champions', 'First Runners-up', 'Second Runners-up']; const iconClasses = ['fas fa-crown', 'fas fa-medal', 'fas fa-medal']; rankedTeams.forEach((team, i) => { container.innerHTML += `<div class="team-card ${cardClasses[i] || ''}"><div class="icon"><i class="${iconClasses[i] || 'fas fa-award'}"></i></div><div class="team-name">${team.name}</div><p class="points"><b>${team.total}</b></p><p class="position">${positionTexts[i] || `#${i + 1} Position`}</p></div>`; }); }
-        function generateDetailedRankings() { const container = document.getElementById('detailed-rankings'); const rankedTeams = Object.values(processedTeamData).sort((a, b) => b.total - a.total); const maxScore = rankedTeams.length > 0 ? rankedTeams[0].total : 0; let headerCols = '', gridTemplateCols = '40px 1.5fr'; dbCategories.forEach(cat => { headerCols += `<div>${cat.name}</div>`; gridTemplateCols += ' 0.8fr'; }); headerCols += `<div>Group</div>`; gridTemplateCols += ' 0.8fr 1fr 1fr'; let tableHtml = `<div class="rankings-table-content" style="min-width: ${700 + dbCategories.length * 80}px;"><div class="ranking-header" style="grid-template-columns: ${gridTemplateCols};"><div>Rank</div><div>Team</div>${headerCols}<div>Total</div><div>Progress</div></div>`; rankedTeams.forEach((team, index) => { const rank = index + 1; const progress = maxScore > 0 ? (team.total / maxScore) * 100 : 0; let pointsCols = ''; dbCategories.forEach((cat, i) => { pointsCols += `<div><span class="points-pill default-pill-${(i % 6) + 1}">${team[cat.name] || 0}</span></div>`; }); pointsCols += `<div><span class="points-pill group">${team['group'] || 0}</span></div>`; tableHtml += `<div class="ranking-row" style="grid-template-columns: ${gridTemplateCols};"><div><span class="rank-cell rank-${rank}">${rank}</span></div><div class="team-name-cell">${team.name}</div>${pointsCols}<div class="total-points-cell">${team.total}</div><td><div class="progress-circle-container"><div class="progress-circle" style="--p:${progress};"><span class="progress-circle-text">${Math.round(progress)}%</span></div></div></td></div>`; }); tableHtml += '</div>'; container.innerHTML = `<h2>Detailed Rankings</h2><p>Complete scoreboard with detailed breakdown by category</p>${tableHtml}`; }
-
-        // UPDATED: renderProgramResults
+        function generateDetailedRankings() { const container = document.getElementById('detailed-rankings'); const rankedTeams = Object.values(processedTeamData).sort((a, b) => b.total - a.total); const maxScore = rankedTeams.length > 0 ? rankedTeams[0].total : 0; let headerCols = '', gridTemplateCols = '40px 1.5fr'; (dbCategories || []).forEach(cat => { headerCols += `<div>${cat.name}</div>`; gridTemplateCols += ' 0.8fr'; }); headerCols += `<div>Group</div>`; gridTemplateCols += ' 0.8fr 1fr 1fr'; let tableHtml = `<div class="rankings-table-content" style="min-width: ${700 + (dbCategories || []).length * 80}px;"><div class="ranking-header" style="grid-template-columns: ${gridTemplateCols};"><div>Rank</div><div>Team</div>${headerCols}<div>Total</div><div>Progress</div></div>`; rankedTeams.forEach((team, index) => { const rank = index + 1; const progress = maxScore > 0 ? (team.total / maxScore) * 100 : 0; let pointsCols = ''; (dbCategories || []).forEach((cat, i) => { pointsCols += `<div><span class="points-pill default-pill-${(i % 6) + 1}">${team[cat.name] || 0}</span></div>`; }); pointsCols += `<div><span class="points-pill group">${team['group'] || 0}</span></div>`; tableHtml += `<div class="ranking-row" style="grid-template-columns: ${gridTemplateCols};"><div><span class="rank-cell rank-${rank}">${rank}</span></div><div class="team-name-cell">${team.name}</div>${pointsCols}<div class="total-points-cell">${team.total}</div><td><div class="progress-circle-container"><div class="progress-circle" style="--p:${progress};"><span class="progress-circle-text">${Math.round(progress)}%</span></div></div></td></div>`; }); tableHtml += '</div>'; container.innerHTML = `<h2>Detailed Rankings</h2><p>Complete scoreboard with detailed breakdown by category</p>${tableHtml}`; }
         function renderProgramResults() {
             const grid = document.getElementById('program-results-grid');
             grid.innerHTML = '';
@@ -504,17 +494,13 @@
                 let winnersHtml = '';
                 ['first', 'second', 'third'].forEach((pos, index) => {
                     if (winners[pos] && winners[pos].length > 0) {
-                        // UPDATED: 'winner' is an object {chest: "101", name: "Aamir"}
                         winners[pos].forEach(winner => {
                             const team = getTeamFromChest(winner.chest);
                             const chestId = winner.chest || 'N/A';
                             const winnerName = winner.name === 'Unknown' ? `Chest No: ${chestId}` : winner.name;
-                            
-                            // If it's a group item, just show team name
                             if (isGroupEvent && team) {
                                 winnersHtml += `<div class="winner-entry ${['first-place', 'second-place', 'third-place'][index]}"><i class="${['fas fa-trophy', 'fas fa-medal silver', 'fas fa-medal bronze'][index]} medal-icon"></i><div class="winner-details"><div class="name">${team}</div><div class="id-team"><span>GROUP ITEM</span></div></div><div class="winner-points"><div class="points-value">${currentPoints[pos]}</div><div class="points-label">points</div></div></div>`;
                             } else {
-                                // Individual item
                                 const points = currentPoints[pos];
                                 winnersHtml += `<div class="winner-entry ${['first-place', 'second-place', 'third-place'][index]}"><i class="${['fas fa-trophy', 'fas fa-medal silver', 'fas fa-medal bronze'][index]} medal-icon"></i><div class="winner-details"><div class="name">${winnerName}</div><div class="id-team"><span>ID: ${chestId}</span> ${team || ''}</div></div><div class="winner-points"><div class="points-value">${points}</div><div class="points-label">points</div></div></div>`;
                             }
@@ -529,23 +515,18 @@
                 grid.appendChild(card);
             });
         }
-        
-        // UPDATED: generateTalentList
         function generateTalentList() {
             const container = document.getElementById('talent-list-container');
             container.innerHTML = `<h2 style="text-align: center; color: var(--heading-color); font-family: 'Saira', sans-serif;">Top Talents</h2>`;
-            dbCategories.forEach((category, catIndex) => {
+            (dbCategories || []).forEach((category, catIndex) => {
                 const categoryName = category.name;
                 if (processedTalentData[categoryName] && processedTalentData[categoryName].length > 0) {
                     const talentArray = processedTalentData[categoryName];
                     let topTalentsHtml = '', dropdownTalentsHtml = '';
-                    
                     talentArray.forEach((student, index) => {
-                        // UPDATED: student.name is "101 Aamir Khan"
                         const chestId = (student.name.match(/^\d+/) || ['N/A'])[0];
-                        const studentName = student.name.replace(/^\d+\s*/, ''); // Removes "101 "
+                        const studentName = student.name.replace(/^\d+\s*/, '');
                         const teamName = getTeamFromChest(chestId) || '';
-                        
                         const studentHtml = `<div class="winner-entry ${['first-place', 'second-place', 'third-place'][index] || ''}">${index < 3 ? ['<i class="fas fa-trophy medal-icon"></i>', '<i class="fas fa-medal silver medal-icon"></i>', '<i class="fas fa-medal bronze medal-icon"></i>'][index] : `<span class="medal-icon">#${index + 1}</span>`}<div class="winner-details"><div class="name">${studentName}</div><div class="id-team"><span>ID: ${chestId}</span> ${teamName}</div></div><div class="winner-points"><div class="points-value">${student.points}</div><div class="points-label">points</div></div></div>`;
                         index < 2 ? topTalentsHtml += studentHtml : dropdownTalentsHtml += studentHtml;
                     });
@@ -556,22 +537,16 @@
                 }
             });
         }
-
         function generateScoreboard() { const container = document.getElementById('scoreboard-table-content'); let scoreboardHtml = ''; for (const eventName in processedScoreboardData.eventPoints) { const eventData = processedScoreboardData.eventPoints[eventName]; scoreboardHtml += `<div class="scoreboard-card" data-category="${eventData.category}" data-event-name="${eventName}"><div class="scoreboard-event-header"><span>Program Name:</span><span>${eventName.replace('________NO ONE','')}</span></div>${TEAM_NAMES.map(team => `<div class="scoreboard-team-row"><span>${team}:</span><span>${eventData[team].points} ${getTrophyIconsHTML(eventData[team].positions)}</span></div>`).join('')}</div>`; } scoreboardHtml += `<div class="scoreboard-card total-card" id="scoreboard-total-card"><h3>TOTALS</h3><p id="scoreboard-category-count" class="category-count-text"></p>${TEAM_NAMES.map(team => `<div class="scoreboard-team-row"><span>${team}:</span> <span data-team="${team}">0</span></div>`).join('')}</div><div class="scoreboard-legend"><span><i class="fas fa-trophy gold"></i> Gold</span> <span><i class="fas fa-trophy silver"></i> Silver</span> <span><i class="fas fa-trophy bronze"></i> Bronze</span></div>`; container.innerHTML = scoreboardHtml; }
-        
-        // UPDATED: generateStaticContent
         function generateStaticContent() {
+            if (dbHomepage == null || dbTeams == null) return; // Guard
             const leaderContainer = document.getElementById('leader-cards-container');
             const galleryContainer = document.getElementById('gallery-container');
             const leaderPlaceholder = document.getElementById('leader-placeholder');
             const galleryPlaceholder = document.getElementById('gallery-placeholder');
-            
-            // Hero
             document.getElementById('hero-logo').src = dbHomepage.logo_url || 'https://placehold.co/150x150/FFFFFF/EFEFEF?text=Logo';
             document.getElementById('hero-main-title').innerText = dbHomepage.main_title || 'Event Title';
             document.getElementById('hero-subtitle').innerText = dbHomepage.subtitle || 'Event Subtitle';
-
-            // Leader Cards
             const rankedTeams = Object.values(processedTeamData).sort((a,b) => b.total - a.total);
             if (rankedTeams.length > 0 && Object.keys(dbTeams).length > 0) {
                 if(leaderPlaceholder) leaderPlaceholder.style.display = 'none';
@@ -582,8 +557,6 @@
             } else if (leaderPlaceholder) {
                 leaderPlaceholder.textContent = "Team leaders will appear here once teams are added in admin panel.";
             }
-            
-            // Gallery (Horizontal Scroll)
             galleryContainer.innerHTML = '';
             if (dbHomepage.gallery && dbHomepage.gallery.length > 0) {
                 if(galleryPlaceholder) galleryPlaceholder.style.display = 'none';
@@ -593,12 +566,8 @@
             } else if (galleryPlaceholder) {
                 galleryPlaceholder.textContent = "Gallery images will appear here.";
             }
-            
-            // About
             document.getElementById('about-text').innerText = dbHomepage.about || 'About text will be updated soon.';
             document.getElementById('about-image').src = dbHomepage.about_image_url || 'https://placehold.co/800x400/EFEFEF/CCCCCC?text=Event+Image';
-
-            // Stats (From Admin Text)
             document.getElementById('stats-programs-public').textContent = dbHomepage.total_programs || '...';
             document.getElementById('stats-participants-public').textContent = dbHomepage.total_participants || '...';
             document.getElementById('stats-categories-public').textContent = dbHomepage.total_categories || '...';
@@ -606,7 +575,7 @@
         }
         
         // ===================================================================================
-        // UI & Event Handling (v6 - No changes)
+        // UI & Event Handling (No Changes)
         // ===================================================================================
         window.openNav = function() { document.getElementById("menu-overlay").style.display = "flex"; document.getElementById("main-content").style.filter = 'blur(4px)'; setTimeout(() => document.getElementById("menu-overlay").style.opacity = '1', 10); }
         window.closeNav = function() { document.getElementById("menu-overlay").style.opacity = '0'; setTimeout(() => document.getElementById("menu-overlay").style.display = "none", 300); document.getElementById("main-content").style.filter = 'none'; }
@@ -621,28 +590,77 @@
         window.fireTeamConfetti = function() { if (!window.confetti) return; const end = Date.now() + (2 * 1000); (function frame() { if (Date.now() > end) return; confetti({ particleCount: 2, angle: 60, spread: 55, origin: { x: 0 } }); confetti({ particleCount: 2, angle: 120, spread: 55, origin: { x: 1 } }); requestAnimationFrame(frame); }()); }
 
         // ===================================================================================
-        // Application Initialization (v6 - UPDATED)
+        // Application Initialization (FIXED v6.3)
         // ===================================================================================
         
-        let allDataLoaded = false, resultsLoaded = false, programsLoaded = false, teamsLoaded = false, homepageLoaded = false, categoriesLoaded = false, participantsLoaded = false; // NEW
-        let dbResults = {};
+        let allDataLoaded = false;
+        let loadStatus = {
+            results: false,
+            programs: false,
+            teams: false,
+            homepage: false,
+            categories: false,
+            participants: false
+        };
 
+        // This function now handles both initial load and updates
         function checkAllDataLoaded() {
-            // NEW: Added participantsLoaded
-            if (resultsLoaded && programsLoaded && teamsLoaded && homepageLoaded && categoriesLoaded && participantsLoaded && !allDataLoaded) {
+            // If already loaded, just re-process the data
+            if (allDataLoaded) {
+                processAllData(dbResults);
+                return;
+            }
+
+            // If not loaded, check if all flags are set
+            if (loadStatus.results && loadStatus.programs && loadStatus.teams && loadStatus.homepage && loadStatus.categories && loadStatus.participants) {
                 allDataLoaded = true;
+                console.log("All data loaded. Processing...");
                 processAllData(dbResults);
             }
         }
 
-        // Listeners
-        onSnapshot(query(collection(db, `artifacts/${appId}/public/data/results`)), (snapshot) => { dbResults = {}; snapshot.docs.forEach(doc => { dbResults[doc.id] = doc.data(); }); resultsLoaded = true; if(allDataLoaded) { processAllData(dbResults); } else { checkAllDataLoaded(); } }, (e) => console.error("Error results: ", e));
-        onSnapshot(query(collection(db, `artifacts/${appId}/public/data/programs`)), (snapshot) => { dbPrograms = {}; snapshot.docs.forEach(doc => { dbPrograms[doc.id] = doc.data(); }); programsLoaded = true; checkAllDataLoaded(); }, (e) => console.error("Error programs: ", e));
-        onSnapshot(query(collection(db, `artifacts/${appId}/public/data/teams`)), (snapshot) => { dbTeams = {}; snapshot.docs.forEach(doc => { dbTeams[doc.id] = doc.data(); }); teamsLoaded = true; checkAllDataLoaded(); }, (e) => console.error("Error teams: ", e));
-        onSnapshot(doc(db, `artifacts/${appId}/public/data/config`, 'homepage'), (docSnap) => { if (docSnap.exists()) { dbHomepage = docSnap.data(); } homepageLoaded = true; checkAllDataLoaded(); }, (e) => console.error("Error homepage: ", e));
-        onSnapshot(query(collection(db, `artifacts/${appId}/public/data/categories`)), (snapshot) => { dbCategories = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })).sort((a,b) => a.name.localeCompare(b.name)); categoriesLoaded = true; if(allDataLoaded) { processAllData(dbResults); } else { checkAllDataLoaded(); } }, (e) => console.error("Error categories: ", e));
-        // NEW: Listener for Participants
-        onSnapshot(query(collection(db, `artifacts/${appId}/public/data/participants`)), (snapshot) => { dbParticipants = {}; snapshot.docs.forEach(doc => { dbParticipants[doc.id] = doc.data(); }); participantsLoaded = true; checkAllDataLoaded(); }, (e) => console.error("Error participants: ", e));
+        // --- Listeners (FIXED v6.3) ---
+        // I am initializing the data variables to empty {} or [] first.
+        
+        onSnapshot(query(collection(db, `artifacts/${appId}/public/data/results`)), (snapshot) => { 
+            dbResults = {}; 
+            snapshot.docs.forEach(doc => { dbResults[doc.id] = doc.data(); }); 
+            loadStatus.results = true; 
+            checkAllDataLoaded();
+        }, (e) => { console.error("Error loading results: ", e); dbResults = {}; loadStatus.results = true; checkAllDataLoaded(); });
+        
+        onSnapshot(query(collection(db, `artifacts/${appId}/public/data/programs`)), (snapshot) => { 
+            dbPrograms = {}; 
+            snapshot.docs.forEach(doc => { dbPrograms[doc.id] = doc.data(); }); 
+            loadStatus.programs = true; 
+            checkAllDataLoaded();
+        }, (e) => { console.error("Error loading programs: ", e); dbPrograms = {}; loadStatus.programs = true; checkAllDataLoaded(); });
+        
+        onSnapshot(query(collection(db, `artifacts/${appId}/public/data/teams`)), (snapshot) => { 
+            dbTeams = {}; 
+            snapshot.docs.forEach(doc => { dbTeams[doc.id] = doc.data(); }); 
+            loadStatus.teams = true; 
+            checkAllDataLoaded();
+        }, (e) => { console.error("Error loading teams: ", e); dbTeams = {}; loadStatus.teams = true; checkAllDataLoaded(); });
+        
+        onSnapshot(doc(db, `artifacts/${appId}/public/data/config`, 'homepage'), (docSnap) => { 
+            dbHomepage = docSnap.exists() ? docSnap.data() : {}; 
+            loadStatus.homepage = true; 
+            checkAllDataLoaded();
+        }, (e) => { console.error("Error loading homepage: ", e); dbHomepage = {}; loadStatus.homepage = true; checkAllDataLoaded(); });
+        
+        onSnapshot(query(collection(db, `artifacts/${appId}/public/data/categories`)), (snapshot) => { 
+            dbCategories = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })).sort((a,b) => a.name.localeCompare(b.name)); 
+            loadStatus.categories = true; 
+            checkAllDataLoaded();
+        }, (e) => { console.error("Error loading categories: ", e); dbCategories = []; loadStatus.categories = true; checkAllDataLoaded(); });
+        
+        onSnapshot(query(collection(db, `artifacts/${appId}/public/data/participants`)), (snapshot) => { 
+            dbParticipants = {}; 
+            snapshot.docs.forEach(doc => { dbParticipants[doc.id] = doc.data(); }); 
+            loadStatus.participants = true; 
+            checkAllDataLoaded();
+        }, (e) => { console.error("Error loading participants: ", e); dbParticipants = {}; loadStatus.participants = true; checkAllDataLoaded(); });
         
         window.onload = function() {
             showPage('home-page');
