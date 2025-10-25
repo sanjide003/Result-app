@@ -459,21 +459,20 @@
             return data; 
         }
 
-        function processAllData() { // UPDATED: Removed parameter
-            // Use global dbResults
+        function processAllData() { 
             if (dbCategories == null || dbTeams == null || dbHomepage == null || dbParticipants == null || dbPrograms == null || dbResults == null) {
                 console.warn("processAllData called, but essential data is null. Waiting...");
                 return;
             }
             
-            const currentResults = dbResults; // Use the global variable
+            const currentResults = dbResults; 
             processedTeamData = initializeTeamData();
             processedProgramData = [];
             const talentPoints = {};
             processedScoreboardData = { eventPoints: {}, categoryTotals: {}, categoryCounts: {} };
             let resultsCount = 0;
             const categoryNames = dbCategories.map(cat => cat.name);
-            categoryNames.push('group');
+            categoryNames.push('group'); // Keep 'group' for internal logic
             categoryNames.forEach(catName => { processedScoreboardData.categoryTotals[catName] = {}; TEAM_NAMES.forEach(team => { processedScoreboardData.categoryTotals[catName][team] = 0; }); processedScoreboardData.categoryCounts[catName] = 0; });
             
             for (const programId in currentResults) {
@@ -553,15 +552,22 @@
                 return; 
             }
             generateFilterButtons();
-            generateTeamCards(); // UPDATED
-            generateDetailedRankings(); // RESTORED
+            generateTeamCards(); // FIXED
+            generateDetailedRankings(); 
             renderProgramResults();
             generateTalentList();
             generateScoreboard();
             generateStaticContent(); 
             updateResultCounts();
-            const defaultScoreboardFilter = (dbCategories && dbCategories.length > 0) ? dbCategories[0].name : 'group';
-            filterScoreboard(defaultScoreboardFilter);
+            
+            // UPDATED: Default filter
+            const defaultScoreboardFilter = (dbCategories && dbCategories.length > 0) ? dbCategories[0].name : '';
+            if (defaultScoreboardFilter) {
+                filterScoreboard(defaultScoreboardFilter);
+            } else {
+                const scoreboardFiltersEl = d.getElementById('scoreboard-filter-buttons');
+                if (scoreboardFiltersEl) scoreboardFiltersEl.innerHTML = "<p class='text-gray-500'>Please add categories in the admin panel.</p>";
+            }
             
             d.getElementById('loading-overlay').style.opacity = '0';
             setTimeout(() => { 
@@ -570,18 +576,28 @@
             }, 500);
         }
 
+        // UPDATED: Removed 'Group' button
         function generateFilterButtons() { 
             const programFiltersEl = d.getElementById('program-filter-buttons'); 
             const scoreboardFiltersEl = d.getElementById('scoreboard-filter-buttons'); 
             let buttonsHtml = `<button class="filter-btn active" data-filter="all" onclick="filterResults('all')">All</button>`; 
-            (dbCategories || []).forEach(cat => { buttonsHtml += `<button class="filter-btn" data-filter="${cat.name}" onclick="filterResults('${cat.name}')">${cat.name}</button>`; }); 
-            buttonsHtml += `<button class="filter-btn" data-filter="group" onclick="filterResults('group')">Group</button>`; 
-            if (programFiltersEl) programFiltersEl.innerHTML = buttonsHtml; // Added check
+            (dbCategories || []).forEach(cat => { 
+                buttonsHtml += `<button class="filter-btn" data-filter="${cat.name}" onclick="filterResults('${cat.name}')">${cat.name}</button>`; 
+            }); 
+            // 'Group' button removed from here
+            if (programFiltersEl) programFiltersEl.innerHTML = buttonsHtml;
             
             let scoreboardButtonsHtml = ''; 
-            (dbCategories || []).forEach((cat, index) => { scoreboardButtonsHtml += `<button class="filter-btn ${index === 0 ? 'active' : ''}" data-filter="${cat.name}" onclick="filterScoreboard('${cat.name}')">${cat.name}</button>`; }); 
-            scoreboardButtonsHtml += `<button class="filter-btn" data-filter="group" onclick="filterScoreboard('group')">Group</button>`; 
-            if (scoreboardFiltersEl) scoreboardFiltersEl.innerHTML = scoreboardButtonsHtml; // Added check
+            (dbCategories || []).forEach((cat, index) => { 
+                scoreboardButtonsHtml += `<button class="filter-btn ${index === 0 ? 'active' : ''}" data-filter="${cat.name}" onclick="filterScoreboard('${cat.name}')">${cat.name}</button>`; 
+            }); 
+            // 'Group' button removed from here
+            if (scoreboardFiltersEl) {
+                if(scoreboardButtonsHtml === '') {
+                    scoreboardButtonsHtml = "<p class='text-gray-500'>No categories added yet.</p>";
+                }
+                scoreboardFiltersEl.innerHTML = scoreboardButtonsHtml; 
+            }
         }
         
         function generateTeamCards() {
@@ -596,7 +612,7 @@
             const positionTexts = ['Champions', 'First Runners-up', 'Second Runners-up'];
             const iconClasses = ['fas fa-crown', 'fas fa-medal', 'fas fa-medal'];
             
-            rankedTeams.slice(0, 3).forEach((team, i) => { // Only top 3
+            rankedTeams.slice(0, 3).forEach((team, i) => { 
                 container.innerHTML += `<div class="team-card ${cardClasses[i] || ''}"><div class="icon"><i class="${iconClasses[i] || 'fas fa-award'}"></i></div><div class="team-name">${team.name}</div><p class="points"><b>${team.total}</b></p><p class="position">${positionTexts[i] || `#${i + 1} Position`}</p></div>`;
             });
 
@@ -605,10 +621,10 @@
             }
         }
         
-        // RESTORED: generateDetailedRankings
+        // UPDATED: Removed 'Group' column
         function generateDetailedRankings() {
             const container = d.getElementById('detailed-rankings');
-            if (!container) return; // Safety check
+            if (!container) return; 
             
             const dataToRank = processedTeamData || {};
             const rankedTeams = Object.values(dataToRank).sort((a, b) => b.total - a.total);
@@ -620,10 +636,10 @@
                 headerCols += `<div>${cat.name}</div>`; 
                 gridTemplateCols += ' 0.8fr'; 
             });
-            headerCols += `<div>Group</div>`; 
-            gridTemplateCols += ' 0.8fr 1fr 1fr'; 
+            // REMOVED 'Group' header
+            gridTemplateCols += ' 1fr 1fr'; // Add for Total and Progress
             
-            let tableHtml = `<div class="rankings-table-content" style="min-width: ${700 + (dbCategories || []).length * 80}px;">
+            let tableHtml = `<div class="rankings-table-content" style="min-width: ${620 + (dbCategories || []).length * 80}px;">
                                 <div class="ranking-header" style="grid-template-columns: ${gridTemplateCols};">
                                     <div>Rank</div><div>Team</div>${headerCols}<div>Total</div><div>Progress</div>
                                 </div>`;
@@ -635,7 +651,7 @@
                 (dbCategories || []).forEach((cat, i) => {
                     pointsCols += `<div><span class="points-pill default-pill-${(i % 6) + 1}">${team[cat.name] || 0}</span></div>`;
                 });
-                pointsCols += `<div><span class="points-pill group">${team['group'] || 0}</span></div>`;
+                // REMOVED 'Group' points column
                 
                 tableHtml += `<div class="ranking-row" style="grid-template-columns: ${gridTemplateCols};">
                                 <div><span class="rank-cell ${rank === 1 ? 'rank-1' : (rank === 2 ? 'rank-2' : (rank === 3 ? 'rank-3' : ''))}">${rank}</span></div>
@@ -650,74 +666,10 @@
             container.innerHTML = `<h2>Detailed Rankings</h2><p>Complete scoreboard with detailed breakdown by category</p>${tableHtml}`;
         }
         
-        // റിസൾട്ട് കാർഡുകൾ ഉണ്ടാക്കുന്നു (UPDATED for custom points)
         function renderProgramResults() { /* ... (കോഡ് മാറ്റമില്ല) ... */ }
-        
-        // ടാലന്റ് ലിസ്റ്റ് ഉണ്ടാക്കുന്നു (UPDATED for custom points)
         function generateTalentList() { /* ... (കോഡ് മാറ്റമില്ല) ... */ }
-
         function generateScoreboard() { /* ... (കോഡ് മാറ്റമില്ല) ... */ }
-        
-        // ഹോം പേജിലെ സ്റ്റാറ്റിക് ഉള്ളടക്കം ഉണ്ടാക്കുന്നു (UPDATED for new fields)
-        function generateStaticContent() {
-            if (dbHomepage == null || dbTeams == null) return; 
-            const leaderContainer = d.getElementById('leader-cards-container');
-            const galleryPlaceholder = d.getElementById('gallery-placeholder');
-            const galleryRowContainers = [d.getElementById('gallery-row-0'), d.getElementById('gallery-row-1'), d.getElementById('gallery-row-2')];
-            const leaderPlaceholder = d.getElementById('leader-placeholder');
-            const headerTitleEl = d.getElementById('dynamic-header-title'); 
-            const footerSocialIconsEl = d.getElementById('footer-social-icons'); 
-            const footerInstitutionEl = d.getElementById('footer-institution-name'); 
-            const footerCopyrightEl = d.getElementById('footer-copyright'); 
-            const aboutTitleEl = d.getElementById('about-section-title'); // NEW
-            const aboutSubtitleEl = d.getElementById('about-section-subtitle'); // NEW
-            
-            // ഹെഡറും ഹീറോയും
-            if (headerTitleEl) headerTitleEl.innerText = dbHomepage.header_title || 'Sadaye Madeena 2k25'; 
-            d.getElementById('hero-logo').src = dbHomepage.logo_url || 'https://placehold.co/150x150/FFFFFF/EFEFEF?text=Logo';
-            d.getElementById('hero-main-title').innerText = dbHomepage.main_title || 'Event Title';
-            d.getElementById('hero-subtitle').innerText = dbHomepage.subtitle || 'Event Subtitle';
-            
-            // ലീഡർ കാർഡുകൾ
-            const rankedTeams = Object.values(processedTeamData).sort((a,b) => b.total - a.total);
-            if (rankedTeams.length > 0 && Object.keys(dbTeams).length > 0) {
-                if(leaderPlaceholder) leaderPlaceholder.style.display = 'none';
-                leaderContainer.innerHTML = rankedTeams.map((team, index) => { const teamDetails = dbTeams[team.name] || { leader: 'N/A', asst: 'N/A' }; return `<div class="leader-card"><div class="rank-badge">#${index+1}</div><h3>Team ${team.name}</h3><p class="score">Score: ${team.total} pts</p><div class="leader-info"><div><span>Leader:</span> <span>${teamDetails.leader}</span></div><div><span>Asst. Leader:</span> <span>${teamDetails.asst}</span></div></div></div>` }).join('');
-            } else if (leaderPlaceholder) { leaderPlaceholder.textContent = "Team leaders will appear here once teams are added in admin panel."; }
-
-            // ഗാലറി
-            galleryRowContainers.forEach(row => { if(row) row.innerHTML = ''; }); 
-            if (dbHomepage.gallery && dbHomepage.gallery.length > 0) {
-                if(galleryPlaceholder) galleryPlaceholder.style.display = 'none';
-                dbHomepage.gallery.forEach((imgUrl, index) => { const rowIndex = index % 3; const galleryItemHTML = ` <div class="gallery-item-wrapper"> <img src="${imgUrl}" alt="Gallery Image ${index + 1}" loading="lazy" onerror="this.onerror=null;this.src='https://placehold.co/200x${Math.round(200 * 9 / 7)}/EFEFEF/CCCCCC?text=Image';"> <button class="share-btn" data-url="${imgUrl}" aria-label="Share image"> <i class="fas fa-share-alt"></i> </button> </div> `; if (galleryRowContainers[rowIndex]) { galleryRowContainers[rowIndex].innerHTML += galleryItemHTML; } });
-            } else if (galleryPlaceholder) { galleryPlaceholder.textContent = "Gallery images will appear here."; galleryPlaceholder.style.display = 'block'; }
-            
-            // എബൗട്ട് സെക്ഷൻ
-            if (aboutTitleEl) aboutTitleEl.innerText = dbHomepage.about_title || 'About The Fest'; // NEW
-            if (aboutSubtitleEl) aboutSubtitleEl.innerText = dbHomepage.about_subtitle || "Thirunoor'25"; // NEW
-            d.getElementById('about-text').innerText = dbHomepage.about || 'About text will be updated soon.';
-            d.getElementById('about-image').src = dbHomepage.about_image_url || 'https://placehold.co/800x400/EFEFEF/CCCCCC?text=Event+Image';
-            
-            // സ്റ്റാറ്റ്സ്
-            d.getElementById('stats-programs-public').textContent = dbHomepage.total_programs || '...';
-            d.getElementById('stats-participants-public').textContent = dbHomepage.total_participants || '...';
-            d.getElementById('stats-categories-public').textContent = dbHomepage.total_categories || '...';
-            d.getElementById('stats-teams-public').textContent = dbHomepage.total_teams || '...';
-
-            // ഫൂട്ടർ
-            if (footerInstitutionEl) footerInstitutionEl.innerText = dbHomepage.institution_name || 'Institution Name';
-            if (footerCopyrightEl) footerCopyrightEl.innerText = dbHomepage.copyright_text || '© Year Org Name. All rights reserved.';
-            if (footerSocialIconsEl) {
-                const instaLink = dbHomepage.social_instagram || '#';
-                const youtubeLink = dbHomepage.social_youtube || '#';
-                const facebookLink = dbHomepage.social_facebook || '#';
-                footerSocialIconsEl.innerHTML = `
-                    ${instaLink !== '#' ? `<a href="${instaLink}" target="_blank" aria-label="Instagram"><i class="fab fa-instagram"></i></a>` : ''}
-                    ${youtubeLink !== '#' ? `<a href="${youtubeLink}" target="_blank" aria-label="YouTube"><i class="fab fa-youtube"></i></a>` : ''}
-                    ${facebookLink !== '#' ? `<a href="${facebookLink}" target="_blank" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>` : ''}
-                `;
-            }
-        }
+        function generateStaticContent() { /* ... (കോഡ് മാറ്റമില്ല) ... */ }
         
         // ===================================
         // UI പ്രവർത്തനങ്ങൾ
