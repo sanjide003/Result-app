@@ -9,10 +9,10 @@
     <link href="https://fonts.googleapis.com/css2?family=Saira:wght@700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
-    <!-- Confetti ലൈബ്രറി -->
+    <!-- Confetti ലൈബ്രറി (ഇപ്പോൾ ഉപയോഗിക്കുന്നില്ല, പക്ഷെ നീക്കം ചെയ്യുന്നില്ല) -->
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <style>
-        /* CSS വേരിയബിളുകൾ */
+        /* ... (CSS കോഡ് മാറ്റമില്ലാതെ തുടരുന്നു) ... */
         :root {
             --primary-color: #4a90e2;
             --secondary-color: #50e3c2;
@@ -572,6 +572,7 @@
         
         // UPDATED: This function now renders Top 3 
         function generateTeamCards() {
+            // FIXED: Add safety check for processedTeamData
             const dataToRank = processedTeamData || {};
             const rankedTeams = Object.values(dataToRank).sort((a, b) => b.total - a.total);
             
