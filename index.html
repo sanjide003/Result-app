@@ -4,16 +4,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Team Status & Results 2025</title>
-    <!-- [FONT & ICON LINKS] -->
     <!-- ഫോണ്ടുകളും ഐക്കണുകളും ലോഡ് ചെയ്യുന്നു -->
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Malayalam:wght@400;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Saira:wght@700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
-    <!-- Confetti ലൈബ്രറി (ആനിമേഷന് വേണ്ടി) -->
+    <!-- Confetti ലൈബ്രറി -->
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <style>
-        /* CSS വേരിയബിളുകൾ: നിറങ്ങൾ, പാഡിംഗ് തുടങ്ങിയവ എളുപ്പത്തിൽ മാറ്റാൻ */
+        /* CSS വേരിയബിളുകൾ */
         :root {
             --primary-color: #4a90e2;
             --secondary-color: #50e3c2;
@@ -31,18 +30,18 @@
             --second-place-bg: #f8f9fa;
             --third-place-bg: #fff3e0;
         }
-        html { scroll-behavior: smooth; /* സ്ക്രോളിംഗ് സ്മൂത്ത് ആക്കുന്നു */ }
-        body { margin: 0; padding: 0; background-color: var(--background-color); font-family: 'Inter', 'Noto Sans Malayalam', sans-serif; color: var(--text-color); padding-top: 80px; /* ഹെഡറിന് സ്ഥലം നൽകുന്നു */ }
+        html { scroll-behavior: smooth; }
+        body { margin: 0; padding: 0; background-color: var(--background-color); font-family: 'Inter', 'Noto Sans Malayalam', sans-serif; color: var(--text-color); padding-top: 80px; /* ഹെഡറിന് സ്ഥലം */ }
         * { box-sizing: border-box; }
-        .container { max-width: 1200px; margin: 0 auto; padding: 20px; /* പ്രധാന ഉള്ളടക്കം ഒതുക്കാൻ */ }
+        .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
         
         /* മുകളിൽ ഒട്ടിനിൽക്കുന്ന ഹെഡർ */
         .sticky-header { position: fixed; top: 15px; left: 15px; right: 15px; max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; background-color: var(--card-background); padding: 10px 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); z-index: 1000; border-radius: 12px; transition: top 0.3s ease; }
-        .header-title { font-size: 1.5em; color: var(--heading-color); font-weight: bold; }
-        .menu-btn { background: none; border: none; font-size: 1.5em; color: var(--heading-color); cursor: pointer; }
+        .header-title { font-size: 1.5em; color: var(--heading-color); font-weight: bold; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; } /* Text overflow handling */
+        .menu-btn { background: none; border: none; font-size: 1.5em; color: var(--heading-color); cursor: pointer; flex-shrink: 0; /* Prevent shrinking */ }
         
         /* മെനു ഓവർലേ */
-        .menu-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.4); backdrop-filter: blur(4px); z-index: 1001; display: none; justify-content: center; align-items: flex-start; padding-top: 80px; }
+        .menu-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.4); backdrop-filter: blur(4px); z-index: 1001; display: none; justify-content: center; align-items: flex-start; padding-top: 80px; opacity: 0; transition: opacity 0.3s ease; }
         .menu-box { background: var(--card-background); width: 90%; max-width: 350px; border-radius: 16px; box-shadow: 0 8px 30px rgba(0,0,0,0.15); padding: 15px; animation: slideDown 0.5s ease-out; }
         @keyframes slideDown { from { transform: translateY(-50px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
         .menu-header { display: flex; justify-content: space-between; align-items: center; padding-bottom: 10px; margin-bottom: 10px; border-bottom: 1px solid var(--border-color); }
@@ -50,14 +49,14 @@
         .close-btn { background: none; border: none; font-size: 2em; cursor: pointer; color: var(--subtle-text); }
         .menu-link { display: block; padding: 12px 15px; text-decoration: none; color: var(--text-color); font-weight: 500; border-radius: 8px; transition: background-color 0.2s, color 0.2s; }
         .menu-link:hover { background-color: #f1f5f9; }
-        .menu-link.active { background-color: var(--primary-color); color: white; font-weight: bold; /* നിലവിൽ തിരഞ്ഞെടുത്ത മെനു ലിങ്ക് */ }
+        .menu-link.active { background-color: var(--primary-color); color: white; font-weight: bold; }
         
         #home-page { text-align: center; }
-        main { transition: filter 0.3s ease-in-out; padding-bottom: 20px; /* ഫൂട്ടറിന് മുമ്പ് സ്ഥലം */ }
+        main { transition: filter 0.3s ease-in-out; padding-bottom: 20px; }
         
-        /* ഹോം പേജിലെ പ്രധാന ഭാഗം */
+        /* ഹീറോ സെക്ഷൻ */
         .hero-section { min-height: calc(100vh - 90px); display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 20px; }
-        .hero-section .logo { width: 150px; height: 150px; object-fit: contain; margin-bottom: 20px; }
+        .hero-section .logo { width: 150px; height: 150px; object-fit: contain; margin-bottom: 20px; border-radius: 12px; /* Added border radius */ box-shadow: 0 4px 8px rgba(0,0,0,0.1); /* Added subtle shadow */ }
         .hero-section h1 { font-family: 'Saira', sans-serif; font-size: clamp(2rem, 6vw, 3.5rem); color: var(--heading-color); margin: 0; }
         .hero-section p { font-size: 1.2em; color: var(--subtle-text); margin: 5px 0 30px 0; }
         .primary-btn { padding: 15px 35px; background: linear-gradient(45deg, var(--primary-color), var(--secondary-color)); color: white; border: none; border-radius: 50px; font-size: 1.1em; font-weight: bold; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1); }
@@ -72,17 +71,14 @@
         .home-section .section-subtitle { text-align: center; color: var(--subtle-text); margin-bottom: 40px; font-size: 1.1em; }
         #about-text { min-height: 100px; text-align: left; font-size: 1.1em; line-height: 1.7; }
         
-        /* എബൗട്ട് സെക്ഷനിലെ ചിത്രം */
         #about-image { width: 100%; height: auto; max-height: 250px; object-fit: cover; border-radius: 12px; box-shadow: 0 4px 12px var(--shadow-color); margin: 24px 0; }
         @media (min-width: 768px) { #about-image { max-height: 400px; } }
 
-        /* സ്റ്റാറ്റസ് ബോക്സുകൾ (Programs, Contestants..) */
         .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 20px; margin-top: 30px; }
         .stat-item { background-color: var(--card-background); padding: 20px; border-radius: 12px; box-shadow: 0 2px 8px var(--shadow-color); text-align: center; }
         .stat-item .value { font-size: 2em; font-weight: bold; color: var(--primary-color); }
         .stat-item .label { color: var(--subtle-text); }
         
-        /* ടീം ലീഡർ കാർഡുകൾ */
         #leader-cards-container { min-height: 200px; }
         .leader-card { background-color: var(--card-background); border-radius: 16px; padding: 20px; margin-bottom: 20px; box-shadow: 0 4px 12px var(--shadow-color); position: relative; overflow: hidden; text-align: left;}
         .leader-card .rank-badge { position: absolute; top: 15px; right: 15px; background-color: var(--primary-color); color: white; width: 35px; height: 35px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 1.1em; }
@@ -92,21 +88,20 @@
         .leader-info div { display: flex; justify-content: space-between; padding: 8px 0; }
         .leader-info div span:first-child { color: var(--subtle-text); }
         
-        /* ഗാലറി (3 വരി, വെർട്ടിക്കൽ ചിത്രം, സ്ലൈഡിംഗ്) */
+        /* ഗാലറി (3 വരി, വെർട്ടിക്കൽ, സ്ലൈഡിംഗ്) */
         #gallery-rows-container { display: flex; flex-direction: column; gap: 20px; min-height: 350px; }
         .gallery-row { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch; scroll-behavior: smooth; padding: 10px 0; gap: 15px; }
         .gallery-row::-webkit-scrollbar { display: none; }
         .gallery-row { -ms-overflow-style: none; scrollbar-width: none; }
         .gallery-item-wrapper { position: relative; flex: 0 0 auto; width: 200px; scroll-snap-align: center; display: flex; justify-content: center; }
-        .gallery-item-wrapper img { width: 100%; height: auto; aspect-ratio: 7 / 9; /* 1050x1350 അനുപാതം */ object-fit: cover; border-radius: 16px; box-shadow: 0 6px 15px var(--shadow-color); transition: transform 0.3s; display: block; }
+        .gallery-item-wrapper img { width: 100%; height: auto; aspect-ratio: 7 / 9; object-fit: cover; border-radius: 16px; box-shadow: 0 6px 15px var(--shadow-color); transition: transform 0.3s; display: block; }
         .gallery-item-wrapper img:hover { transform: scale(1.02); } 
         .share-btn { position: absolute; top: 12px; right: 12px; background-color: rgba(0, 0, 0, 0.5); color: white; border: none; border-radius: 50%; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; font-size: 1em; cursor: pointer; transition: background-color 0.2s; z-index: 2; }
         .share-btn:hover { background-color: rgba(0, 0, 0, 0.7); }
         .share-btn i { pointer-events: none; }
         
-        #scoreboard-page { display: none; /* ഡിഫോൾട്ടായി മറയ്ക്കുന്നു */ }
-        
-        /* സ്കോർബോർഡ് പേജിലെ ടാബ് ബട്ടണുകൾ */
+        #scoreboard-page { display: none; }
+        /* ... [Rest of the CSS styles remain unchanged] ... */
         .main-tab-buttons-wrapper { background: var(--card-background); padding: 15px; border-radius: 16px; margin-bottom: 25px; box-shadow: 0 4px 12px var(--shadow-color); }
         .main-tab-buttons { display: flex; justify-content: center; gap: 5px; flex-wrap: wrap; }
         .main-tab-button { padding: 8px 16px; background: #f1f5f9; border: none; border-radius: 50px; font-size: 0.9em; font-weight: bold; color: var(--subtle-text); cursor: pointer; transition: all 0.3s ease; }
@@ -115,8 +110,6 @@
         .main-tab-button.active { background: linear-gradient(45deg, var(--primary-color), var(--secondary-color)); color: white; box-shadow: 0 2px 5px rgba(74, 144, 226, 0.4); }
         .main-tab-content { display: none; animation: fadeIn 0.5s ease-in-out; }
         .main-tab-content.active { display: block; }
-        
-        /* ടീം ടാബിലെ കാർഡുകൾ */
         .card-container { display: flex; flex-wrap: wrap; justify-content: center; gap: 25px; padding: 15px; }
         .team-card { width: 90%; max-width: 300px; padding: 20px; text-align: center; border-radius: 20px; box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15); transition: transform 0.3s ease, box-shadow 0.3s ease; }
         .team-card:hover { transform: translateY(-6px); box-shadow: 0 10px 20px rgba(0, 0, 0, 0.25); }
@@ -130,8 +123,6 @@
         .team-name { font-size: 1.6em; font-weight: bold; margin: 10px 0; color: #333; }
         .points { font-size: 2.4em; font-weight: bold; margin: 0; color: #222; }
         .position { font-size: 1em; margin: 5px 0 0; font-weight: 600; color: #444; }
-        
-        /* ടീം ടാബിലെ വിശദമായ റാങ്കിംഗ് ടേബിൾ */
         .detailed-rankings-container { max-width: 1100px; margin: 40px auto 20px auto; background-color: var(--card-background); border-radius: 16px; padding: 25px; box-shadow: 0 4px 12px var(--shadow-color); overflow-x: auto; }
         .rankings-table-content { min-width: 950px; }
         .detailed-rankings-container h2 { margin-top: 0; margin-bottom: 5px; font-size: 1.5em; color: var(--heading-color); }
@@ -158,16 +149,12 @@
         .progress-circle { width: 100%; height: 100%; border-radius: 50%; display: grid; place-items: center; background: conic-gradient(var(--primary-color) calc(var(--p) * 1%), var(--border-color) 0); transition: background 0.5s; }
         .progress-circle::before { content: ""; position: absolute; border-radius: 50%; background: var(--card-background); width: calc(100% - 12px); height: calc(100% - 12px); }
         .progress-circle-text { position: relative; font-size: 0.9em; font-weight: bold; color: var(--heading-color); }
-        
-        /* റിസൾട്ട് ഫിൽട്ടർ ചെയ്യാനുള്ള ഭാഗം */
         .filter-controls { background-color: var(--card-background); padding: 20px; border-radius: 16px; margin: 0 auto 25px auto; max-width: 800px; box-shadow: 0 4px 12px var(--shadow-color); }
         .search-bar { width: 100%; padding: 12px 20px; border: 1px solid var(--border-color); border-radius: 25px; font-size: 1em; margin-bottom: 15px; outline-color: var(--primary-color); }
         .filter-buttons { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; }
         .filter-btn { padding: 8px 18px; border: 1px solid var(--border-color); background-color: #f8f9fa; color: var(--subtle-text); border-radius: 20px; cursor: pointer; font-weight: 500; transition: all 0.2s ease-in-out; }
         .filter-btn:hover { background-color: #e9ecef; border-color: #dee2e6; }
         .filter-btn.active { background-color: var(--primary-color); color: white; border-color: var(--primary-color); }
-        
-        /* റിസൾട്ട് കാർഡുകൾ */
         #program-results-grid, #scoreboard-container { max-width: 800px; margin: 0 auto; }
         .event-result-card { background-color: var(--card-background); border-radius: 16px; padding: 15px 20px; box-shadow: 0 4px 12px var(--shadow-color); animation: fadeIn 0.5s; margin-bottom: 15px; }
         .event-card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
@@ -190,8 +177,6 @@
         .winner-points { text-align: right; }
         .winner-points .points-value { font-size: 1.5em; font-weight: bold; color: var(--heading-color); }
         .winner-points .points-label { font-size: 0.8em; color: var(--subtle-text); }
-        
-        /* ടാലന്റ് ടാബ് */
         #talent-list-container { max-width: 800px; margin: 0 auto; }
         .talent-category-card { background-color: var(--card-background); border-radius: 16px; padding: 20px; margin-bottom: 25px; box-shadow: 0 4px 12px var(--shadow-color); }
         .talent-category-card h3 { text-align: center; font-size: 1.6em; color: var(--heading-color); margin-top: 0; margin-bottom: 20px; font-family: 'Saira', sans-serif; }
@@ -200,8 +185,6 @@
         .talent-dropdown-list.open { max-height: 2000px; margin-top: 10px; }
         .show-more-btn { display: block; width: 100%; margin-top: 15px; padding: 10px; background-color: #f0f4f8; border: 1px solid var(--border-color); border-radius: 8px; font-weight: bold; color: var(--primary-color); cursor: pointer; transition: background-color 0.2s; }
         .show-more-btn:hover { background-color: #e6ecf1; }
-        
-        /* സ്കോർബോർഡ് ടാബ് */
         #scoreboard-container { gap: 15px; display: flex; flex-direction: column; }
         .scoreboard-card { background-color: var(--card-background); border-radius: 12px; padding: 15px; box-shadow: 0 2px 8px var(--shadow-color); }
         .scoreboard-event-header { display: flex; justify-content: space-between; font-weight: bold; color: var(--heading-color); border-bottom: 1px solid var(--border-color); padding-bottom: 10px; margin-bottom: 10px; }
@@ -220,84 +203,39 @@
         .silver { color: var(--runner-up-silver); }
         .bronze { color: var(--second-runner-up-bronze); }
         
-        /* ഫൂട്ടർ (താഴെ) */
-        footer {
-            background-color: var(--card-background);
-            color: var(--subtle-text);
-            text-align: center;
-            padding: 20px 15px; 
-            border-top: 1px solid var(--border-color);
-            margin-top: 40px; 
-            /* Removed position: fixed */
-        }
-        .footer-content {
-            max-width: 1200px;
-            margin: 0 auto;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 10px; 
-        }
-        .institution-name {
-             font-weight: bold;
-             color: var(--heading-color);
-             margin: 5px 0;
-        }
-        .social-icons a {
-            color: var(--subtle-text);
-            font-size: 1.4em; 
-            margin: 0 10px; 
-            transition: color 0.2s;
-        }
+        /* ഫൂട്ടർ */
+        footer { background-color: var(--card-background); color: var(--subtle-text); text-align: center; padding: 20px 15px; border-top: 1px solid var(--border-color); margin-top: 40px; }
+        .footer-content { max-width: 1200px; margin: 0 auto; display: flex; flex-direction: column; align-items: center; gap: 10px; }
+        .institution-name { font-weight: bold; color: var(--heading-color); margin: 5px 0; }
+        .social-icons a { color: var(--subtle-text); font-size: 1.4em; margin: 0 10px; transition: color 0.2s; }
         .social-icons a:hover { color: var(--primary-color); }
-        .footer-content .copyright {
-            margin-top: 5px; 
-            font-size: 0.85em; 
-        }
+        .footer-content .copyright { margin-top: 5px; font-size: 0.85em; }
         
         /* മുകളിലേക്ക് പോകാനുള്ള ബട്ടൺ */
-        #scrollTopBtn {
-            position: fixed;
-            bottom: 50px; /* ഉയരം കൂട്ടി */
-            right: 20px;
-            background-color: var(--primary-color);
-            color: white;
-            border: none;
-            border-radius: 50%;
-            width: 45px;
-            height: 45px;
-            font-size: 1.2em;
-            cursor: pointer;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-            z-index: 1000;
-            display: none; 
-            opacity: 0;
-            transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out;
-            visibility: hidden;
-        }
+        #scrollTopBtn { position: fixed; bottom: 50px; right: 20px; background-color: var(--primary-color); color: white; border: none; border-radius: 50%; width: 45px; height: 45px; font-size: 1.2em; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.2); z-index: 1000; display: none; opacity: 0; transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out; visibility: hidden; }
         #scrollTopBtn.show { display: flex; align-items: center; justify-content: center; opacity: 1; visibility: visible; }
         #scrollTopBtn:hover { background-color: #3a7ac2; }
 
 
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        /* ഡെസ്ക്ടോപ്പ് കാഴ്ചയ്ക്കുള്ള നിയമങ്ങൾ */
+        /* ഡെസ്ക്ടോപ്പ് കാഴ്ച */
         @media (min-width: 992px) { .card-container { flex-wrap: nowrap; align-items: flex-end; gap: 10px; } .team-card { width: 33%; } .team-card.champion { order: 2; transform: scale(1.1) translateY(-10px); } .team-card.first-runner-up { order: 1; } .team-card.second-runner-up { order: 3; } .team-card:hover { transform: scale(1.05) translateY(-6px); } .team-card.champion:hover { transform: scale(1.15) translateY(-16px); } }
-        /* ടാബ്‌ലെറ്റ് കാഴ്ചയ്ക്കുള്ള നിയമങ്ങൾ */
+        /* ടാബ്‌ലെറ്റ് കാഴ്ച */
         @media (min-width: 768px) and (max-width: 991px) { .card-container { max-width: 700px; margin-left: auto; margin-right: auto; } }
         
-        /* മൊബൈൽ കാഴ്ചയ്ക്കുള്ള നിയമങ്ങൾ */
+        /* മൊബൈൽ കാഴ്ച */
         @media(max-width: 600px) { 
             body { padding-bottom: 0; }
             .container { padding: 10px; } 
             .main-tab-buttons { gap: 5px; } 
             .main-tab-button { padding: 8px 12px; font-size: 0.8em; } 
-            .header-container{ flex-direction: column; gap: 15px; } 
+            .header-title { font-size: 1.2em; /* Smaller header title on mobile */ } 
             .title-container{ text-align: center; }
             .hero-section { min-height: calc(70vh - 80px); } 
             .gallery-item-wrapper { width: 70vw; } 
             .footer-content { font-size: 0.8em; } 
             .social-icons a { font-size: 1.2em; margin: 0 6px;}
-            #scrollTopBtn { bottom: 40px; /* ഉയരം കൂട്ടി (മൊബൈൽ) */ width: 40px; height: 40px; font-size: 1em;}
+            #scrollTopBtn { bottom: 40px; width: 40px; height: 40px; font-size: 1em;}
         }
         
         /* ലോഡിംഗ് ഓവർലേ */
@@ -309,20 +247,22 @@
 </head>
 <body>
 
-    <!-- ലോഡിംഗ് കാണിക്കുന്ന ഭാഗം -->
+    <!-- ലോഡിംഗ് ഓവർലേ -->
     <div id="loading-overlay">
         <div class="spinner"></div>
         <p>Loading Live Data...</p>
     </div>
 
-    <!-- മുകളിലെ ഹെഡർ -->
+    <!-- ഹെഡർ -->
     <div class="sticky-header">
-        <span class="header-title">Sadaye Madeena 2k25</span>
+        <!-- ഹെഡർ ടൈറ്റിൽ (ഡൈനാമിക്) -->
+        <span class="header-title" id="dynamic-header-title">Sadaye Madeena 2k25</span> 
         <button class="menu-btn" onclick="openNav()" aria-label="Open menu"><i class="fas fa-bars"></i></button>
     </div>
     
-    <!-- മെനു തുറക്കുമ്പോൾ വരുന്ന ഭാഗം -->
+    <!-- മെനു -->
     <div id="menu-overlay" class="menu-overlay">
+        <!-- ... (മെനു ഉള്ളടക്കം മാറ്റമില്ല) ... -->
         <div class="menu-box">
             <div class="menu-header">
                 <span class="header-title">MENU</span>
@@ -336,11 +276,11 @@
         </div>
     </div>
     
-    <!-- പ്രധാന ഉള്ളടക്കം വരുന്ന ഭാഗം -->
+    <!-- പ്രധാന ഉള്ളടക്കം -->
     <main id="main-content" style="visibility: hidden;">
         <!-- ഹോം പേജ് -->
         <div id="home-page">
-            <!-- ഹീറോ സെക്ഷൻ (ലോഗോ, ടൈറ്റിൽ, ബട്ടൺ) -->
+            <!-- ഹീറോ സെക്ഷൻ -->
             <div class="hero-section">
                 <img src="https://placehold.co/150x150/FFFFFF/EFEFEF?text=Logo" alt="Art Fest Logo" class="logo" id="hero-logo" onerror="this.onerror=null;this.src='https://placehold.co/150x150/FFFFFF/EFEFEF?text=Logo';">
                 <h1 id="hero-main-title">Loading...</h1>
@@ -367,7 +307,7 @@
                 </div>
             </section>
 
-            <!-- ടീം ലീഡേഴ്സ് സെക്ഷൻ -->
+            <!-- ലീഡേഴ്സ് സെക്ഷൻ -->
             <section id="leaders" class="home-section">
                 <h2>Team Leaders</h2>
                 <p class="section-subtitle">Meet the leaders of our teams</p>
@@ -376,7 +316,7 @@
                 </div>
             </section>
 
-            <!-- ഇമേജ് ഗാലറി സെക്ഷൻ -->
+            <!-- ഗാലറി സെക്ഷൻ -->
             <section id="gallery" class="home-section">
                 <h2>Image Gallery</h2>
                 <p class="section-subtitle">Discover and share beautiful moments</p>
@@ -389,7 +329,7 @@
             </section>
         </div>
 
-        <!-- സ്കോർബോർഡ് പേജ് (റിസൾട്ട്, ടീം, ടാലന്റ്, സ്കോർബോർഡ് ടാബുകൾ) -->
+        <!-- സ്കോർബോർഡ് പേജ് -->
         <div id="scoreboard-page">
              <div class="container">
                 <!-- ടാബ് ബട്ടണുകൾ -->
@@ -401,14 +341,14 @@
                         <button class="main-tab-button" onclick="showMainTab('talent-tab')">TALENT</button>
                     </div>
                 </div>
-                <!-- ടീം ടാബ് ഉള്ളടക്കം -->
+                <!-- ടീം ടാബ് -->
                 <div id="team-tab" class="main-tab-content active">
                     <h2 style="text-align: center; color: var(--heading-color); font-family: 'Saira', sans-serif;">Live Team Point Status</h2>
                     <p id="team-results-count" style="text-align: center; margin-top: -10px; margin-bottom: 20px; color: var(--subtle-text);"></p>
                     <div class="card-container" id="team-cards-container"></div>
                     <div class="detailed-rankings-container" id="detailed-rankings"></div>
                 </div>
-                <!-- റിസൾട്ട് ടാബ് ഉള്ളടക്കം -->
+                <!-- റിസൾട്ട് ടാബ് -->
                 <div id="program-tab" class="main-tab-content">
                      <div class="filter-controls">
                          <input type="text" id="search-input" class="search-bar" onkeyup="filterResults()" placeholder="Search programs or participants...">
@@ -416,14 +356,14 @@
                      </div>
                      <div id="program-results-grid"></div>
                 </div>
-                <!-- സ്കോർബോർഡ് ടാബ് ഉള്ളടക്കം -->
+                <!-- സ്കോർബോർഡ് ടാബ് -->
                 <div id="scoreboard-tab" class="main-tab-content">
                     <div class="filter-controls">
                          <div class="filter-buttons" id="scoreboard-filter-buttons"><p class="text-gray-500">Loading filters...</p></div>
                      </div>
                     <div id="scoreboard-container"><div id="scoreboard-table-content"></div></div>
                 </div>
-                <!-- ടാലന്റ് ടാബ് ഉള്ളടക്കം -->
+                <!-- ടാലന്റ് ടാബ് -->
                 <div id="talent-tab" class="main-tab-content">
                     <div id="talent-list-container"></div>
                 </div>
@@ -434,13 +374,16 @@
     <!-- ഫൂട്ടർ -->
     <footer>
         <div class="footer-content">
-            <div class="social-icons">
+            <!-- സോഷ്യൽ മീഡിയ ഐക്കണുകൾ (ഡൈനാമിക്) -->
+            <div class="social-icons" id="footer-social-icons">
                 <a href="#" target="_blank" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
                 <a href="#" target="_blank" aria-label="YouTube"><i class="fab fa-youtube"></i></a>
                 <a href="#" target="_blank" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
             </div>
-            <p class="institution-name">Noorul Islam madrasa devathiyal</p>
-            <p class="copyright">&copy; 2025 Thirunoor Media Team. All rights reserved.</p>
+            <!-- സ്ഥാപനത്തിൻ്റെ പേര് (ഡൈനാമിക്) -->
+            <p class="institution-name" id="footer-institution-name">Institution Name</p>
+            <!-- പകർപ്പവകാശം (ഡൈനാമിക്) -->
+            <p class="copyright" id="footer-copyright">© Year Org Name. All rights reserved.</p>
         </div>
     </footer>
 
@@ -451,7 +394,7 @@
 
     <!-- JavaScript കോഡ് -->
     <script type="module">
-        // Firebase കോൺഫിഗറേഷൻ (നിങ്ങളുടെ പ്രോജക്റ്റിന്റെ വിവരങ്ങൾ)
+        // Firebase Config
         const firebaseConfig = {
             apiKey: "AIzaSyDBfnce5gtJhW9u1xwU2FVPQGx2KvG1vw8",
             authDomain: "result25.firebaseapp.com",
@@ -462,284 +405,77 @@
             measurementId: "G-S4BJW3N642"
         };
         
-        // Canvas Environment Variables (ഇവ ഓട്ടോമാറ്റിക് ആയി ലഭിക്കും)
+        // Canvas Env Vars
         const appId = typeof __app_id !== 'undefined' ? __app_id : firebaseConfig.projectId;
         const finalFirebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : firebaseConfig;
         finalFirebaseConfig.projectId = appId;
 
-        // Firebase മൊഡ്യൂളുകൾ ഇമ്പോർട്ട് ചെയ്യുന്നു
+        // Firebase Imports
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js";
         import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-auth.js";
         import { getFirestore, doc, onSnapshot, collection, query } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-firestore.js";
 
-        // Firebase സജ്ജീകരിക്കുന്നു
+        // Initialize Firebase
         const app = initializeApp(finalFirebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
 
-        // താൽക്കാലികമായി ലോഗിൻ ചെയ്യുന്നു (ഡാറ്റ വായിക്കാൻ)
+        // താൽക്കാലിക ലോഗിൻ
         try { await signInAnonymously(auth); } catch(error) { console.error("Anonymous sign-in failed: ", error); }
 
-        // ===================================================================================
+        // ===================================
         // ഡാറ്റാ കോൺഫിഗറേഷൻ
-        // ===================================================================================
-        let TEAM_NAMES = []; // ടീമുകളുടെ പേരുകൾ (ഉദാ: ['BURAQ', 'DUL DUL', 'QASWA'])
-        // പോയിന്റ് നിലകൾ (വ്യക്തിഗതം / ഗ്രൂപ്പ്)
+        // ===================================
+        let TEAM_NAMES = [];
         const POINTS = { STANDARD: { first: 5, second: 3, third: 1 }, GROUP: { first: 10, second: 8, third: 5 } };
-        // ഗ്രൂപ്പ് ഐറ്റംസ് ഏതൊക്കെയാണെന്ന് ലിസ്റ്റ് ചെയ്യുന്നു
-        const groupEvents = [ "മദ്ഹുന്നബി സംഘഗാനം", "മുനാഖശ", "മാഷപ്പ്", "സംഘഗാനം (അറബി)", "സംഘഗാനം (മലയാളം)","മൗലിദ് പാരായണം", "ബുർദ ആലാപനം", "മാലപ്പാട്ട്", "ഇസ്ലാമിക് സമൂഹഗാനം (മലയാളം)", "പത്ര നിർമ്മാണം", "മാഗസിൻ നിർമ്മാണം", "ഡിജിറ്റൽ ക്വിസ്" ];
-
-        // പ്രധാന ഡാറ്റ സൂക്ഷിക്കാനുള്ള വേരിയബിളുകൾ
+        const groupEvents = [ /* ഗ്രൂപ്പ് ഐറ്റം പേരുകൾ */ "മദ്ഹുന്നബി സംഘഗാനം", "മുനാഖശ", "മാഷപ്പ്", "സംഘഗാനം (അറബി)", "സംഘഗാനം (മലയാളം)","മൗലിദ് പാരായണം", "ബുർദ ആലാപനം", "മാലപ്പാട്ട്", "ഇസ്ലാമിക് സമൂഹഗാനം (മലയാളം)", "പത്ര നിർമ്മാണം", "മാഗസിൻ നിർമ്മാണം", "ഡിജിറ്റൽ ക്വിസ്" ];
         let processedTeamData = {}, processedProgramData = [], processedTalentData = {}, processedScoreboardData = {};
         let publishedResultsCount = 0;
-        // ഡാറ്റാബേസിൽ നിന്ന് നേരിട്ട് വരുന്ന ഡാറ്റ (തുടക്കത്തിൽ null ആയിരിക്കും)
         let dbPrograms = null, dbTeams = null, dbCategories = null, dbHomepage = null, dbParticipants = null;
         let dbResults = null; 
 
-        // ===================================================================================
-        // ഡാറ്റാ പ്രോസസ്സിംഗ് (കണക്കുകൂട്ടലുകൾ)
-        // ===================================================================================
+        // ===================================
+        // ഡാറ്റാ പ്രോസസ്സിംഗ്
+        // ===================================
+        // ചെസ്റ്റ് നമ്പറിൽ നിന്ന് ടീമിനെ കണ്ടെത്തുന്നു
+        function getTeamFromChest(chestNo) { /* ... (കോഡ് മാറ്റമില്ല) ... */ if (!chestNo || typeof chestNo !== 'string') return null; if (dbTeams == null || dbParticipants == null) return null; for (const teamName of TEAM_NAMES) { if (chestNo.toUpperCase() === teamName) return teamName; } if (dbParticipants[chestNo] && dbParticipants[chestNo].team) { return dbParticipants[chestNo].team; } const chestNumberMatch = chestNo.match(/^\d+/); if (chestNumberMatch) { const chestNumber = parseInt(chestNumberMatch[0], 10); for (const team of Object.values(dbTeams)) { const idFrom = parseInt(team.id_from, 10); const idTo = parseInt(team.id_to, 10); if (!isNaN(idFrom) && !isNaN(idTo) && chestNumber >= idFrom && chestNumber <= idTo) { return team.name; } } } return null; }
+        // ടീം പോയിന്റ് കണക്കുകൂട്ടൽ തുടങ്ങുന്നു
+        function initializeTeamData() { /* ... (കോഡ് മാറ്റമില്ല) ... */ const data = {}; if (dbTeams == null || dbCategories == null) return data; TEAM_NAMES = Object.keys(dbTeams); TEAM_NAMES.forEach(team => { data[team] = { name: team, total: 0 }; dbCategories.forEach(cat => { data[team][cat.name] = 0; }); data[team]['group'] = 0; }); return data; }
+        // എല്ലാ ഡാറ്റയും ഉപയോഗിച്ച് പോയിന്റുകൾ കണക്കാക്കുന്നു
+        function processAllData(currentResults) { /* ... (കോഡ് മാറ്റമില്ല) ... */ if (dbCategories == null || dbTeams == null || dbHomepage == null || dbParticipants == null || dbPrograms == null || currentResults == null) { console.warn("processAllData called, but essential data is null. Waiting..."); return; } processedTeamData = initializeTeamData(); processedProgramData = []; const talentPoints = {}; processedScoreboardData = { eventPoints: {}, categoryTotals: {}, categoryCounts: {} }; let resultsCount = 0; const categoryNames = dbCategories.map(cat => cat.name); categoryNames.push('group'); categoryNames.forEach(catName => { processedScoreboardData.categoryTotals[catName] = {}; TEAM_NAMES.forEach(team => { processedScoreboardData.categoryTotals[catName][team] = 0; }); processedScoreboardData.categoryCounts[catName] = 0; }); for (const programId in currentResults) { const program = dbPrograms[programId]; if (!program) continue; const eventName = program.name, categoryName = program.category, winners = currentResults[programId]; if (!((winners.first && winners.first.length > 0) || (winners.second && winners.second.length > 0) || (winners.third && winners.third.length > 0))) continue; resultsCount++; const isGroupEvent = groupEvents.includes(eventName); const currentPoints = isGroupEvent ? POINTS.GROUP : POINTS.STANDARD; const filterCategory = isGroupEvent ? 'group' : categoryName; const eventScore = { category: categoryName }; TEAM_NAMES.forEach(team => { eventScore[team] = { points: 0, positions: [] }; }); for (const position of ['first', 'second', 'third']) { if (winners[position] && winners[position].length > 0) { winners[position].forEach(winner => { const team = getTeamFromChest(winner.chest); if (team) { const pointValue = currentPoints[position]; processedTeamData[team].total += pointValue; const pointCategoryKey = isGroupEvent ? 'group' : categoryName; if (processedTeamData[team][pointCategoryKey] !== undefined) { processedTeamData[team][pointCategoryKey] += pointValue; } if (!isGroupEvent) { const winnerIdentifier = `${winner.chest} ${winner.name}`; if (!talentPoints[winnerIdentifier]) talentPoints[winnerIdentifier] = { points: 0, category: categoryName }; talentPoints[winnerIdentifier].points += pointValue; } eventScore[team].points += pointValue; eventScore[team].positions.push(position === 'first' ? 1 : (position === 'second' ? 2 : 3)); } }); } } processedScoreboardData.eventPoints[eventName] = eventScore; const scoreboardCat = isGroupEvent ? 'group' : categoryName; if (processedScoreboardData.categoryTotals[scoreboardCat]) { TEAM_NAMES.forEach(team => { processedScoreboardData.categoryTotals[scoreboardCat][team] += eventScore[team].points; }); processedScoreboardData.categoryCounts[scoreboardCat]++; } processedProgramData.push({ eventName, categoryName, filterCategory, winners }); } processedTalentData = {}; for (const studentKey in talentPoints) { const { points, category } = talentPoints[studentKey]; if (!processedTalentData[category]) processedTalentData[category] = []; processedTalentData[category].push({ name: studentKey, points }); } for (const category in processedTalentData) { processedTalentData[category].sort((a, b) => b.points - a.points); } publishedResultsCount = resultsCount; renderAllComponents(); }
 
-        // ഒരു ചെസ്റ്റ് നമ്പറിൽ നിന്ന് ടീമിനെ കണ്ടെത്താനുള്ള ഫംഗ്ഷൻ
-        function getTeamFromChest(chestNo) {
-            if (!chestNo || typeof chestNo !== 'string') return null;
-            if (dbTeams == null || dbParticipants == null) return null; // ഡാറ്റ വന്നിട്ടില്ലെങ്കിൽ നിർത്തുക
-            
-            // 1. ഗ്രൂപ്പ് ഐറ്റം ആണെങ്കിൽ ചെസ്റ്റ് നമ്പർ ടീമിന്റെ പേരായിരിക്കും
-            for (const teamName of TEAM_NAMES) { if (chestNo.toUpperCase() === teamName) return teamName; }
-            
-            // 2. പാർട്ടിസിപ്പന്റ് ഡാറ്റയിൽ നിന്ന് ടീമിനെ കണ്ടെത്തുക (CSV ഇമ്പോർട്ടിൽ നിന്ന്)
-            if (dbParticipants[chestNo] && dbParticipants[chestNo].team) { return dbParticipants[chestNo].team; }
-            
-            // 3. ടീമിന്റെ ചെസ്റ്റ് നമ്പർ റേഞ്ച് വെച്ച് കണ്ടെത്തുക (പഴയ രീതി)
-            const chestNumberMatch = chestNo.match(/^\d+/);
-            if (chestNumberMatch) {
-                const chestNumber = parseInt(chestNumberMatch[0], 10);
-                for (const team of Object.values(dbTeams)) {
-                    const idFrom = parseInt(team.id_from, 10);
-                    const idTo = parseInt(team.id_to, 10);
-                    // id_from, id_to എന്നിവ സംഖ്യകളാണോ എന്ന് ഉറപ്പുവരുത്തുന്നു
-                    if (!isNaN(idFrom) && !isNaN(idTo) && chestNumber >= idFrom && chestNumber <= idTo) {
-                        return team.name;
-                    }
-                }
-            }
-            return null; // ടീമിനെ കണ്ടെത്താൻ കഴിഞ്ഞില്ലെങ്കിൽ null നൽകുക
-        }
-
-        // ടീമുകളുടെ പോയിന്റ് കണക്കുകൂട്ടാൻ ഒരു ഘടന ഉണ്ടാക്കുന്നു
-        function initializeTeamData() { 
-            const data = {}; 
-            if (dbTeams == null || dbCategories == null) return data; 
-            
-            TEAM_NAMES = Object.keys(dbTeams); // ടീമുകളുടെ പേരുകൾ എടുക്കുന്നു
-            TEAM_NAMES.forEach(team => { 
-                data[team] = { name: team, total: 0 }; // ഓരോ ടീമിനും ടോട്ടൽ പോയിന്റ് 0 ആക്കുന്നു
-                // ഓരോ കാറ്റഗറിക്കും പോയിന്റ് 0 ആക്കുന്നു
-                dbCategories.forEach(cat => { data[team][cat.name] = 0; }); 
-                data[team]['group'] = 0; // ഗ്രൂപ്പ് ഐറ്റംസിനും പോയിന്റ് 0 ആക്കുന്നു
-            }); 
-            return data; 
-        }
-
-        // ഡാറ്റാബേസിൽ നിന്ന് ലഭിച്ച എല്ലാ വിവരങ്ങളും ഉപയോഗിച്ച് പോയിന്റുകൾ കണക്കാക്കുന്നു
-        function processAllData(currentResults) {
-            // ആവശ്യമായ എല്ലാ ഡാറ്റയും (null അല്ലെങ്കിൽ) വന്നിട്ടുണ്ടോ എന്ന് പരിശോധിക്കുന്നു
-            if (dbCategories == null || dbTeams == null || dbHomepage == null || dbParticipants == null || dbPrograms == null || currentResults == null) {
-                console.warn("processAllData called, but essential data is null. Waiting...");
-                return; // ഏതെങ്കിലും ഡാറ്റ ഇല്ലെങ്കിൽ പ്രവർത്തനം നിർത്തുന്നു
-            }
-            
-            // പഴയ കണക്കുകൂട്ടലുകൾ മായ്ക്കുന്നു
-            processedTeamData = initializeTeamData();
-            processedProgramData = [];
-            const talentPoints = {};
-            processedScoreboardData = { eventPoints: {}, categoryTotals: {}, categoryCounts: {} };
-            let resultsCount = 0; // പബ്ലിഷ് ചെയ്ത റിസൾട്ടുകളുടെ എണ്ണം
-            
-            // സ്കോർബോർഡ് ടാബിനുള്ള തയ്യാറെടുപ്പ്
-            const categoryNames = dbCategories.map(cat => cat.name);
-            categoryNames.push('group');
-            categoryNames.forEach(catName => { 
-                processedScoreboardData.categoryTotals[catName] = {}; 
-                TEAM_NAMES.forEach(team => { processedScoreboardData.categoryTotals[catName][team] = 0; }); 
-                processedScoreboardData.categoryCounts[catName] = 0; 
-            });
-            
-            // ഓരോ റിസൾട്ടും എടുത്ത് പോയിന്റ് കണക്കാക്കുന്നു
-            for (const programId in currentResults) {
-                const program = dbPrograms[programId]; // പ്രോഗ്രാമിന്റെ വിവരങ്ങൾ എടുക്കുന്നു
-                if (!program) continue; // പ്രോഗ്രാം ഇല്ലെങ്കിൽ അടുത്തതിലേക്ക് പോകുന്നു
-                
-                const eventName = program.name, categoryName = program.category, winners = currentResults[programId];
-                
-                // വിജയികൾ ആരെങ്കിലും ഉണ്ടോ എന്ന് നോക്കുന്നു
-                if (!((winners.first && winners.first.length > 0) || (winners.second && winners.second.length > 0) || (winners.third && winners.third.length > 0))) continue;
-                
-                resultsCount++; // റിസൾട്ട് ഉണ്ടെങ്കിൽ എണ്ണം കൂട്ടുന്നു
-                
-                const isGroupEvent = groupEvents.includes(eventName); // ഗ്രൂപ്പ് ഐറ്റം ആണോ?
-                const currentPoints = isGroupEvent ? POINTS.GROUP : POINTS.STANDARD; // പോയിന്റ് തിരഞ്ഞെടുക്കുന്നു
-                const filterCategory = isGroupEvent ? 'group' : categoryName; // ഫിൽട്ടർ ചെയ്യാനുള്ള കാറ്റഗറി
-                
-                // സ്കോർബോർഡിനുള്ള തയ്യാറെടുപ്പ്
-                const eventScore = { category: categoryName };
-                TEAM_NAMES.forEach(team => { eventScore[team] = { points: 0, positions: [] }; });
-
-                // 1, 2, 3 സ്ഥാനക്കാർക്ക് പോയിന്റ് നൽകുന്നു
-                for (const position of ['first', 'second', 'third']) {
-                    if (winners[position] && winners[position].length > 0) {
-                        // വിജയി ഒരു object ആണ് {chest: "101", name: "Aamir"}
-                        winners[position].forEach(winner => {
-                            const team = getTeamFromChest(winner.chest); // ടീമിനെ കണ്ടെത്തുന്നു
-                            if (team) { // ടീം ഉണ്ടെങ്കിൽ
-                                const pointValue = currentPoints[position];
-                                // ടീമിന്റെ ടോട്ടൽ പോയിന്റും കാറ്റഗറി പോയിന്റും കൂട്ടുന്നു
-                                processedTeamData[team].total += pointValue;
-                                const pointCategoryKey = isGroupEvent ? 'group' : categoryName;
-                                if (processedTeamData[team][pointCategoryKey] !== undefined) {
-                                   processedTeamData[team][pointCategoryKey] += pointValue;
-                                }
-                                // ടാലന്റ് പോയിന്റ് (വ്യക്തിഗതം മാത്രം)
-                                if (!isGroupEvent) {
-                                    const winnerIdentifier = `${winner.chest} ${winner.name}`; // ഉദാ: "101 Aamir Khan"
-                                    if (!talentPoints[winnerIdentifier]) talentPoints[winnerIdentifier] = { points: 0, category: categoryName };
-                                    talentPoints[winnerIdentifier].points += pointValue;
-                                }
-                                // സ്കോർബോർഡ് പോയിന്റ്
-                                eventScore[team].points += pointValue;
-                                eventScore[team].positions.push(position === 'first' ? 1 : (position === 'second' ? 2 : 3));
-                            }
-                        });
-                    }
-                }
-                // സ്കോർബോർഡ് ഡാറ്റ അപ്ഡേറ്റ് ചെയ്യുന്നു
-                processedScoreboardData.eventPoints[eventName] = eventScore;
-                const scoreboardCat = isGroupEvent ? 'group' : categoryName;
-                if (processedScoreboardData.categoryTotals[scoreboardCat]) {
-                    TEAM_NAMES.forEach(team => { processedScoreboardData.categoryTotals[scoreboardCat][team] += eventScore[team].points; });
-                    processedScoreboardData.categoryCounts[scoreboardCat]++;
-                }
-                // റിസൾട്ട് ടാബിൽ കാണിക്കാനുള്ള ഡാറ്റ തയ്യാറാക്കുന്നു
-                processedProgramData.push({ eventName, categoryName, filterCategory, winners });
-            }
-            
-            // ടാലന്റ് ലിസ്റ്റ് തയ്യാറാക്കുന്നു
-            processedTalentData = {};
-            for (const studentKey in talentPoints) {
-                const { points, category } = talentPoints[studentKey];
-                if (!processedTalentData[category]) processedTalentData[category] = [];
-                processedTalentData[category].push({ name: studentKey, points });
-            }
-            // ഓരോ കാറ്റഗറിയിലെയും ടാലന്റുകളെ പോയിന്റ് അനുസരിച്ച് ഓർഡർ ചെയ്യുന്നു
-            for (const category in processedTalentData) { processedTalentData[category].sort((a, b) => b.points - a.points); }
-            
-            publishedResultsCount = resultsCount; // ആകെ റിസൾട്ടുകളുടെ എണ്ണം
-            renderAllComponents(); // എല്ലാ ഭാഗങ്ങളും സ്ക്രീനിൽ കാണിക്കുന്നു
-        }
-
-        // ===================================================================================
-        // റെൻഡറിംഗ് ഫംഗ്ഷനുകൾ (സ്ക്രീനിൽ കാണിക്കുന്നത്)
-        // ===================================================================================
-        
+        // ===================================
+        // റെൻഡറിംഗ് ഫംഗ്ഷനുകൾ
+        // ===================================
         // എല്ലാ ഭാഗങ്ങളും ഒന്നിച്ചു വിളിക്കുന്നു
-        function renderAllComponents() {
-            if (dbCategories == null) return; 
-            generateFilterButtons(); // ഫിൽട്ടർ ബട്ടണുകൾ ഉണ്ടാക്കുന്നു
-            generateTeamCards(); // ടീം കാർഡുകൾ ഉണ്ടാക്കുന്നു
-            generateDetailedRankings(); // വിശദമായ റാങ്കിംഗ് ടേബിൾ ഉണ്ടാക്കുന്നു
-            renderProgramResults(); // റിസൾട്ട് കാർഡുകൾ ഉണ്ടാക്കുന്നു
-            generateTalentList(); // ടാലന്റ് ലിസ്റ്റ് ഉണ്ടാക്കുന്നു
-            generateScoreboard(); // സ്കോർബോർഡ് ഉണ്ടാക്കുന്നു
-            generateStaticContent(); // ഹോം പേജ് ഉള്ളടക്കം ഉണ്ടാക്കുന്നു (ഗാലറി ഉൾപ്പെടെ)
-            updateResultCounts(); // റിസൾട്ടുകളുടെ എണ്ണം കാണിക്കുന്നു
-            // ഡിഫോൾട്ട് ആയി ആദ്യത്തെ കാറ്റഗറി സ്കോർബോർഡിൽ കാണിക്കുന്നു
-            const defaultScoreboardFilter = (dbCategories && dbCategories.length > 0) ? dbCategories[0].name : 'group';
-            filterScoreboard(defaultScoreboardFilter);
-            
-            // ലോഡിംഗ് സ്ക്രീൻ മാറ്റുന്നു
-            document.getElementById('loading-overlay').style.opacity = '0';
-            setTimeout(() => { 
-                document.getElementById('loading-overlay').style.display = 'none'; 
-                document.getElementById('main-content').style.visibility = 'visible'; 
-            }, 500);
-        }
-
-        // ഫിൽട്ടർ ബട്ടണുകൾ ഉണ്ടാക്കുന്നു (Result, Scoreboard ടാബുകളിൽ)
-        function generateFilterButtons() { const programFiltersEl = document.getElementById('program-filter-buttons'); const scoreboardFiltersEl = document.getElementById('scoreboard-filter-buttons'); let buttonsHtml = `<button class="filter-btn active" data-filter="all" onclick="filterResults('all')">All</button>`; (dbCategories || []).forEach(cat => { buttonsHtml += `<button class="filter-btn" data-filter="${cat.name}" onclick="filterResults('${cat.name}')">${cat.name}</button>`; }); buttonsHtml += `<button class="filter-btn" data-filter="group" onclick="filterResults('group')">Group</button>`; programFiltersEl.innerHTML = buttonsHtml; let scoreboardButtonsHtml = ''; (dbCategories || []).forEach((cat, index) => { scoreboardButtonsHtml += `<button class="filter-btn ${index === 0 ? 'active' : ''}" data-filter="${cat.name}" onclick="filterScoreboard('${cat.name}')">${cat.name}</button>`; }); scoreboardButtonsHtml += `<button class="filter-btn" data-filter="group" onclick="filterScoreboard('group')">Group</button>`; scoreboardFiltersEl.innerHTML = scoreboardButtonsHtml; }
-        // ടീം ടാബിലെ പ്രധാന കാർഡുകൾ ഉണ്ടാക്കുന്നു
-        function generateTeamCards() { const rankedTeams = Object.values(processedTeamData).sort((a, b) => b.total - a.total); const container = document.getElementById('team-cards-container'); container.innerHTML = ''; const cardClasses = ['champion', 'first-runner-up', 'second-runner-up']; const positionTexts = ['Champions', 'First Runners-up', 'Second Runners-up']; const iconClasses = ['fas fa-crown', 'fas fa-medal', 'fas fa-medal']; rankedTeams.forEach((team, i) => { container.innerHTML += `<div class="team-card ${cardClasses[i] || ''}"><div class="icon"><i class="${iconClasses[i] || 'fas fa-award'}"></i></div><div class="team-name">${team.name}</div><p class="points"><b>${team.total}</b></p><p class="position">${positionTexts[i] || `#${i + 1} Position`}</p></div>`; }); }
-        // ടീം ടാബിലെ വിശദമായ റാങ്കിംഗ് ടേബിൾ ഉണ്ടാക്കുന്നു
-        function generateDetailedRankings() { const container = document.getElementById('detailed-rankings'); const rankedTeams = Object.values(processedTeamData).sort((a, b) => b.total - a.total); const maxScore = rankedTeams.length > 0 ? rankedTeams[0].total : 0; let headerCols = '', gridTemplateCols = '40px 1.5fr'; (dbCategories || []).forEach(cat => { headerCols += `<div>${cat.name}</div>`; gridTemplateCols += ' 0.8fr'; }); headerCols += `<div>Group</div>`; gridTemplateCols += ' 0.8fr 1fr 1fr'; let tableHtml = `<div class="rankings-table-content" style="min-width: ${700 + (dbCategories || []).length * 80}px;"><div class="ranking-header" style="grid-template-columns: ${gridTemplateCols};"><div>Rank</div><div>Team</div>${headerCols}<div>Total</div><div>Progress</div></div>`; rankedTeams.forEach((team, index) => { const rank = index + 1; const progress = maxScore > 0 ? (team.total / maxScore) * 100 : 0; let pointsCols = ''; (dbCategories || []).forEach((cat, i) => { pointsCols += `<div><span class="points-pill default-pill-${(i % 6) + 1}">${team[cat.name] || 0}</span></div>`; }); pointsCols += `<div><span class="points-pill group">${team['group'] || 0}</span></div>`; tableHtml += `<div class="ranking-row" style="grid-template-columns: ${gridTemplateCols};"><div><span class="rank-cell rank-${rank}">#${rank}</span></div><div class="team-name-cell">${team.name}</div>${pointsCols}<div class="total-points-cell">${team.total}</div><td><div class="progress-circle-container"><div class="progress-circle" style="--p:${progress};"><span class="progress-circle-text">${Math.round(progress)}%</span></div></div></td></div>`; }); tableHtml += '</div>'; container.innerHTML = `<h2>Detailed Rankings</h2><p>Complete scoreboard with detailed breakdown by category</p>${tableHtml}`; }
-        // റിസൾട്ട് ടാബിലെ കാർഡുകൾ ഉണ്ടാക്കുന്നു (ചെസ്റ്റ് നമ്പറും പേരും ഉൾപ്പെടെ)
-        function renderProgramResults() {
-            const grid = document.getElementById('program-results-grid');
-            grid.innerHTML = '';
-            [...processedProgramData].sort((a, b) => a.eventName.localeCompare(b.eventName)).forEach(result => {
-                const { eventName, categoryName, filterCategory, winners } = result;
-                const isGroupEvent = groupEvents.includes(eventName);
-                const currentPoints = isGroupEvent ? POINTS.GROUP : POINTS.STANDARD;
-                let winnersHtml = '';
-                ['first', 'second', 'third'].forEach((pos, index) => {
-                    if (winners[pos] && winners[pos].length > 0) {
-                        winners[pos].forEach(winner => {
-                            const team = getTeamFromChest(winner.chest);
-                            const chestId = winner.chest || 'N/A';
-                            const winnerName = winner.name === 'Unknown' ? `Chest No: ${chestId}` : winner.name;
-                            if (isGroupEvent && team) {
-                                winnersHtml += `<div class="winner-entry ${['first-place', 'second-place', 'third-place'][index]}"><i class="${['fas fa-trophy', 'fas fa-medal silver', 'fas fa-medal bronze'][index]} medal-icon"></i><div class="winner-details"><div class="name">${team}</div><div class="id-team"><span>GROUP ITEM</span></div></div><div class="winner-points"><div class="points-value">${currentPoints[pos]}</div><div class="points-label">points</div></div></div>`;
-                            } else {
-                                const points = currentPoints[pos];
-                                winnersHtml += `<div class="winner-entry ${['first-place', 'second-place', 'third-place'][index]}"><i class="${['fas fa-trophy', 'fas fa-medal silver', 'fas fa-medal bronze'][index]} medal-icon"></i><div class="winner-details"><div class="name">${winnerName}</div><div class="id-team"><span>ID: ${chestId}</span> ${team || ''}</div></div><div class="winner-points"><div class="points-value">${points}</div><div class="points-label">points</div></div></div>`;
-                            }
-                        });
-                    }
-                });
-                const card = document.createElement('div');
-                card.className = 'event-result-card';
-                card.dataset.category = filterCategory;
-                card.dataset.searchText = `${eventName} ${categoryName} ${winnersHtml}`.toLowerCase();
-                card.innerHTML = `<div class="event-card-header"><h3>${eventName.replace('________NO ONE','')}</h3><span class="event-category-tag">${categoryName.toUpperCase()}</span></div><div class="winners-container">${winnersHtml}</div>`;
-                grid.appendChild(card);
-            });
-        }
-        // ടാലന്റ് ടാബ് ഉണ്ടാക്കുന്നു (ചെസ്റ്റ് നമ്പറും പേരും ഉൾപ്പെടെ)
-        function generateTalentList() {
-            const container = document.getElementById('talent-list-container');
-            container.innerHTML = `<h2 style="text-align: center; color: var(--heading-color); font-family: 'Saira', sans-serif;">Top Talents</h2>`;
-            (dbCategories || []).forEach((category, catIndex) => {
-                const categoryName = category.name;
-                if (processedTalentData[categoryName] && processedTalentData[categoryName].length > 0) {
-                    const talentArray = processedTalentData[categoryName];
-                    let topTalentsHtml = '', dropdownTalentsHtml = '';
-                    talentArray.forEach((student, index) => {
-                        const chestId = (student.name.match(/^\d+/) || ['N/A'])[0];
-                        const studentName = student.name.replace(/^\d+\s*/, '');
-                        const teamName = getTeamFromChest(chestId) || '';
-                        const studentHtml = `<div class="winner-entry ${['first-place', 'second-place', 'third-place'][index] || ''}">${index < 3 ? ['<i class="fas fa-trophy medal-icon"></i>', '<i class="fas fa-medal silver medal-icon"></i>', '<i class="fas fa-medal bronze medal-icon"></i>'][index] : `<span class="medal-icon">#${index + 1}</span>`}<div class="winner-details"><div class="name">${studentName}</div><div class="id-team"><span>ID: ${chestId}</span> ${teamName}</div></div><div class="winner-points"><div class="points-value">${student.points}</div><div class="points-label">points</div></div></div>`;
-                        index < 2 ? topTalentsHtml += studentHtml : dropdownTalentsHtml += studentHtml;
-                    });
-                    const card = document.createElement('div');
-                    card.className = 'talent-category-card';
-                    card.innerHTML = `<h3>${categoryName.toUpperCase()}</h3><div class="talent-list">${topTalentsHtml}</div>` + (dropdownTalentsHtml ? `<div class="talent-dropdown-list" id="talent-dropdown-${catIndex}">${dropdownTalentsHtml}</div><button class="show-more-btn" onclick="toggleTalentDropdown('talent-dropdown-${catIndex}', this)">Show More</button>` : '');
-                    container.appendChild(card);
-                }
-            });
-        }
-        // സ്കോർബോർഡ് ടാബ് ഉണ്ടാക്കുന്നു
-        function generateScoreboard() { const container = document.getElementById('scoreboard-table-content'); let scoreboardHtml = ''; for (const eventName in processedScoreboardData.eventPoints) { const eventData = processedScoreboardData.eventPoints[eventName]; scoreboardHtml += `<div class="scoreboard-card" data-category="${eventData.category}" data-event-name="${eventName}"><div class="scoreboard-event-header"><span>Program Name:</span><span>${eventName.replace('________NO ONE','')}</span></div>${TEAM_NAMES.map(team => `<div class="scoreboard-team-row"><span>${team}:</span><span>${eventData[team].points} ${getTrophyIconsHTML(eventData[team].positions)}</span></div>`).join('')}</div>`; } scoreboardHtml += `<div class="scoreboard-card total-card" id="scoreboard-total-card"><h3>TOTALS</h3><p id="scoreboard-category-count" class="category-count-text"></p>${TEAM_NAMES.map(team => `<div class="scoreboard-team-row"><span>${team}:</span> <span data-team="${team}">0</span></div>`).join('')}</div><div class="scoreboard-legend"><span><i class="fas fa-trophy gold"></i> Gold</span> <span><i class="fas fa-trophy silver"></i> Silver</span> <span><i class="fas fa-trophy bronze"></i> Bronze</span></div>`; container.innerHTML = scoreboardHtml; }
+        function renderAllComponents() { /* ... (കോഡ് മാറ്റമില്ല) ... */ if (dbCategories == null) return; generateFilterButtons(); generateTeamCards(); generateDetailedRankings(); renderProgramResults(); generateTalentList(); generateScoreboard(); generateStaticContent(); updateResultCounts(); const defaultScoreboardFilter = (dbCategories && dbCategories.length > 0) ? dbCategories[0].name : 'group'; filterScoreboard(defaultScoreboardFilter); document.getElementById('loading-overlay').style.opacity = '0'; setTimeout(() => { document.getElementById('loading-overlay').style.display = 'none'; document.getElementById('main-content').style.visibility = 'visible'; }, 500); }
+        // ഫിൽട്ടർ ബട്ടണുകൾ ഉണ്ടാക്കുന്നു
+        function generateFilterButtons() { /* ... (കോഡ് മാറ്റമില്ല) ... */ const programFiltersEl = document.getElementById('program-filter-buttons'); const scoreboardFiltersEl = document.getElementById('scoreboard-filter-buttons'); let buttonsHtml = `<button class="filter-btn active" data-filter="all" onclick="filterResults('all')">All</button>`; (dbCategories || []).forEach(cat => { buttonsHtml += `<button class="filter-btn" data-filter="${cat.name}" onclick="filterResults('${cat.name}')">${cat.name}</button>`; }); buttonsHtml += `<button class="filter-btn" data-filter="group" onclick="filterResults('group')">Group</button>`; programFiltersEl.innerHTML = buttonsHtml; let scoreboardButtonsHtml = ''; (dbCategories || []).forEach((cat, index) => { scoreboardButtonsHtml += `<button class="filter-btn ${index === 0 ? 'active' : ''}" data-filter="${cat.name}" onclick="filterScoreboard('${cat.name}')">${cat.name}</button>`; }); scoreboardButtonsHtml += `<button class="filter-btn" data-filter="group" onclick="filterScoreboard('group')">Group</button>`; scoreboardFiltersEl.innerHTML = scoreboardButtonsHtml; }
+        // ടീം കാർഡുകൾ ഉണ്ടാക്കുന്നു
+        function generateTeamCards() { /* ... (കോഡ് മാറ്റമില്ല) ... */ const rankedTeams = Object.values(processedTeamData).sort((a, b) => b.total - a.total); const container = document.getElementById('team-cards-container'); container.innerHTML = ''; const cardClasses = ['champion', 'first-runner-up', 'second-runner-up']; const positionTexts = ['Champions', 'First Runners-up', 'Second Runners-up']; const iconClasses = ['fas fa-crown', 'fas fa-medal', 'fas fa-medal']; rankedTeams.forEach((team, i) => { container.innerHTML += `<div class="team-card ${cardClasses[i] || ''}"><div class="icon"><i class="${iconClasses[i] || 'fas fa-award'}"></i></div><div class="team-name">${team.name}</div><p class="points"><b>${team.total}</b></p><p class="position">${positionTexts[i] || `#${i + 1} Position`}</p></div>`; }); }
+        // വിശദമായ റാങ്കിംഗ് ടേബിൾ ഉണ്ടാക്കുന്നു
+        function generateDetailedRankings() { /* ... (കോഡ് മാറ്റമില്ല) ... */ const container = document.getElementById('detailed-rankings'); const rankedTeams = Object.values(processedTeamData).sort((a, b) => b.total - a.total); const maxScore = rankedTeams.length > 0 ? rankedTeams[0].total : 0; let headerCols = '', gridTemplateCols = '40px 1.5fr'; (dbCategories || []).forEach(cat => { headerCols += `<div>${cat.name}</div>`; gridTemplateCols += ' 0.8fr'; }); headerCols += `<div>Group</div>`; gridTemplateCols += ' 0.8fr 1fr 1fr'; let tableHtml = `<div class="rankings-table-content" style="min-width: ${700 + (dbCategories || []).length * 80}px;"><div class="ranking-header" style="grid-template-columns: ${gridTemplateCols};"><div>Rank</div><div>Team</div>${headerCols}<div>Total</div><div>Progress</div></div>`; rankedTeams.forEach((team, index) => { const rank = index + 1; const progress = maxScore > 0 ? (team.total / maxScore) * 100 : 0; let pointsCols = ''; (dbCategories || []).forEach((cat, i) => { pointsCols += `<div><span class="points-pill default-pill-${(i % 6) + 1}">${team[cat.name] || 0}</span></div>`; }); pointsCols += `<div><span class="points-pill group">${team['group'] || 0}</span></div>`; tableHtml += `<div class="ranking-row" style="grid-template-columns: ${gridTemplateCols};"><div><span class="rank-cell rank-${rank}">#${rank}</span></div><div class="team-name-cell">${team.name}</div>${pointsCols}<div class="total-points-cell">${team.total}</div><td><div class="progress-circle-container"><div class="progress-circle" style="--p:${progress};"><span class="progress-circle-text">${Math.round(progress)}%</span></div></div></td></div>`; }); tableHtml += '</div>'; container.innerHTML = `<h2>Detailed Rankings</h2><p>Complete scoreboard with detailed breakdown by category</p>${tableHtml}`; }
+        // റിസൾട്ട് കാർഡുകൾ ഉണ്ടാക്കുന്നു
+        function renderProgramResults() { /* ... (കോഡ് മാറ്റമില്ല) ... */ const grid = document.getElementById('program-results-grid'); grid.innerHTML = ''; [...processedProgramData].sort((a, b) => a.eventName.localeCompare(b.eventName)).forEach(result => { const { eventName, categoryName, filterCategory, winners } = result; const isGroupEvent = groupEvents.includes(eventName); const currentPoints = isGroupEvent ? POINTS.GROUP : POINTS.STANDARD; let winnersHtml = ''; ['first', 'second', 'third'].forEach((pos, index) => { if (winners[pos] && winners[pos].length > 0) { winners[pos].forEach(winner => { const team = getTeamFromChest(winner.chest); const chestId = winner.chest || 'N/A'; const winnerName = winner.name === 'Unknown' ? `Chest No: ${chestId}` : winner.name; if (isGroupEvent && team) { winnersHtml += `<div class="winner-entry ${['first-place', 'second-place', 'third-place'][index]}"><i class="${['fas fa-trophy', 'fas fa-medal silver', 'fas fa-medal bronze'][index]} medal-icon"></i><div class="winner-details"><div class="name">${team}</div><div class="id-team"><span>GROUP ITEM</span></div></div><div class="winner-points"><div class="points-value">${currentPoints[pos]}</div><div class="points-label">points</div></div></div>`; } else { const points = currentPoints[pos]; winnersHtml += `<div class="winner-entry ${['first-place', 'second-place', 'third-place'][index]}"><i class="${['fas fa-trophy', 'fas fa-medal silver', 'fas fa-medal bronze'][index]} medal-icon"></i><div class="winner-details"><div class="name">${winnerName}</div><div class="id-team"><span>ID: ${chestId}</span> ${team || ''}</div></div><div class="winner-points"><div class="points-value">${points}</div><div class="points-label">points</div></div></div>`; } }); } }); const card = document.createElement('div'); card.className = 'event-result-card'; card.dataset.category = filterCategory; card.dataset.searchText = `${eventName} ${categoryName} ${winnersHtml}`.toLowerCase(); card.innerHTML = `<div class="event-card-header"><h3>${eventName.replace('________NO ONE','')}</h3><span class="event-category-tag">${categoryName.toUpperCase()}</span></div><div class="winners-container">${winnersHtml}</div>`; grid.appendChild(card); }); }
+        // ടാലന്റ് ലിസ്റ്റ് ഉണ്ടാക്കുന്നു
+        function generateTalentList() { /* ... (കോഡ് മാറ്റമില്ല) ... */ const container = document.getElementById('talent-list-container'); container.innerHTML = `<h2 style="text-align: center; color: var(--heading-color); font-family: 'Saira', sans-serif;">Top Talents</h2>`; (dbCategories || []).forEach((category, catIndex) => { const categoryName = category.name; if (processedTalentData[categoryName] && processedTalentData[categoryName].length > 0) { const talentArray = processedTalentData[categoryName]; let topTalentsHtml = '', dropdownTalentsHtml = ''; talentArray.forEach((student, index) => { const chestId = (student.name.match(/^\d+/) || ['N/A'])[0]; const studentName = student.name.replace(/^\d+\s*/, ''); const teamName = getTeamFromChest(chestId) || ''; const studentHtml = `<div class="winner-entry ${['first-place', 'second-place', 'third-place'][index] || ''}">${index < 3 ? ['<i class="fas fa-trophy medal-icon"></i>', '<i class="fas fa-medal silver medal-icon"></i>', '<i class="fas fa-medal bronze medal-icon"></i>'][index] : `<span class="medal-icon">#${index + 1}</span>`}<div class="winner-details"><div class="name">${studentName}</div><div class="id-team"><span>ID: ${chestId}</span> ${teamName}</div></div><div class="winner-points"><div class="points-value">${student.points}</div><div class="points-label">points</div></div></div>`; index < 2 ? topTalentsHtml += studentHtml : dropdownTalentsHtml += studentHtml; }); const card = document.createElement('div'); card.className = 'talent-category-card'; card.innerHTML = `<h3>${categoryName.toUpperCase()}</h3><div class="talent-list">${topTalentsHtml}</div>` + (dropdownTalentsHtml ? `<div class="talent-dropdown-list" id="talent-dropdown-${catIndex}">${dropdownTalentsHtml}</div><button class="show-more-btn" onclick="toggleTalentDropdown('talent-dropdown-${catIndex}', this)">Show More</button>` : ''); container.appendChild(card); } }); }
+        // സ്കോർബോർഡ് ഉണ്ടാക്കുന്നു
+        function generateScoreboard() { /* ... (കോഡ് മാറ്റമില്ല) ... */ const container = document.getElementById('scoreboard-table-content'); let scoreboardHtml = ''; for (const eventName in processedScoreboardData.eventPoints) { const eventData = processedScoreboardData.eventPoints[eventName]; scoreboardHtml += `<div class="scoreboard-card" data-category="${eventData.category}" data-event-name="${eventName}"><div class="scoreboard-event-header"><span>Program Name:</span><span>${eventName.replace('________NO ONE','')}</span></div>${TEAM_NAMES.map(team => `<div class="scoreboard-team-row"><span>${team}:</span><span>${eventData[team].points} ${getTrophyIconsHTML(eventData[team].positions)}</span></div>`).join('')}</div>`; } scoreboardHtml += `<div class="scoreboard-card total-card" id="scoreboard-total-card"><h3>TOTALS</h3><p id="scoreboard-category-count" class="category-count-text"></p>${TEAM_NAMES.map(team => `<div class="scoreboard-team-row"><span>${team}:</span> <span data-team="${team}">0</span></div>`).join('')}</div><div class="scoreboard-legend"><span><i class="fas fa-trophy gold"></i> Gold</span> <span><i class="fas fa-trophy silver"></i> Silver</span> <span><i class="fas fa-trophy bronze"></i> Bronze</span></div>`; container.innerHTML = scoreboardHtml; }
         
-        // ഹോം പേജിലെ സ്റ്റാറ്റിക് ഉള്ളടക്കം (ലോഗോ, ടൈറ്റിൽ, എബൗട്ട്, ഗാലറി, ലീഡേഴ്സ്) ഉണ്ടാക്കുന്നു
+        // ഹോം പേജിലെ സ്റ്റാറ്റിക് ഉള്ളടക്കം (ഹെഡർ, ഫൂട്ടർ ഉൾപ്പെടെ) ഉണ്ടാക്കുന്നു
         function generateStaticContent() {
             if (dbHomepage == null || dbTeams == null) return; 
             const leaderContainer = document.getElementById('leader-cards-container');
             const galleryPlaceholder = document.getElementById('gallery-placeholder');
-            const galleryRowContainers = [
-                document.getElementById('gallery-row-0'),
-                document.getElementById('gallery-row-1'),
-                document.getElementById('gallery-row-2')
-            ];
+            const galleryRowContainers = [document.getElementById('gallery-row-0'), document.getElementById('gallery-row-1'), document.getElementById('gallery-row-2')];
             const leaderPlaceholder = document.getElementById('leader-placeholder');
+            const headerTitleEl = document.getElementById('dynamic-header-title'); // ഹെഡർ ടൈറ്റിൽ
+            const footerSocialIconsEl = document.getElementById('footer-social-icons'); // ഫൂട്ടർ ഐക്കൺസ്
+            const footerInstitutionEl = document.getElementById('footer-institution-name'); // ഫൂട്ടർ സ്ഥാപന നാമം
+            const footerCopyrightEl = document.getElementById('footer-copyright'); // ഫൂട്ടർ കോപ്പിറൈറ്റ്
+            
+            // ഹെഡർ ടൈറ്റിൽ അപ്ഡേറ്റ്
+            if (headerTitleEl) headerTitleEl.innerText = dbHomepage.header_title || 'Sadaye Madeena 2k25'; 
             
             // ഹീറോ സെക്ഷൻ അപ്ഡേറ്റ്
             document.getElementById('hero-logo').src = dbHomepage.logo_url || 'https://placehold.co/150x150/FFFFFF/EFEFEF?text=Logo';
@@ -750,190 +486,74 @@
             const rankedTeams = Object.values(processedTeamData).sort((a,b) => b.total - a.total);
             if (rankedTeams.length > 0 && Object.keys(dbTeams).length > 0) {
                 if(leaderPlaceholder) leaderPlaceholder.style.display = 'none';
-                leaderContainer.innerHTML = rankedTeams.map((team, index) => {
-                    const teamDetails = dbTeams[team.name] || { leader: 'N/A', asst: 'N/A' };
-                    return `<div class="leader-card"><div class="rank-badge">#${index+1}</div><h3>Team ${team.name}</h3><p class="score">Score: ${team.total} pts</p><div class="leader-info"><div><span>Leader:</span> <span>${teamDetails.leader}</span></div><div><span>Asst. Leader:</span> <span>${teamDetails.asst}</span></div></div></div>`
-                }).join('');
-            } else if (leaderPlaceholder) {
-                leaderPlaceholder.textContent = "Team leaders will appear here once teams are added in admin panel.";
-            }
+                leaderContainer.innerHTML = rankedTeams.map((team, index) => { /* ... (ലീഡർ കാർഡ് HTML മാറ്റമില്ല) ... */ const teamDetails = dbTeams[team.name] || { leader: 'N/A', asst: 'N/A' }; return `<div class="leader-card"><div class="rank-badge">#${index+1}</div><h3>Team ${team.name}</h3><p class="score">Score: ${team.total} pts</p><div class="leader-info"><div><span>Leader:</span> <span>${teamDetails.leader}</span></div><div><span>Asst. Leader:</span> <span>${teamDetails.asst}</span></div></div></div>` }).join('');
+            } else if (leaderPlaceholder) { leaderPlaceholder.textContent = "Team leaders will appear here once teams are added in admin panel."; }
 
-            // ഗാലറി അപ്ഡേറ്റ് (3 വരി, ഷെയർ ബട്ടൺ)
+            // ഗാലറി അപ്ഡേറ്റ്
             galleryRowContainers.forEach(row => { if(row) row.innerHTML = ''; }); 
             if (dbHomepage.gallery && dbHomepage.gallery.length > 0) {
                 if(galleryPlaceholder) galleryPlaceholder.style.display = 'none';
-                dbHomepage.gallery.forEach((imgUrl, index) => {
-                    const rowIndex = index % 3; 
-                    const galleryItemHTML = `
-                        <div class="gallery-item-wrapper">
-                            <img src="${imgUrl}" alt="Gallery Image ${index + 1}" loading="lazy" onerror="this.onerror=null;this.src='https://placehold.co/200x${Math.round(200 * 9 / 7)}/EFEFEF/CCCCCC?text=Image';">
-                            <button class="share-btn" data-url="${imgUrl}" aria-label="Share image">
-                                <i class="fas fa-share-alt"></i>
-                            </button>
-                        </div>
-                    `;
-                    if (galleryRowContainers[rowIndex]) {
-                        galleryRowContainers[rowIndex].innerHTML += galleryItemHTML;
-                    }
-                });
-            } else if (galleryPlaceholder) {
-                 galleryPlaceholder.textContent = "Gallery images will appear here.";
-                 galleryPlaceholder.style.display = 'block'; 
-            }
+                dbHomepage.gallery.forEach((imgUrl, index) => { /* ... (ഗാലറി HTML മാറ്റമില്ല) ... */ const rowIndex = index % 3; const galleryItemHTML = ` <div class="gallery-item-wrapper"> <img src="${imgUrl}" alt="Gallery Image ${index + 1}" loading="lazy" onerror="this.onerror=null;this.src='https://placehold.co/200x${Math.round(200 * 9 / 7)}/EFEFEF/CCCCCC?text=Image';"> <button class="share-btn" data-url="${imgUrl}" aria-label="Share image"> <i class="fas fa-share-alt"></i> </button> </div> `; if (galleryRowContainers[rowIndex]) { galleryRowContainers[rowIndex].innerHTML += galleryItemHTML; } });
+            } else if (galleryPlaceholder) { galleryPlaceholder.textContent = "Gallery images will appear here."; galleryPlaceholder.style.display = 'block'; }
             
             // എബൗട്ട് സെക്ഷൻ അപ്ഡേറ്റ്
             document.getElementById('about-text').innerText = dbHomepage.about || 'About text will be updated soon.';
             document.getElementById('about-image').src = dbHomepage.about_image_url || 'https://placehold.co/800x400/EFEFEF/CCCCCC?text=Event+Image';
             
-            // സ്റ്റാറ്റസ് ബോക്സുകൾ അപ്ഡേറ്റ്
+            // സ്റ്റാറ്റ്സ് ബോക്സുകൾ അപ്ഡേറ്റ്
             document.getElementById('stats-programs-public').textContent = dbHomepage.total_programs || '...';
             document.getElementById('stats-participants-public').textContent = dbHomepage.total_participants || '...';
             document.getElementById('stats-categories-public').textContent = dbHomepage.total_categories || '...';
             document.getElementById('stats-teams-public').textContent = dbHomepage.total_teams || '...';
-        }
-        
-        // ===================================================================================
-        // UI പ്രവർത്തനങ്ങൾ (ബട്ടൺ ക്ലിക്ക്, മെനു, ഫിൽട്ടർ...)
-        // ===================================================================================
-        // മെനു തുറക്കുന്നു
-        window.openNav = function() { document.getElementById("menu-overlay").style.display = "flex"; document.getElementById("main-content").style.filter = 'blur(4px)'; setTimeout(() => document.getElementById("menu-overlay").style.opacity = '1', 10); }
-        // മെനു അടയ്ക്കുന്നു
-        window.closeNav = function() { document.getElementById("menu-overlay").style.opacity = '0'; setTimeout(() => document.getElementById("menu-overlay").style.display = "none", 300); document.getElementById("main-content").style.filter = 'none'; }
-        // ഹോം പേജും സ്കോർബോർഡ് പേജും തമ്മിൽ മാറുന്നു
-        window.showPage = function(pageId) { 
-            const homeVisible = pageId === 'home-page';
-            document.getElementById('home-page').style.display = homeVisible ? 'block' : 'none'; 
-            document.getElementById('scoreboard-page').style.display = homeVisible ? 'none' : 'block'; 
-            // പേജ് മാറുമ്പോൾ സ്ക്രോൾ ബട്ടൺ കാണിക്കുകയോ മറയ്ക്കുകയോ ചെയ്യുന്നു
-            const scrollTopBtn = document.getElementById('scrollTopBtn');
-            if (scrollTopBtn) {
-                 if (homeVisible) { handleScroll(); } 
-                 else { scrollTopBtn.classList.remove('show'); }
-            }
-            updateMenuActiveState(); // മെനു ലിങ്ക് ആക്റ്റീവ് ആക്കുന്നു
-        }
-        // സ്കോർബോർഡ് പേജിലെ ടാബുകൾ മാറുന്നു (RESULT, SCOREBOARD, TEAM, TALENT)
-        window.showMainTab = function(tabId) { const currentActiveButton = document.querySelector('#scoreboard-page .main-tab-button.active'); const clickedButton = document.querySelector(`.main-tab-button[onclick*="'${tabId}'"]`); if (clickedButton && clickedButton.isSameNode(currentActiveButton)) return; if (currentActiveButton) currentActiveButton.classList.remove('active'); document.querySelectorAll('.main-tab-content').forEach(tab => tab.classList.remove('active')); document.getElementById(tabId).classList.add('active'); if (clickedButton) clickedButton.classList.add('active'); updateMenuActiveState(); if (tabId === 'team-tab') fireTeamConfetti(); /* ടീം ടാബിൽ confetti */ }
-        // റിസൾട്ട് ടാബിലെ ഫിൽട്ടർ പ്രവർത്തിപ്പിക്കുന്നു (കാറ്റഗറി, സെർച്ച്)
-        window.filterResults = function(category = 'all') { document.querySelectorAll('#program-tab .filter-btn').forEach(btn => btn.classList.remove('active')); document.querySelector(`#program-tab .filter-btn[data-filter="${category}"]`).classList.add('active'); const searchTerm = document.getElementById('search-input').value.toLowerCase(); document.querySelectorAll('.event-result-card').forEach(card => { const categoryMatch = (category === 'all' || card.dataset.category === category); const searchMatch = (card.dataset.searchText.includes(searchTerm)); card.style.display = (categoryMatch && searchMatch) ? 'block' : 'none'; }); }
-        // സ്കോർബോർഡ് ടാബിലെ ഫിൽട്ടർ പ്രവർത്തിപ്പിക്കുന്നു (കാറ്റഗറി അനുസരിച്ച്)
-        window.filterScoreboard = function(category) { if (!category) return; document.querySelectorAll('#scoreboard-filter-buttons .filter-btn').forEach(btn => btn.classList.remove('active')); const activeButton = document.querySelector(`#scoreboard-filter-buttons .filter-btn[data-filter="${category}"]`); if (activeButton) activeButton.classList.add('active'); const totalsToShow = processedScoreboardData.categoryTotals[category]; const totalCard = document.getElementById('scoreboard-total-card'); const countElement = document.getElementById('scoreboard-category-count'); if (totalCard && totalsToShow) { TEAM_NAMES.forEach(team => { const teamSpan = totalCard.querySelector(`span[data-team="${team}"]`); if (teamSpan) teamSpan.textContent = totalsToShow[team] || 0; }); } if (countElement) { const count = processedScoreboardData.categoryCounts[category] || 0; countElement.textContent = `Published Results: ${count}`; } document.querySelectorAll('#scoreboard-container .scoreboard-card:not(.total-card)').forEach(card => { const eventName = card.dataset.eventName; const eventData = eventName ? processedScoreboardData.eventPoints[eventName] : undefined; if (!eventData) { card.style.display = 'none'; return; } const isGroup = groupEvents.includes(eventName); const eventCategory = isGroup ? 'group' : eventData.category; card.style.display = (category === eventCategory) ? 'block' : 'none'; }); }
-        // ടീം ടാബിൽ റിസൾട്ടുകളുടെ എണ്ണം കാണിക്കുന്നു
-        window.updateResultCounts = function() { const el = document.getElementById('team-results-count'); if (el) el.innerText = `Team point status after ${publishedResultsCount} results`; }
-        // സ്കോർബോർഡിൽ ട്രോഫി ഐക്കണുകൾ കാണിക്കുന്നു
-        window.getTrophyIconsHTML = function(positions) { if (!positions || positions.length === 0) return ''; return positions.map(pos => { if (pos === 1) return '<i class="fas fa-trophy trophy-icon gold"></i>'; if (pos === 2) return '<i class="fas fa-trophy trophy-icon silver"></i>'; if (pos === 3) return '<i class="fas fa-trophy trophy-icon bronze"></i>'; return ''; }).join(''); }
-        // ടാലന്റ് ടാബിൽ "Show More" / "Show Less" ബട്ടൺ പ്രവർത്തിപ്പിക്കുന്നു
-        window.toggleTalentDropdown = function(listId, button) { const list = document.getElementById(listId); list.classList.toggle('open'); button.textContent = list.classList.contains('open') ? 'Show Less' : 'Show More'; }
-        
-        // ഏത് പേജിലാണ്/ടാബിലാണ് എന്നതിനനുസരിച്ച് മെനുവിലെ ലിങ്ക് ആക്റ്റീവ് ആക്കുന്നു
-        window.updateMenuActiveState = function() { 
-            const homePageVisible = document.getElementById('home-page').style.display !== 'none'; 
-            document.querySelectorAll('.menu-link').forEach(link => link.classList.remove('active')); 
-            
-            if (homePageVisible) { 
-                const homeLink = document.querySelector('.menu-link[data-target="home-page"]');
-                if (homeLink) homeLink.classList.add('active'); 
-            } else { 
-                const activeTabButton = document.querySelector('#scoreboard-page .main-tab-button.active'); 
-                if (activeTabButton) { 
-                    const tabId = activeTabButton.getAttribute('onclick').match(/'([^']+)'/)[1]; 
-                    const activeMenuLink = document.querySelector(`.menu-link[data-target="${tabId}"]`); 
-                    if (activeMenuLink) activeMenuLink.classList.add('active'); 
-                } else {
-                    // ഒരു ടാബും ആക്റ്റീവ് അല്ലെങ്കിൽ (ഉദാ: നേരിട്ട് റിസൾട്ട് പേജിലേക്ക് വന്നാൽ) RESULT ആക്റ്റീവ് ആക്കുന്നു
-                    const programLink = document.querySelector('.menu-link[data-target="program-tab"]');
-                    if (programLink) programLink.classList.add('active');
-                }
-            } 
-        }
 
-        // ടീം ടാബ് തുറക്കുമ്പോൾ confetti ആനിമേഷൻ
-        window.fireTeamConfetti = function() { if (!window.confetti) return; const end = Date.now() + (2 * 1000); (function frame() { if (Date.now() > end) return; confetti({ particleCount: 2, angle: 60, spread: 55, origin: { x: 0 } }); confetti({ particleCount: 2, angle: 120, spread: 55, origin: { x: 1 } }); requestAnimationFrame(frame); }()); }
-
-        // ഗാലറിയിലെ ചിത്രം ഷെയർ ചെയ്യാനുള്ള ഫംഗ്ഷൻ
-        async function shareImage(imageUrl) {
-            if (navigator.share) { // ബ്രൗസർ ഷെയർ സപ്പോർട്ട് ചെയ്യുന്നുണ്ടോ?
-                try {
-                    await navigator.share({
-                        title: 'Sadaye Madeena 2k25 Gallery Image',
-                        text: 'Check out this image from the fest!',
-                        url: imageUrl // ചിത്രത്തിന്റെ ലിങ്ക് ഷെയർ ചെയ്യുന്നു
-                    });
-                    console.log('Image shared successfully');
-                } catch (err) {
-                    console.error('Error sharing image:', err);
-                    alert('Sharing failed.');
-                }
-            } else { // ഷെയർ സപ്പോർട്ട് ഇല്ലെങ്കിൽ ലിങ്ക് കോപ്പി ചെയ്യാൻ ശ്രമിക്കുന്നു
-                try {
-                    const textArea = document.createElement("textarea");
-                    textArea.value = imageUrl;
-                    textArea.style.position = "fixed"; 
-                    document.body.appendChild(textArea);
-                    textArea.focus();
-                    textArea.select();
-                    document.execCommand('copy'); // കോപ്പി ചെയ്യുന്നു
-                    document.body.removeChild(textArea);
-                    alert('Sharing not supported, but image link copied to clipboard!');
-                } catch (err) {
-                    alert('Sharing is not supported on this browser. Please copy the link manually.');
-                    console.error('Fallback copy failed:', err);
-                }
+            // ഫൂട്ടർ അപ്ഡേറ്റ്
+            if (footerInstitutionEl) footerInstitutionEl.innerText = dbHomepage.institution_name || 'Institution Name';
+            if (footerCopyrightEl) footerCopyrightEl.innerText = dbHomepage.copyright_text || '© Year Org Name. All rights reserved.';
+            if (footerSocialIconsEl) {
+                // ലിങ്കുകൾ ഉണ്ടെങ്കിൽ മാത്രം ഐക്കൺ കാണിക്കുക
+                const instaLink = dbHomepage.social_instagram || '#';
+                const youtubeLink = dbHomepage.social_youtube || '#';
+                const facebookLink = dbHomepage.social_facebook || '#';
+                footerSocialIconsEl.innerHTML = `
+                    ${instaLink !== '#' ? `<a href="${instaLink}" target="_blank" aria-label="Instagram"><i class="fab fa-instagram"></i></a>` : ''}
+                    ${youtubeLink !== '#' ? `<a href="${youtubeLink}" target="_blank" aria-label="YouTube"><i class="fab fa-youtube"></i></a>` : ''}
+                    ${facebookLink !== '#' ? `<a href="${facebookLink}" target="_blank" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>` : ''}
+                `;
             }
         }
-
-        // ഗാലറിയിലെ ഷെയർ ബട്ടണുകൾക്ക് ക്ലിക്ക് ഇവന്റ് ചേർക്കുന്നു
-        document.getElementById('gallery').addEventListener('click', function(event) {
-            const shareButton = event.target.closest('.share-btn'); // ക്ലിക്ക് ചെയ്തത് ഷെയർ ബട്ടൺ ആണോ?
-            if (shareButton) {
-                const imageUrl = shareButton.dataset.url; // ചിത്രത്തിന്റെ ലിങ്ക് എടുക്കുന്നു
-                if (imageUrl) {
-                    event.stopPropagation(); 
-                    shareImage(imageUrl); // ഷെയർ ഫംഗ്ഷൻ വിളിക്കുന്നു
-                }
-            }
-        });
         
-        // മുകളിലേക്ക് പോകാനുള്ള ബട്ടൺ പ്രവർത്തിപ്പിക്കുന്നു
+        // ===================================
+        // UI പ്രവർത്തനങ്ങൾ
+        // ===================================
+        window.openNav = function() { /* ... (കോഡ് മാറ്റമില്ല) ... */ document.getElementById("menu-overlay").style.display = "flex"; document.getElementById("main-content").style.filter = 'blur(4px)'; setTimeout(() => document.getElementById("menu-overlay").style.opacity = '1', 10); }
+        window.closeNav = function() { /* ... (കോഡ് മാറ്റമില്ല) ... */ document.getElementById("menu-overlay").style.opacity = '0'; setTimeout(() => document.getElementById("menu-overlay").style.display = "none", 300); document.getElementById("main-content").style.filter = 'none'; }
+        window.showPage = function(pageId) { /* ... (കോഡ് മാറ്റമില്ല) ... */ const homeVisible = pageId === 'home-page'; document.getElementById('home-page').style.display = homeVisible ? 'block' : 'none'; document.getElementById('scoreboard-page').style.display = homeVisible ? 'none' : 'block'; const scrollTopBtn = document.getElementById('scrollTopBtn'); if (scrollTopBtn) { if (homeVisible) { handleScroll(); } else { scrollTopBtn.classList.remove('show'); } } updateMenuActiveState(); }
+        window.showMainTab = function(tabId) { /* ... (കോഡ് മാറ്റമില്ല) ... */ const currentActiveButton = document.querySelector('#scoreboard-page .main-tab-button.active'); const clickedButton = document.querySelector(`.main-tab-button[onclick*="'${tabId}'"]`); if (clickedButton && clickedButton.isSameNode(currentActiveButton)) return; if (currentActiveButton) currentActiveButton.classList.remove('active'); document.querySelectorAll('.main-tab-content').forEach(tab => tab.classList.remove('active')); document.getElementById(tabId).classList.add('active'); if (clickedButton) clickedButton.classList.add('active'); updateMenuActiveState(); if (tabId === 'team-tab') fireTeamConfetti(); }
+        window.filterResults = function(category = 'all') { /* ... (കോഡ് മാറ്റമില്ല) ... */ document.querySelectorAll('#program-tab .filter-btn').forEach(btn => btn.classList.remove('active')); document.querySelector(`#program-tab .filter-btn[data-filter="${category}"]`).classList.add('active'); const searchTerm = document.getElementById('search-input').value.toLowerCase(); document.querySelectorAll('.event-result-card').forEach(card => { const categoryMatch = (category === 'all' || card.dataset.category === category); const searchMatch = (card.dataset.searchText.includes(searchTerm)); card.style.display = (categoryMatch && searchMatch) ? 'block' : 'none'; }); }
+        window.filterScoreboard = function(category) { /* ... (കോഡ് മാറ്റമില്ല) ... */ if (!category) return; document.querySelectorAll('#scoreboard-filter-buttons .filter-btn').forEach(btn => btn.classList.remove('active')); const activeButton = document.querySelector(`#scoreboard-filter-buttons .filter-btn[data-filter="${category}"]`); if (activeButton) activeButton.classList.add('active'); const totalsToShow = processedScoreboardData.categoryTotals[category]; const totalCard = document.getElementById('scoreboard-total-card'); const countElement = document.getElementById('scoreboard-category-count'); if (totalCard && totalsToShow) { TEAM_NAMES.forEach(team => { const teamSpan = totalCard.querySelector(`span[data-team="${team}"]`); if (teamSpan) teamSpan.textContent = totalsToShow[team] || 0; }); } if (countElement) { const count = processedScoreboardData.categoryCounts[category] || 0; countElement.textContent = `Published Results: ${count}`; } document.querySelectorAll('#scoreboard-container .scoreboard-card:not(.total-card)').forEach(card => { const eventName = card.dataset.eventName; const eventData = eventName ? processedScoreboardData.eventPoints[eventName] : undefined; if (!eventData) { card.style.display = 'none'; return; } const isGroup = groupEvents.includes(eventName); const eventCategory = isGroup ? 'group' : eventData.category; card.style.display = (category === eventCategory) ? 'block' : 'none'; }); }
+        window.updateResultCounts = function() { /* ... (കോഡ് മാറ്റമില്ല) ... */ const el = document.getElementById('team-results-count'); if (el) el.innerText = `Team point status after ${publishedResultsCount} results`; }
+        window.getTrophyIconsHTML = function(positions) { /* ... (കോഡ് മാറ്റമില്ല) ... */ if (!positions || positions.length === 0) return ''; return positions.map(pos => { if (pos === 1) return '<i class="fas fa-trophy trophy-icon gold"></i>'; if (pos === 2) return '<i class="fas fa-trophy trophy-icon silver"></i>'; if (pos === 3) return '<i class="fas fa-trophy trophy-icon bronze"></i>'; return ''; }).join(''); }
+        window.toggleTalentDropdown = function(listId, button) { /* ... (കോഡ് മാറ്റമില്ല) ... */ const list = document.getElementById(listId); list.classList.toggle('open'); button.textContent = list.classList.contains('open') ? 'Show Less' : 'Show More'; }
+        window.updateMenuActiveState = function() { /* ... (കോഡ് മാറ്റമില്ല) ... */ const homePageVisible = document.getElementById('home-page').style.display !== 'none'; document.querySelectorAll('.menu-link').forEach(link => link.classList.remove('active')); if (homePageVisible) { const homeLink = document.querySelector('.menu-link[data-target="home-page"]'); if (homeLink) homeLink.classList.add('active'); } else { const activeTabButton = document.querySelector('#scoreboard-page .main-tab-button.active'); if (activeTabButton) { const tabId = activeTabButton.getAttribute('onclick').match(/'([^']+)'/)[1]; const activeMenuLink = document.querySelector(`.menu-link[data-target="${tabId}"]`); if (activeMenuLink) activeMenuLink.classList.add('active'); } else { const programLink = document.querySelector('.menu-link[data-target="program-tab"]'); if (programLink) programLink.classList.add('active'); } } }
+        window.fireTeamConfetti = function() { /* ... (കോഡ് മാറ്റമില്ല) ... */ if (!window.confetti) return; const end = Date.now() + (2 * 1000); (function frame() { if (Date.now() > end) return; confetti({ particleCount: 2, angle: 60, spread: 55, origin: { x: 0 } }); confetti({ particleCount: 2, angle: 120, spread: 55, origin: { x: 1 } }); requestAnimationFrame(frame); }()); }
+        // ഷെയർ ഫംഗ്ഷൻ
+        async function shareImage(imageUrl) { /* ... (കോഡ് മാറ്റമില്ല) ... */ if (navigator.share) { try { await navigator.share({ title: 'Sadaye Madeena 2k25 Gallery Image', text: 'Check out this image from the fest!', url: imageUrl }); console.log('Image shared successfully'); } catch (err) { console.error('Error sharing image:', err); alert('Sharing failed.'); } } else { try { const textArea = document.createElement("textarea"); textArea.value = imageUrl; textArea.style.position = "fixed"; document.body.appendChild(textArea); textArea.focus(); textArea.select(); document.execCommand('copy'); document.body.removeChild(textArea); alert('Sharing not supported, but image link copied to clipboard!'); } catch (err) { alert('Sharing is not supported on this browser. Please copy the link manually.'); console.error('Fallback copy failed:', err); } } }
+        // ഗാലറിയിലെ ഷെയർ ബട്ടൺ ക്ലിക്ക് ചെയ്യുമ്പോൾ
+        document.getElementById('gallery').addEventListener('click', function(event) { /* ... (കോഡ് മാറ്റമില്ല) ... */ const shareButton = event.target.closest('.share-btn'); if (shareButton) { const imageUrl = shareButton.dataset.url; if (imageUrl) { event.stopPropagation(); shareImage(imageUrl); } } });
+        // മുകളിലേക്ക് സ്ക്രോൾ ചെയ്യാനുള്ള ബട്ടൺ
         const scrollTopBtn = document.getElementById('scrollTopBtn');
-        // സ്ക്രോൾ ചെയ്യുമ്പോൾ ബട്ടൺ കാണിക്കുകയോ മറയ്ക്കുകയോ ചെയ്യുന്നു (ഹോം പേജിൽ മാത്രം)
-        function handleScroll() {
-            const homePageVisible = document.getElementById('home-page').style.display !== 'none';
-            if (homePageVisible && window.scrollY > 300) { // 300px താഴേക്ക് സ്ക്രോൾ ചെയ്താൽ
-                 if(scrollTopBtn) scrollTopBtn.classList.add('show');
-            } else {
-                 if(scrollTopBtn) scrollTopBtn.classList.remove('show');
-            }
-        }
-        // ബട്ടൺ ക്ലിക്ക് ചെയ്യുമ്പോൾ മുകളിലേക്ക് സ്ക്രോൾ ചെയ്യുന്നു
-        window.scrollToTop = function() {
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
-        // സ്ക്രോൾ ഇവന്റ് ശ്രദ്ധിക്കുന്നു
+        function handleScroll() { /* ... (കോഡ് മാറ്റമില്ല) ... */ const homePageVisible = document.getElementById('home-page').style.display !== 'none'; if (homePageVisible && window.scrollY > 300) { if(scrollTopBtn) scrollTopBtn.classList.add('show'); } else { if(scrollTopBtn) scrollTopBtn.classList.remove('show'); } }
+        window.scrollToTop = function() { window.scrollTo({ top: 0, behavior: 'smooth' }); }
         window.addEventListener('scroll', handleScroll);
 
-
-        // ===================================================================================
-        // ആപ്ലിക്കേഷൻ ആരംഭിക്കുമ്പോൾ (ഡാറ്റ ലോഡിംഗ്)
-        // ===================================================================================
-        
-        let allDataLoaded = false; // എല്ലാ ഡാറ്റയും ലോഡ് ആയോ?
-        // ഓരോ ഡാറ്റയും ലോഡ് ആയോ എന്ന് നോക്കാനുള്ള ഫ്ലാഗുകൾ
+        // ===================================
+        // ആപ്ലിക്കേഷൻ ആരംഭിക്കുമ്പോൾ
+        // ===================================
+        let allDataLoaded = false;
         let loadStatus = { results: false, programs: false, teams: false, homepage: false, categories: false, participants: false };
-
-        // എല്ലാ ഡാറ്റയും ലോഡ് ആയാൽ processAllData വിളിക്കുന്നു
-        function checkAllDataLoaded() {
-            if (allDataLoaded) { processAllData(dbResults); return; } // ஏற்கனவே ലോഡ് ആയെങ്കിൽ വീണ്ടും പ്രോസസ്സ് ചെയ്യുന്നു
-            // എല്ലാ ഫ്ലാഗുകളും true ആണോ എന്ന് നോക്കുന്നു
-            if (loadStatus.results && loadStatus.programs && loadStatus.teams && loadStatus.homepage && loadStatus.categories && loadStatus.participants) { 
-                allDataLoaded = true; 
-                console.log("All data loaded. Processing..."); 
-                processAllData(dbResults); // ആദ്യമായി പ്രോസസ്സ് ചെയ്യുന്നു
-            }
-        }
-
-        // Firebase-ൽ നിന്ന് ഡാറ്റ വരുമ്പോൾ ശ്രദ്ധിക്കുന്നു (Real-time updates)
-        // ഓരോ ഡാറ്റയും വരുമ്പോൾ对应的 ഫ്ലാഗ് true ആക്കുന്നു, എന്നിട്ട് checkAllDataLoaded വിളിക്കുന്നു
+        // എല്ലാ ഡാറ്റയും ലോഡ് ആയോ എന്ന് പരിശോധിക്കുന്നു
+        function checkAllDataLoaded() { /* ... (കോഡ് മാറ്റമില്ല) ... */ if (allDataLoaded) { processAllData(dbResults); return; } if (loadStatus.results && loadStatus.programs && loadStatus.teams && loadStatus.homepage && loadStatus.categories && loadStatus.participants) { allDataLoaded = true; console.log("All data loaded. Processing..."); processAllData(dbResults); } }
+        // Firebase-ൽ നിന്ന് ഡാറ്റ വരുമ്പോൾ ശ്രദ്ധിക്കുന്നു
         onSnapshot(query(collection(db, `artifacts/${appId}/public/data/results`)), (snapshot) => { dbResults = {}; snapshot.docs.forEach(doc => { dbResults[doc.id] = doc.data(); }); loadStatus.results = true; checkAllDataLoaded(); }, (e) => { console.error("Error loading results: ", e); dbResults = {}; loadStatus.results = true; checkAllDataLoaded(); });
         onSnapshot(query(collection(db, `artifacts/${appId}/public/data/programs`)), (snapshot) => { dbPrograms = {}; snapshot.docs.forEach(doc => { dbPrograms[doc.id] = doc.data(); }); loadStatus.programs = true; checkAllDataLoaded(); }, (e) => { console.error("Error loading programs: ", e); dbPrograms = {}; loadStatus.programs = true; checkAllDataLoaded(); });
         onSnapshot(query(collection(db, `artifacts/${appId}/public/data/teams`)), (snapshot) => { dbTeams = {}; snapshot.docs.forEach(doc => { dbTeams[doc.id] = doc.data(); }); loadStatus.teams = true; checkAllDataLoaded(); }, (e) => { console.error("Error loading teams: ", e); dbTeams = {}; loadStatus.teams = true; checkAllDataLoaded(); });
@@ -941,11 +561,11 @@
         onSnapshot(query(collection(db, `artifacts/${appId}/public/data/categories`)), (snapshot) => { dbCategories = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })).sort((a,b) => a.name.localeCompare(b.name)); loadStatus.categories = true; checkAllDataLoaded(); }, (e) => { console.error("Error loading categories: ", e); dbCategories = []; loadStatus.categories = true; checkAllDataLoaded(); });
         onSnapshot(query(collection(db, `artifacts/${appId}/public/data/participants`)), (snapshot) => { dbParticipants = {}; snapshot.docs.forEach(doc => { dbParticipants[doc.id] = doc.data(); }); loadStatus.participants = true; checkAllDataLoaded(); }, (e) => { console.error("Error loading participants: ", e); dbParticipants = {}; loadStatus.participants = true; checkAllDataLoaded(); });
         
-        // പേജ് ലോഡ് ആകുമ്പോൾ ഹോം പേജ് കാണിക്കുന്നു
+        // പേജ് ലോഡ് ആകുമ്പോൾ
         window.onload = function() {
             showPage('home-page'); 
             updateMenuActiveState(); 
-            showMainTab('team-tab'); // സ്കോർബോർഡ് പേജിലെ ഡിഫോൾട്ട് ടാബ്
+            showMainTab('team-tab'); 
         };
 
     </script>
