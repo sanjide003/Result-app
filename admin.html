@@ -177,32 +177,42 @@
                     </form>
                 </div>
 
-                <!-- Participants Import (UPDATED) -->
+                <!-- Participants (UPDATED) -->
                 <div id="page-participants" class="admin-page hidden space-y-8">
                      <h1 class="text-3xl font-bold text-gray-900">Manage Participants</h1>
-                     <div class="info-text"> <strong>നിർദ്ദേശം:</strong> ഇവിടെ CSV ഫയൽ ഉപയോഗിച്ച് എല്ലാ മത്സരാർത്ഥികളെയും ഒന്നിച്ചു ചേർക്കാം. അതിനുശേഷം, താഴെയുള്ള 'Current Participants' ലിസ്റ്റിൽ നിന്ന് ഓരോരുത്തരെയും എഡിറ്റ് ചെയ്യുകയോ ഡിലീറ്റ് ചെയ്യുകയോ ചെയ്യാം. </div>
+                     <div class="info-text"> 
+                        <strong>നിർദ്ദേശം:</strong> ഇവിടെ മത്സരാർത്ഥികളെ ചേർക്കാം.
+                        <br>1. ആദ്യം ടീം തിരഞ്ഞെടുക്കുക (ടീമുകളെ 'Manage Teams' പേജിൽ ചേർത്തിരിക്കണം).
+                        <br>2. താഴെയുള്ള പെട്ടിയിൽ മത്സരാർത്ഥികളുടെ പേരുകൾ ഒന്നൊന്നായി, ഓരോ വരിയിലും ഒരാളുടെ പേര് മാത്രം എന്ന ക്രമത്തിൽ ടൈപ്പ് ചെയ്യുക.
+                        <br>3. 'Add Participants' ബട്ടൺ അമർത്തുമ്പോൾ, ആ ടീമിന്റെ ചെസ്റ്റ് നമ്പർ പരിധിക്കുള്ളിൽ ലഭ്യമായ നമ്പറുകൾ ഓട്ടോമാറ്റിക് ആയി നൽകുന്നതാണ്.
+                    </div>
                      
-                     <!-- Card 1: Import -->
+                     <!-- Card 1: Add Participants Manually -->
                      <div class="card">
-                         <h2 class="card-header">Import Participants (Overwrite All)</h2>
-                         <p class="text-sm text-gray-500 mb-4 -mt-4"><strong>ശ്രദ്ധിക്കുക:</strong> ഇത് നിലവിലുള്ള എല്ലാ മത്സരാർത്ഥികളെയും ഡിലീറ്റ് ചെയ്ത ശേഷം പുതിയ ഡാറ്റ ചേർക്കും.</p>
-                         <div class="space-y-4">
-                             <div>
-                                <button id="download-template-btn" class="btn btn-secondary w-full sm:w-auto"><i class="fas fa-download"></i> Download Template</button>
-                             </div>
-                             <form id="form-import-csv" class="space-y-4">
-                                 <div class="flex flex-wrap items-center gap-4"> 
-                                     <input type="file" id="csv-file-input" class="hidden" accept=".csv, text/csv">
-                                     <label for="csv-file-input" class="btn btn-light flex-shrink-0"><i class="fas fa-upload"></i> Choose File</label>
-                                     <span id="csv-filename" class="text-sm text-gray-500 flex-grow min-w-0 break-words">No file chosen</span> 
-                                 </div>
-                                  <button type="submit" class="btn btn-success"><i class="fas fa-file-import"></i> Import & Overwrite</button>
-                             </form>
+                         <h2 class="card-header">Add Participants Automatically</h2>
+                         <form id="form-add-participants" class="space-y-4">
+                            <div>
+                                <label for="participant-add-team" class="form-label">Select Team</label>
+                                <select id="participant-add-team" class="form-select" required>
+                                    <option value="">-- Select a Team --</option>
+                                    <!-- Teams loaded by JS -->
+                                </select>
+                            </div>
+                            <div>
+                                <label for="participant-add-names" class="form-label">Enter Names (One per line)</label>
+                                <textarea id="participant-add-names" class="form-textarea" rows="8" placeholder="Participant 1 Name\nParticipant 2 Name\nParticipant 3 Name" required></textarea>
+                            </div>
+                            <div class="flex justify-end">
+                                 <button type="submit" id="add-participants-btn" class="btn btn-success"><i class="fas fa-plus"></i>Add Participants</button>
+                            </div>
+                         </form>
+                         <div id="add-log-container" class="mt-6 hidden">
+                            <h3 class="font-semibold text-lg mb-2">Process Log:</h3>
+                            <pre id="add-log" class="bg-gray-900 text-white rounded-lg p-4 max-h-60 overflow-y-auto text-sm"></pre>
                          </div>
-                         <div id="import-log-container" class="mt-6 hidden"> <h3 class="font-semibold text-lg mb-2">Import Log:</h3> <pre id="import-log" class="bg-gray-900 text-white rounded-lg p-4 max-h-60 overflow-y-auto text-sm"></pre> </div>
                      </div>
 
-                     <!-- Card 2: Manage -->
+                     <!-- Card 2: Manage Current Participants -->
                      <div class="card">
                          <h2 class="card-header">Current Participants</h2>
                          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
@@ -340,8 +350,10 @@
             let allPrograms = []; let allCategories = []; let allParticipants = {}; let allTeamsAdmin = {}; 
             
             const d = document; // Use 'd' for document
+            // All DOM element selections moved inside DOMContentLoaded
             const loginPage=d.getElementById('login-page'), adminPanel=d.getElementById('admin-panel'), loginForm=d.getElementById('login-form'), registerForm=d.getElementById('register-form'), logoutButton=d.getElementById('logout-button'), adminEmail=d.getElementById('admin-email'), pages=d.querySelectorAll('.admin-page'), adminMenuOverlay=d.getElementById('admin-menu-overlay'), adminMenuBox=d.getElementById('admin-menu-box'), adminMenuBtn=d.getElementById('admin-menu-btn'), adminMenuCloseBtn=d.getElementById('admin-menu-close-btn'), navLinks=d.querySelectorAll('.menu-link');
-            const downloadTemplateBtn=d.getElementById('download-template-btn'), importCsvBtn=d.getElementById('import-csv-btn'), fileInput=d.getElementById('csv-file-input'), fileNameEl=d.getElementById('csv-filename'), importLogContainer=d.getElementById('import-log-container'), importLog=d.getElementById('import-log'), participantCountEl=d.getElementById('participant-count'), deleteAllParticipantsBtn=d.getElementById('delete-all-participants-btn');
+            // UPDATED: Removed CSV import elements, added new manual add elements
+            const participantAddTeam = d.getElementById('participant-add-team'), participantAddNames = d.getElementById('participant-add-names'), addParticipantsBtn = d.getElementById('add-participants-btn'), addLogContainer = d.getElementById('add-log-container'), addLog = d.getElementById('add-log'), participantCountEl=d.getElementById('participant-count'), deleteAllParticipantsBtn=d.getElementById('delete-all-participants-btn');
             const categoryForm=d.getElementById('form-add-category'), categoryInput=d.getElementById('category-name'), categoryList=d.getElementById('category-list'), programForm=d.getElementById('form-add-program'), programNameInput=d.getElementById('program-name'), programCategorySelect=d.getElementById('program-category'), programList=d.getElementById('program-list');
             const programPointsFirst = d.getElementById('program-points-first');
             const programPointsSecond = d.getElementById('program-points-second');
@@ -380,7 +392,7 @@
             function loadDataForPage(pageId) {
                  console.log("Loading data for:", pageId);
                  if (pageId === 'page-dashboard') loadHomepageContent();
-                 if (pageId === 'page-participants') { loadTeamsForAdmin(); loadAllParticipants(); } // Load teams for filter
+                 if (pageId === 'page-participants') { loadTeamsForAdmin(); loadAllParticipants(); } // Load teams for both dropdowns
                  if (pageId === 'page-programs') { loadCategories(); loadPrograms(); }
                  if (pageId === 'page-results') { loadCategoriesForResults(); /* Only load categories first */ }
                  if (pageId === 'page-teams') loadTeamsForAdmin();
@@ -467,14 +479,15 @@
             // ===================================
             // Participants Page (UPDATED)
             // ===================================
+            
             function loadAllParticipants() {
                 const participantsRef = collection(db, `artifacts/${appId}/public/data/participants`);
                 onSnapshot(participantsRef, (snapshot) => {
                     allParticipants = {};
                     snapshot.docs.forEach(doc => { 
-                        allParticipants[doc.id] = { ...doc.data(), chestNo: doc.id }; // Store chestNo
+                        allParticipants[doc.id] = { ...doc.data(), chestNo: doc.id }; 
                     });
-                    renderParticipantList(); // Render list
+                    renderParticipantList(); 
                     console.log('Participants data loaded:', Object.keys(allParticipants).length);
                 }, (error) => { console.error("Error loading participants:", error); });
             }
@@ -519,7 +532,7 @@
                 filteredParticipants.forEach(p => {
                     const item = d.createElement('div');
                     item.className = 'participant-list-item';
-                    item.style.gridTemplateColumns = '1.5fr 1fr 1fr 100px'; // 4-col layout
+                    item.style.gridTemplateColumns = '1.5fr 1fr 1fr 100px'; 
                     item.innerHTML = `
                         <span class="list-item-name">${p.name}</span>
                         <span class="list-item-details">${p.chestNo}</span>
@@ -538,7 +551,8 @@
             }
             
             window.editParticipant = async (chestNo, currentName, currentTeam) => {
-                const newName = prompt("Enter new name:", currentName);
+                const newChestNo = prompt("Enter new Chest No:", chestNo);
+                const newName = prompt("Enter new Name:", currentName);
                 
                 let teamOptions = Object.keys(allTeamsAdmin).sort().map((t,i) => `${i+1}: ${t}`).join('\n');
                 let teamPromptMsg = `Enter number for new team (current: ${currentTeam}):\n${teamOptions}`;
@@ -556,17 +570,43 @@
                 }
 
                 const finalName = (newName !== null && newName.trim() !== '') ? newName.trim() : currentName;
+                const finalChestNo = (newChestNo !== null && newChestNo.trim() !== '') ? newChestNo.trim() : chestNo;
 
-                if (finalName === currentName && newTeam === currentTeam) {
+                if (finalName === currentName && newTeam === currentTeam && finalChestNo === chestNo) {
                     alert("No changes made.");
+                    return;
+                }
+                
+                // Check if new chest number is numeric
+                if (!/^\d+$/.test(finalChestNo)) {
+                    alert("Error: Chest Number must be numeric.");
                     return;
                 }
 
                 try {
-                    await updateDoc(doc(db, `artifacts/${appId}/public/data/participants`, chestNo), { 
-                        name: finalName, 
-                        team: newTeam 
-                    });
+                    if (finalChestNo === chestNo) {
+                        // Chest No not changed, just update
+                        await updateDoc(doc(db, `artifacts/${appId}/public/data/participants`, chestNo), { 
+                            name: finalName, 
+                            team: newTeam 
+                        });
+                    } else {
+                        // Chest No changed, check for conflict
+                        const newDocRef = doc(db, `artifacts/${appId}/public/data/participants`, finalChestNo);
+                        const newDocSnap = await getDoc(newDocRef);
+                        
+                        if (newDocSnap.exists()) {
+                            alert(`Error: Chest No ${finalChestNo} is already taken.`);
+                            return;
+                        }
+                        
+                        // Delete old and create new in a batch
+                        const batch = writeBatch(db);
+                        const oldDocRef = doc(db, `artifacts/${appId}/public/data/participants`, chestNo);
+                        batch.delete(oldDocRef);
+                        batch.set(newDocRef, { name: finalName, team: newTeam });
+                        await batch.commit();
+                    }
                     alert('Participant updated!');
                 } catch (error) {
                     alert(`Error updating participant: ${error.message}`);
@@ -583,60 +623,82 @@
                  }
             };
             
-            if(downloadTemplateBtn) downloadTemplateBtn.addEventListener('click', () => { const csvContent = "Chest No,Name,Team\n101,Fathima Sana,BURAQ\n102,Muhammed Ali,BURAQ\n201,Aysha,DUL DUL\n"; const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' }); const link = d.createElement("a"); const url = URL.createObjectURL(blob); link.setAttribute("href", url); link.setAttribute("download", "participants_template.csv"); link.style.visibility = 'hidden'; d.body.appendChild(link); link.click(); d.body.removeChild(link); });
-            if(fileInput) fileInput.addEventListener('change', (e) => { if(fileNameEl) fileNameEl.textContent = e.target.files[0] ? e.target.files[0].name : 'No file chosen'; });
+            // NEW: Add Participants Manually
+            const addParticipantsForm = d.getElementById('form-add-participants');
+            if (addParticipantsForm) {
+                addParticipantsForm.addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    if (!participantAddTeam || !participantAddNames || !addLogContainer || !addLog) return;
+                    
+                    const teamName = participantAddTeam.value;
+                    const namesText = participantAddNames.value;
+                    
+                    if (!teamName) { alert("Please select a team."); return; }
+                    if (!namesText) { alert("Please enter participant names."); return; }
 
-            // UPDATED: Using form submit event
-            const csvForm = d.getElementById('form-import-csv');
-            if(csvForm) csvForm.addEventListener('submit', (e) => {
-                 e.preventDefault();
-                 if (!fileInput) return;
-                 const file = fileInput.files[0];
-                 if (!file) { alert("Please choose a CSV file to upload."); return; }
-                 if(importLogContainer) importLogContainer.style.display = 'block';
-                 if(importLog) importLog.textContent = 'Starting import... Please wait.\nDeleting existing participants...\n';
+                    const team = allTeamsAdmin[teamName];
+                    if (!team || !team.id_from || !team.id_to) {
+                        alert("Selected team does not have a valid Chest No. range set. Please update it in 'Manage Teams'.");
+                        return;
+                    }
+                    
+                    addLogContainer.style.display = 'block';
+                    addLog.textContent = 'Starting...\n';
+                    
+                    const idFrom = parseInt(team.id_from, 10);
+                    const idTo = parseInt(team.id_to, 10);
+                    
+                    // Get all existing chest numbers in this team's range
+                    const existingNos = new Set();
+                    Object.keys(allParticipants).forEach(chestNoStr => {
+                        const chestNo = parseInt(chestNoStr, 10);
+                        if (!isNaN(chestNo) && chestNo >= idFrom && chestNo <= idTo) {
+                            existingNos.add(chestNo);
+                        }
+                    });
 
-                 deleteAllParticipants(false) 
-                     .then(() => { 
-                         if(importLog) importLog.textContent += 'Existing participants deleted.\nParsing CSV file...\n';
-                         Papa.parse(file, {
-                             header: true, skipEmptyLines: true,
-                             complete: async (results) => {
-                                 const data = results.data;
-                                 if (!data.length || !data[0]["Chest No"] || !data[0]["Name"] || !data[0]["Team"]) {
-                                     if(importLog) importLog.textContent += "ERROR: Invalid file format.\nMake sure columns are 'Chest No', 'Name', 'Team'.\nImport aborted.\n"; return;
-                                 }
-                                 if(importLog) importLog.textContent += `Found ${data.length} participants.\nImporting to database...\n`;
-                                 try {
-                                     const batch = writeBatch(db); let importedCount = 0; let skippedCount = 0;
-                                     data.forEach(row => {
-                                         const chestNo = row["Chest No"] ? String(row["Chest No"]).trim() : null; 
-                                         const name = row["Name"] ? row["Name"].trim() : null;
-                                         const team = row["Team"] ? row["Team"].trim() : null;
-                                         if (chestNo && name && team && /^\d+$/.test(chestNo)) { 
-                                             const docRef = doc(db, `artifacts/${appId}/public/data/participants`, chestNo);
-                                             batch.set(docRef, { name: name, team: team.toUpperCase() }); importedCount++;
-                                         } else {
-                                             if(importLog) importLog.textContent += `SKIPPED ROW: Invalid data ${JSON.stringify(row)}\n`; skippedCount++;
-                                         }
-                                     });
-                                     await batch.commit();
-                                     if(importLog) importLog.textContent += `\nSUCCESS: Imported ${importedCount} participants. Skipped ${skippedCount} rows.\n`;
-                                     if(fileInput) fileInput.value = null; 
-                                     if(fileNameEl) fileNameEl.textContent = 'No file chosen';
-                                 } catch (error) { if(importLog) importLog.textContent += `\nIMPORT ERROR: ${error.message}\n`; }
-                             },
-                             error: (error) => { if(importLog) importLog.textContent += `\nCSV PARSE ERROR: ${error.message}\n`; }
-                         });
-                     })
-                     .catch(error => { 
-                         if (error !== 'Deletion cancelled by user.' && error !== 'Internal skip.') {
-                            if(importLog) importLog.textContent += `\nERROR DELETING OLD DATA: ${error}\nImport aborted.\n`;
-                         } else {
-                             if(importLog) importLog.textContent += '\nImport cancelled.\n'; 
-                         }
-                     });
-            });
+                    let nextChestNo = idFrom;
+                    // Find the first available number
+                    while (existingNos.has(nextChestNo) && nextChestNo <= idTo) {
+                        nextChestNo++;
+                    }
+
+                    const names = namesText.split('\n').map(n => n.trim()).filter(Boolean);
+                    const batch = writeBatch(db);
+                    let addedCount = 0;
+                    
+                    for (const name of names) {
+                        if (nextChestNo > idTo) {
+                            addLog.textContent += `ERROR: Team's chest number limit (${idTo}) reached. Cannot add '${name}'.\n`;
+                            break; // Stop adding
+                        }
+                        
+                        const chestNoStr = String(nextChestNo);
+                        const participantData = { name: name, team: teamName };
+                        
+                        const docRef = doc(db, `artifacts/${appId}/public/data/participants`, chestNoStr);
+                        batch.set(docRef, participantData);
+                        
+                        addLog.textContent += `Added: ${name}  ->  ${chestNoStr}\n`;
+                        addedCount++;
+                        
+                        // Find the next available number for the next person
+                        nextChestNo++;
+                        while (existingNos.has(nextChestNo) && nextChestNo <= idTo) {
+                            nextChestNo++;
+                        }
+                    }
+                    
+                    try {
+                        await batch.commit();
+                        addLog.textContent += `\nSUCCESS: Added ${addedCount} participants to team ${teamName}.\n`;
+                        participantAddNames.value = ''; // Clear textarea
+                    } catch (error) {
+                        addLog.textContent += `\nERROR: ${error.message}\n`;
+                    }
+                });
+            }
+
             async function deleteAllParticipants(promptUser = true) {
                  let confirmation = 'DELETE'; 
                  if (promptUser) {
@@ -646,11 +708,8 @@
                      alert('Deletion cancelled.');
                      return Promise.reject('Deletion cancelled by user.'); 
                  }
-                 if (!promptUser && confirmation === 'DELETE') { // This is the case for import
-                    // Continue silently
-                 } else if (!promptUser) {
-                    // This case should not be hit, but safety first
-                     return Promise.resolve(); // Resolve silently
+                 if (!promptUser && confirmation !== 'DELETE') { 
+                     return Promise.resolve(); // Silently resolve if skipping prompt
                  }
 
                  try {
@@ -665,7 +724,7 @@
                      snapshot.docs.forEach(doc => { batch.delete(doc.ref); });
                      await batch.commit();
                      if (promptUser) alert('All participants have been deleted.');
-                     // loadAllParticipants() will be called by onSnapshot
+                     // onSnapshot will auto-refresh the list
                      return Promise.resolve(); 
                  } catch (error) {
                      if (promptUser) alert(`Error deleting participants: ${error.message}`);
@@ -678,49 +737,14 @@
             // ===================================
             // Programs & Categories Page
             // ===================================
-            async function loadCategories() {
-                 try {
-                     const q = query(collection(db, `artifacts/${appId}/public/data/categories`));
-                     const snapshot = await getDocs(q);
-                     allCategories = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })).sort((a,b)=>a.name.localeCompare(b.name));
-                     if (categoryList) categoryList.innerHTML = ''; 
-                     if (programCategorySelect) programCategorySelect.innerHTML = '<option value="">Select Category</option>'; 
-                     if (allCategories.length === 0) {
-                         if (categoryList) categoryList.innerHTML = '<p class="text-gray-500 italic p-4">No categories added yet.</p>';
-                     } else {
-                         allCategories.forEach(cat => {
-                             if (categoryList) {
-                                 categoryList.innerHTML += ` <div class="list-item"> <div class="list-item-content"> <span class="list-item-name">${cat.name}</span> </div> <div class="list-item-actions"> <button class="btn btn-warning btn-sm btn-icon-only" onclick="editCategory('${cat.id}', \`${cat.name}\`)"><i class="fas fa-edit"></i></button> <button class="btn btn-danger btn-sm btn-icon-only" onclick="deleteCategory('${cat.id}')"><i class="fas fa-trash-alt"></i></button> </div> </div>`;
-                             }
-                             if (programCategorySelect) programCategorySelect.innerHTML += `<option value="${cat.name}">${cat.name}</option>`;
-                         });
-                     }
-                 } catch(error) { console.error("Error loading categories:", error); if (categoryList) categoryList.innerHTML = '<p class="text-red-500 p-4">Error loading categories.</p>';}
-            }
-            if(categoryForm && categoryInput) categoryForm.addEventListener('submit', async (e) => { e.preventDefault(); const name = categoryInput.value.trim(); if (!name) return; try { await addDoc(collection(db, `artifacts/${appId}/public/data/categories`), { name }); categoryInput.value = ''; await loadCategories(); } catch (error) { alert(`Error: ${error.message}`); }});
-            window.deleteCategory = async (id) => { if (!confirm('Are you sure you want to delete this category?')) return; try { await deleteDoc(doc(db, `artifacts/${appId}/public/data/categories`, id)); await loadCategories(); } catch (error) { alert(`Error: ${error.message}`); }};
-            window.editCategory = async (id, currentName) => { const newName = prompt("Enter the new name for the category:", currentName); if (newName && newName.trim() !== '' && newName.trim() !== currentName) { try { await updateDoc(doc(db, `artifacts/${appId}/public/data/categories`, id), { name: newName.trim() }); alert('Category updated!'); await loadCategories(); await loadPrograms(); } catch (error) { alert(`Error updating category: ${error.message}`); } } };
-            
-            async function loadPrograms() {
-                 try {
-                     const q = query(collection(db, `artifacts/${appId}/public/data/programs`));
-                     const snapshot = await getDocs(q);
-                     allPrograms = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })).sort((a,b)=>a.name.localeCompare(b.name)); 
-                     if (programList) programList.innerHTML = '';
-                     if (allPrograms.length === 0) {
-                          if (programList) programList.innerHTML = '<p class="text-gray-500 italic p-4">No programs added yet.</p>';
-                     } else {
-                         allPrograms.forEach(prog => {
-                             if (programList) {
-                                 programList.innerHTML += ` <div class="list-item" style="grid-template-columns: 1.5fr 1fr 100px;"> <div class="list-item-content"> <span class="list-item-name">${prog.name}</span> <span class="list-item-details">${prog.category}</span> </div> <div class="list-item-content"> <span class="list-item-points">Points: ${prog.points_first || 0}, ${prog.points_second || 0}, ${prog.points_third || 0}</span> </div> <div class="list-item-actions !col-span-1"> <button class="btn btn-warning btn-sm btn-icon-only" onclick="editProgram('${prog.id}', \`${prog.name}\`, '${prog.category}', '${prog.points_first || 0}', '${prog.points_second || 0}', '${prog.points_third || 0}')"><i class="fas fa-edit"></i></button> <button class="btn btn-danger btn-sm btn-icon-only" onclick="deleteProgram('${prog.id}')"><i class="fas fa-trash-alt"></i></button> </div> </div>`;
-                             }
-                         });
-                     }
-                } catch(error) { console.error("Error loading programs:", error); if (programList) programList.innerHTML = '<p class="text-red-500 p-4">Error loading programs.</p>';}
-            }
-            if(programForm && programNameInput && programCategorySelect) programForm.addEventListener('submit', async (e) => { e.preventDefault(); const name = programNameInput.value.trim(); const category = programCategorySelect.value; const points_first = parseInt(programPointsFirst.value, 10); const points_second = parseInt(programPointsSecond.value, 10); const points_third = parseInt(programPointsThird.value, 10); if (!name || !category || isNaN(points_first) || isNaN(points_second) || isNaN(points_third)) { alert('Please fill in all fields, including points.'); return; } try { await addDoc(collection(db, `artifacts/${appId}/public/data/programs`), { name, category, points_first, points_second, points_third }); programForm.reset(); await loadPrograms(); } catch (error) { alert(`Error: ${error.message}`); }});
-            window.deleteProgram = async (id) => { if (!confirm('Are you sure you want to delete this program?')) return; try { await deleteDoc(doc(db, `artifacts/${appId}/public/data/programs`, id)); await deleteDoc(doc(db, `artifacts/${appId}/public/data/results`, id)); await loadPrograms(); } catch (error) { alert(`Error: ${error.message}`); }};
-            window.editProgram = async (id, currentName, currentCategory, p1, p2, p3) => { const newName = prompt("Enter the new name for the program:", currentName); let categoryOptions = allCategories.map((cat, index) => `${index + 1}: ${cat.name}`).join('\n'); let categoryPromptMsg = `Enter the number for the new category (current: '${currentCategory}'):\n${categoryOptions}`; const categoryChoiceIndex = prompt(categoryPromptMsg); const newP1 = prompt("Enter new 1st place points:", p1); const newP2 = prompt("Enter new 2nd place points:", p2); const newP3 = prompt("Enter new 3rd place points:", p3); let newCategory = currentCategory; if (categoryChoiceIndex && !isNaN(categoryChoiceIndex)) { let index = parseInt(categoryChoiceIndex) - 1; if (index >= 0 && index < allCategories.length) { newCategory = allCategories[index].name; } else { alert("Invalid category number. Keeping original category."); } } const dataToUpdate = { name: (newName && newName.trim() !== '') ? newName.trim() : currentName, category: newCategory, points_first: (newP1 && !isNaN(newP1)) ? parseInt(newP1, 10) : parseInt(p1, 10), points_second: (newP2 && !isNaN(newP2)) ? parseInt(newP2, 10) : parseInt(p2, 10), points_third: (newP3 && !isNaN(newP3)) ? parseInt(newP3, 10) : parseInt(p3, 10) }; try { await updateDoc(doc(db, `artifacts/${appId}/public/data/programs`, id), dataToUpdate); alert('Program updated!'); await loadPrograms(); } catch (error) { alert(`Error updating program: ${error.message}`); } };
+            async function loadCategories() { /* ... */ }
+            if(categoryForm && categoryInput) categoryForm.addEventListener('submit', async (e) => { /* ... */ });
+            window.deleteCategory = async (id) => { /* ... */ };
+            window.editCategory = async (id, currentName) => { /* ... */ };
+            async function loadPrograms() { /* ... */ }
+            if(programForm && programNameInput && programCategorySelect) programForm.addEventListener('submit', async (e) => { /* ... */ });
+            window.deleteProgram = async (id) => { /* ... */ };
+            window.editProgram = async (id, currentName, currentCategory, p1, p2, p3) => { /* ... */ };
 
             // ===================================
             // Results Page
@@ -739,7 +763,27 @@
             // ===================================
             // Teams Page (Admin)
             // ===================================
-            async function loadTeamsForAdmin() { /* ... */ }
+            async function loadTeamsForAdmin() { 
+                try { 
+                    const q = query(collection(db, `artifacts/${appId}/public/data/teams`)); 
+                    const snapshot = await getDocs(q); 
+                    allTeamsAdmin = {}; 
+                    snapshot.docs.forEach(doc => { allTeamsAdmin[doc.id] = { id: doc.id, ...doc.data() }; }); 
+                    renderAdminTeamList(); 
+                    
+                    // NEW: Populate dropdowns in Participants page
+                    if(participantTeamFilter) { 
+                        participantTeamFilter.innerHTML = '<option value="">All Teams</option>'; 
+                        const sortedTeamNames = Object.keys(allTeamsAdmin).sort(); 
+                        sortedTeamNames.forEach(teamName => { participantTeamFilter.innerHTML += `<option value="${teamName}">${teamName}</option>`; }); 
+                    }
+                    if(participantAddTeam) {
+                        participantAddTeam.innerHTML = '<option value="">-- Select a Team --</option>';
+                        const sortedTeamNames = Object.keys(allTeamsAdmin).sort(); 
+                        sortedTeamNames.forEach(teamName => { participantAddTeam.innerHTML += `<option value="${teamName}">${teamName}</option>`; });
+                    }
+                } catch(error) { console.error("Error loading teams for admin:", error); if(teamListAdmin) teamListAdmin.innerHTML = '<p class="text-red-500">Error loading teams.</p>'; } 
+            }
             function renderAdminTeamList() { /* ... */ }
             if(teamForm) teamForm.addEventListener('submit', async (e) => { /* ... */ });
             async function handleUpdateTeam(e) { /* ... */ }
