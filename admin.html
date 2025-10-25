@@ -157,13 +157,13 @@
                 
                 <!-- Home Page Settings -->
                 <div id="page-dashboard" class="admin-page space-y-8"> 
-                   <!-- Home Page Settings Form (Unchanged Structure) -->
+                   <!-- Home Page Settings Form -->
                    <h1 class="text-3xl font-bold text-gray-900">Home Page Settings</h1>
                     <div class="info-text"> <strong>നിർദ്ദേശം:</strong> വെബ്സൈറ്റിന്റെ പ്രധാന പേജിൽ (ഹോം പേജ്) കാണിക്കേണ്ട വിവരങ്ങൾ ഇവിടെ നൽകുക. ഹെഡർ, ലോഗോ, തലക്കെട്ടുകൾ, എബൗട്ട്, ഗാലറി, സ്റ്റാറ്റ്സ്, ഫൂട്ടർ എന്നിവ ഇവിടെ മാറ്റം വരുത്താം. ചിത്രങ്ങളുടെ URL (ലിങ്ക്) ആണ് നൽകേണ്ടത്. സോഷ്യൽ മീഡിയ ലിങ്കുകളും ഇവിടെ നൽകാം. </div>
                     <form id="form-homepage" class="space-y-8"> 
                         <div class="card"> <h2 class="card-header">Header & Hero Content</h2> <div class="space-y-4"> <div class="grid grid-cols-1 md:grid-cols-2 gap-6"> <div> <label for="homepage-header-title" class="form-label">Header Title (Top Bar)</label> <input type="text" id="homepage-header-title" class="form-input" placeholder="e.g., Sadaye Madeena 2k25"> </div> <div> <label for="homepage-logo-url" class="form-label">Logo Image URL</label> <input type="url" id="homepage-logo-url" class="form-input" placeholder="https://example.com/logo.png"> </div> </div> <div class="grid grid-cols-1 md:grid-cols-2 gap-6"> <div> <label for="homepage-main-title" class="form-label">Main Title (Hero Section)</label> <input type="text" id="homepage-main-title" class="form-input" placeholder="e.g., Sadaye Madeena 2k25"> </div> <div> <label for="homepage-subtitle" class="form-label">Subtitle (Hero Section)</label> <input type="text" id="homepage-subtitle" class="form-input" placeholder="e.g., Inter-Madrasa Art Fest"> </div> </div> </div> </div>
                         <div class="card"> <h2 class="card-header">About Section</h2> <div class="space-y-4"> <div> <label for="homepage-about" class="form-label">About The Fest (Description)</label> <textarea id="homepage-about" class="form-textarea" rows="5" placeholder="Write something about the event..."></textarea> </div> <div> <label for="homepage-about-image-url" class="form-label">About Section Image URL</label> <input type="url" id="homepage-about-image-url" class="form-input" placeholder="https://example.com/about-image.jpg"> </div> </div> </div>
-                        <div class="card"> <h2 class="card-header">Statistics Texts</h2> <p class="text-sm text-gray-500 mb-4">...</p> <div class="grid grid-cols-2 md:grid-cols-4 gap-6"> <div> <label for="homepage-total-programs" class="form-label">Total Programs</label> <input type="text" id="homepage-total-programs" class="form-input" placeholder="e.g., 50+"> </div> <div> <label for="homepage-total-participants" class="form-label">Total Contestants</label> <input type="text" id="homepage-total-participants" class="form-input" placeholder="e.g., 200+"> </div> <div> <label for="homepage-total-categories" class="form-label">Total Categories</label> <input type="text" id="homepage-total-categories" class="form-input" placeholder="e.g., 5"> </div> <div> <label for="homepage-total-teams" class="form-label">Total Teams</label> <input type="text" id="homepage-total-teams" class="form-input" placeholder="e.g., 3"> </div> </div> </div>
+                        <div class="card"> <h2 class="card-header">Statistics Texts</h2> <p class="text-sm text-gray-500 mb-4">ഹോം പേജിൽ കാണിക്കേണ്ട സ്ഥിതിവിവരക്കണക്കുകൾ ടെക്സ്റ്റ് ആയി ഇവിടെ നൽകുക (ഉദാ: '50+', '150+').</p> <div class="grid grid-cols-2 md:grid-cols-4 gap-6"> <div> <label for="homepage-total-programs" class="form-label">Total Programs</label> <input type="text" id="homepage-total-programs" class="form-input" placeholder="e.g., 50+"> </div> <div> <label for="homepage-total-participants" class="form-label">Total Contestants</label> <input type="text" id="homepage-total-participants" class="form-input" placeholder="e.g., 200+"> </div> <div> <label for="homepage-total-categories" class="form-label">Total Categories</label> <input type="text" id="homepage-total-categories" class="form-input" placeholder="e.g., 5"> </div> <div> <label for="homepage-total-teams" class="form-label">Total Teams</label> <input type="text" id="homepage-total-teams" class="form-input" placeholder="e.g., 3"> </div> </div> </div>
                         <div class="card"> <h2 class="card-header">Image Gallery URLs</h2> <label for="homepage-gallery" class="form-label">Enter Image URLs (One URL per line)</label> <textarea id="homepage-gallery" class="form-textarea" rows="8" placeholder="https://example.com/image1.jpg\nhttps://example.com/image2.jpg"></textarea> </div>
                         <div class="card"> <h2 class="card-header">Footer Settings</h2> <div class="space-y-4"> <div> <label for="homepage-institution-name" class="form-label">Institution Name</label> <input type="text" id="homepage-institution-name" class="form-input" placeholder="e.g., Noorul Islam madrasa devathiyal"> </div> <div> <label for="homepage-copyright-text" class="form-label">Copyright Text</label> <input type="text" id="homepage-copyright-text" class="form-input" placeholder="e.g., © 2025 Thirunoor Media Team. All rights reserved."> </div> <h3 class="text-lg font-semibold text-gray-800 pt-2">Social Media Links</h3> <div class="grid grid-cols-1 md:grid-cols-3 gap-4"> <div> <label for="homepage-social-instagram" class="form-label">Instagram URL</label> <input type="url" id="homepage-social-instagram" class="form-input" placeholder="https://instagram.com/..."> </div> <div> <label for="homepage-social-youtube" class="form-label">YouTube URL</label> <input type="url" id="homepage-social-youtube" class="form-input" placeholder="https://youtube.com/..."> </div> <div> <label for="homepage-social-facebook" class="form-label">Facebook URL</label> <input type="url" id="homepage-social-facebook" class="form-input" placeholder="https://facebook.com/..."> </div> </div> </div> </div>
                         <div class="flex justify-end pt-4"> <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i>Save All Settings</button> </div>
@@ -178,7 +178,7 @@
                 <!-- Programs & Categories -->
                 <div id="page-programs" class="admin-page hidden space-y-8">
                      <h1 class="text-3xl font-bold text-gray-900">Manage Programs & Categories</h1>
-                     <div class="info-text"> <strong>നിർദ്ദേശം:</strong> ഇവിടെ മത്സരങ്ങളുടെ കാറ്റഗറികളും (ഉദാ: Junior, Senior) ഓരോ മത്സരങ്ങളും ചേർക്കാം... </div>
+                     <div class="info-text"> <strong>നിർദ്ദേശം:</strong> ഇവിടെ മത്സരങ്ങളുടെ കാറ്റഗറികളും... </div>
                      <div class="card">
                          <h2 class="card-header">Manage Categories</h2>
                          <form id="form-add-category" class="mb-6 flex flex-col sm:flex-row items-stretch sm:items-end gap-4"> 
@@ -264,14 +264,15 @@
         const auth = getAuth(app);
         const db = getFirestore(app);
 
-        // Global State & DOM Elements (Make sure all elements are captured)
+        // --- [JavaScript Logic - Includes Authentication, Forms, Data Loading etc.] ---
         let allPrograms = []; let allCategories = []; let allParticipants = {}; let allTeamsAdmin = {}; 
-        const loginPage=document.getElementById('login-page'), adminPanel=document.getElementById('admin-panel'), loginForm=document.getElementById('login-form'), registerForm=document.getElementById('register-form'), logoutButton=document.getElementById('logout-button'), adminEmail=document.getElementById('admin-email'), pages=document.querySelectorAll('.admin-page'), adminMenuOverlay=document.getElementById('admin-menu-overlay'), adminMenuBox=document.getElementById('admin-menu-box'), adminMenuBtn=document.getElementById('admin-menu-btn'), adminMenuCloseBtn=document.getElementById('admin-menu-close-btn'), navLinks=document.querySelectorAll('.menu-link');
-        const downloadTemplateBtn=document.getElementById('download-template-btn'), importForm=document.getElementById('form-import-csv'), fileInput=document.getElementById('csv-file-input'), fileNameEl=document.getElementById('csv-filename'), importLogContainer=document.getElementById('import-log-container'), importLog=document.getElementById('import-log'), participantCountEl=document.getElementById('participant-count'), deleteAllParticipantsBtn=document.getElementById('delete-all-participants-btn');
-        const categoryForm=document.getElementById('form-add-category'), categoryInput=document.getElementById('category-name'), categoryList=document.getElementById('category-list'), programForm=document.getElementById('form-add-program'), programNameInput=document.getElementById('program-name'), programCategorySelect=document.getElementById('program-category'), programList=document.getElementById('program-list');
-        const resultForm=document.getElementById('form-publish-result'), resultCategorySelect=document.getElementById('result-category'), resultProgramSelect=document.getElementById('result-program'), resultInputs={'first':document.getElementById('result-first'), 'second':document.getElementById('result-second'), 'third':document.getElementById('result-third')}, nameSpans={'first':document.getElementById('name-first'), 'second':document.getElementById('name-second'), 'third':document.getElementById('name-third')};
-        const teamForm=document.getElementById('form-add-team'), teamListAdmin=document.getElementById('team-list-admin');
-        const homepageForm=document.getElementById('form-homepage'), homepageFields={'header_title':document.getElementById('homepage-header-title'), 'logo_url':document.getElementById('homepage-logo-url'), 'main_title':document.getElementById('homepage-main-title'), 'subtitle':document.getElementById('homepage-subtitle'), 'about':document.getElementById('homepage-about'), 'about_image_url':document.getElementById('homepage-about-image-url'), 'gallery':document.getElementById('homepage-gallery'), 'total_programs':document.getElementById('homepage-total-programs'), 'total_participants':document.getElementById('homepage-total-participants'), 'total_categories':document.getElementById('homepage-total-categories'), 'total_teams':document.getElementById('homepage-total-teams'), 'institution_name':document.getElementById('homepage-institution-name'), 'copyright_text':document.getElementById('homepage-copyright-text'), 'social_instagram':document.getElementById('homepage-social-instagram'), 'social_youtube':document.getElementById('homepage-social-youtube'), 'social_facebook':document.getElementById('homepage-social-facebook')};
+        const doc = document; // Alias for document
+        const loginPage=doc.getElementById('login-page'), adminPanel=doc.getElementById('admin-panel'), loginForm=doc.getElementById('login-form'), registerForm=doc.getElementById('register-form'), logoutButton=doc.getElementById('logout-button'), adminEmail=doc.getElementById('admin-email'), pages=doc.querySelectorAll('.admin-page'), adminMenuOverlay=doc.getElementById('admin-menu-overlay'), adminMenuBox=doc.getElementById('admin-menu-box'), adminMenuBtn=doc.getElementById('admin-menu-btn'), adminMenuCloseBtn=doc.getElementById('admin-menu-close-btn'), navLinks=doc.querySelectorAll('.menu-link');
+        const downloadTemplateBtn=doc.getElementById('download-template-btn'), importForm=doc.getElementById('form-import-csv'), fileInput=doc.getElementById('csv-file-input'), fileNameEl=doc.getElementById('csv-filename'), importLogContainer=doc.getElementById('import-log-container'), importLog=doc.getElementById('import-log'), participantCountEl=doc.getElementById('participant-count'), deleteAllParticipantsBtn=doc.getElementById('delete-all-participants-btn');
+        const categoryForm=doc.getElementById('form-add-category'), categoryInput=doc.getElementById('category-name'), categoryList=doc.getElementById('category-list'), programForm=doc.getElementById('form-add-program'), programNameInput=doc.getElementById('program-name'), programCategorySelect=doc.getElementById('program-category'), programList=doc.getElementById('program-list');
+        const resultForm=doc.getElementById('form-publish-result'), resultCategorySelect=doc.getElementById('result-category'), resultProgramSelect=doc.getElementById('result-program'), resultInputs={'first':doc.getElementById('result-first'), 'second':doc.getElementById('result-second'), 'third':doc.getElementById('result-third')}, nameSpans={'first':doc.getElementById('name-first'), 'second':doc.getElementById('name-second'), 'third':doc.getElementById('name-third')};
+        const teamForm=doc.getElementById('form-add-team'), teamListAdmin=doc.getElementById('team-list-admin');
+        const homepageForm=doc.getElementById('form-homepage'), homepageFields={'header_title':doc.getElementById('homepage-header-title'), 'logo_url':doc.getElementById('homepage-logo-url'), 'main_title':doc.getElementById('homepage-main-title'), 'subtitle':doc.getElementById('homepage-subtitle'), 'about':doc.getElementById('homepage-about'), 'about_image_url':doc.getElementById('homepage-about-image-url'), 'gallery':doc.getElementById('homepage-gallery'), 'total_programs':doc.getElementById('homepage-total-programs'), 'total_participants':doc.getElementById('homepage-total-participants'), 'total_categories':doc.getElementById('homepage-total-categories'), 'total_teams':doc.getElementById('homepage-total-teams'), 'institution_name':doc.getElementById('homepage-institution-name'), 'copyright_text':doc.getElementById('homepage-copyright-text'), 'social_instagram':doc.getElementById('homepage-social-instagram'), 'social_youtube':doc.getElementById('homepage-social-youtube'), 'social_facebook':doc.getElementById('homepage-social-facebook')};
 
         // ===================================
         // Navigation Logic 
@@ -292,7 +293,8 @@
                 navLinks.forEach(nav => nav.classList.remove('active'));
                 link.classList.add('active');
                 closeAdminNav();
-                loadDataForPage(targetId);
+                // Ensure data is loaded *after* page is potentially visible
+                setTimeout(() => loadDataForPage(targetId), 0); 
             });
         });
 
@@ -301,7 +303,7 @@
              if (pageId === 'page-dashboard') loadHomepageContent();
              if (pageId === 'page-participants') loadParticipantCount();
              if (pageId === 'page-programs') { loadCategories(); loadPrograms(); }
-             if (pageId === 'page-results') { loadCategoriesForResults(); loadProgramsForResults(); /* Load both */ }
+             if (pageId === 'page-results') { loadCategoriesForResults(); /* Don't load programs yet */ }
              if (pageId === 'page-teams') loadTeamsForAdmin();
         }
 
@@ -320,45 +322,55 @@
                 navLinks.forEach(nav => nav.classList.remove('active'));
                 const defaultNavLink = document.querySelector(`.menu-link[data-target="${defaultPageId}"]`);
                  if (defaultNavLink) defaultNavLink.classList.add('active');
-                loadDataForPage(defaultPageId); 
-                loadAllParticipants(); 
+                // Ensure data is loaded *after* the page might be visible
+                setTimeout(() => {
+                    loadDataForPage(defaultPageId); 
+                    loadAllParticipants(); 
+                }, 0);
             } else {
                 if(loginPage) loginPage.style.display = 'flex'; 
                 if(adminPanel) adminPanel.style.display = 'none';
             }
         });
         
-        if(loginForm) {
-            loginForm.addEventListener('submit', async (e) => { 
-                e.preventDefault(); 
-                const emailEl = document.getElementById('login-email');
-                const passwordEl = document.getElementById('login-password');
-                if (!emailEl || !passwordEl) return;
-                const email = emailEl.value;
-                const password = passwordEl.value;
-                if (!email || !password) { alert("Please enter both email and password."); return; }
-                try { await signInWithEmailAndPassword(auth, email, password); } 
-                catch (error) { alert(`Login Failed: ${error.message}`); }
-            });
-        } else { console.error("Login form not found!"); }
+        // Ensure form listeners are added only after DOM is ready
+        document.addEventListener('DOMContentLoaded', () => {
+            const loginForm = document.getElementById('login-form');
+            const registerForm = document.getElementById('register-form');
+            
+            if(loginForm) {
+                loginForm.addEventListener('submit', async (e) => { 
+                    e.preventDefault(); 
+                    const emailEl = document.getElementById('login-email');
+                    const passwordEl = document.getElementById('login-password');
+                    if (!emailEl || !passwordEl) return;
+                    const email = emailEl.value;
+                    const password = passwordEl.value;
+                    if (!email || !password) { alert("Please enter both email and password."); return; }
+                    try { await signInWithEmailAndPassword(auth, email, password); } 
+                    catch (error) { alert(`Login Failed: ${error.message}`); }
+                });
+            } else { console.error("Login form not found!"); }
 
-        if(registerForm) {
-            registerForm.addEventListener('submit', async (e) => { 
-                e.preventDefault(); 
-                 const emailEl = document.getElementById('register-email');
-                 const passwordEl = document.getElementById('register-password');
-                 if (!emailEl || !passwordEl) return;
-                 const email = emailEl.value;
-                 const password = passwordEl.value;
-                 if (!email || !password) { alert("Please enter both email and password."); return; }
-                try { 
-                    await createUserWithEmailAndPassword(auth, email, password); 
-                    alert('Admin user registered! Please login.'); 
-                    registerForm.reset(); 
-                } catch (error) { alert(`Registration Failed: ${error.message}`); }
-            });
-        } else { console.error("Register form not found!"); }
+            if(registerForm) {
+                registerForm.addEventListener('submit', async (e) => { 
+                    e.preventDefault(); 
+                     const emailEl = document.getElementById('register-email');
+                     const passwordEl = document.getElementById('register-password');
+                     if (!emailEl || !passwordEl) return;
+                     const email = emailEl.value;
+                     const password = passwordEl.value;
+                     if (!email || !password) { alert("Please enter both email and password."); return; }
+                    try { 
+                        await createUserWithEmailAndPassword(auth, email, password); 
+                        alert('Admin user registered! Please login.'); 
+                        registerForm.reset(); 
+                    } catch (error) { alert(`Registration Failed: ${error.message}`); }
+                });
+            } else { console.error("Register form not found!"); }
+        }); // End DOMContentLoaded for auth forms
 
+        // Logout button listener can be added directly as it's inside #admin-panel
         if(logoutButton) {
             logoutButton.addEventListener('click', async () => { 
                 try { await signOut(auth); } 
@@ -388,7 +400,7 @@
         function loadParticipantCount() { /* ... */ }
         if(downloadTemplateBtn) downloadTemplateBtn.addEventListener('click', () => { /* ... */ });
         if(fileInput) fileInput.addEventListener('change', (e) => { /* ... */ });
-        if(importForm) importForm.addEventListener('submit', (e) => { /* ... includes deleteAllParticipants(false) ... */ });
+        if(importForm) importForm.addEventListener('submit', (e) => { /* ... */ });
         async function deleteAllParticipants(promptUser = true) { /* ... */ }
         if(deleteAllParticipantsBtn) deleteAllParticipantsBtn.addEventListener('click', () => deleteAllParticipants(true)); 
 
