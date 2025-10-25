@@ -136,7 +136,7 @@
                  <!-- Menu Content -->
                  <div class="menu-header"> <span class="header-title">ADMIN MENU</span> <button id="admin-menu-close-btn" class="close-btn">&times;</button> </div>
                  <a href="#dashboard" data-target="page-dashboard" class="menu-link active"><i class="fas fa-home"></i>Home Page Settings</a>
-                 <a href="#participants" data-target="page-participants" class="menu-link"><i class="fas fa-id-card"></i>Manage Participants</a> 
+                 <a href="#participants" data-target="page-participants" class="menu-link"><i class="fas fa-id-card"></i>Manage Participants</a> <!-- UPDATED: Title -->
                  <a href="#programs" data-target="page-programs" class="menu-link"><i class="fas fa-calendar-alt"></i>Programs & Categories</a>
                  <a href="#teams" data-target="page-teams" class="menu-link"><i class="fas fa-users"></i>Manage Teams</a>
                  <a href="#results" data-target="page-results" class="menu-link"><i class="fas fa-poll"></i>Publish Results</a>
@@ -350,23 +350,30 @@
             let allPrograms = []; let allCategories = []; let allParticipants = {}; let allTeamsAdmin = {}; 
             
             const d = document; // Use 'd' for document
-            // All DOM element selections moved inside DOMContentLoaded
+            // All DOM element selections
             const loginPage=d.getElementById('login-page'), adminPanel=d.getElementById('admin-panel'), loginForm=d.getElementById('login-form'), registerForm=d.getElementById('register-form'), logoutButton=d.getElementById('logout-button'), adminEmail=d.getElementById('admin-email'), pages=d.querySelectorAll('.admin-page'), adminMenuOverlay=d.getElementById('admin-menu-overlay'), adminMenuBox=d.getElementById('admin-menu-box'), adminMenuBtn=d.getElementById('admin-menu-btn'), adminMenuCloseBtn=d.getElementById('admin-menu-close-btn'), navLinks=d.querySelectorAll('.menu-link');
             
-            // UPDATED: Participants page elements
+            // Participants page elements
             const participantAddForm = d.getElementById('form-add-participants');
-            const participantAddTeam = d.getElementById('participant-add-team'), participantAddNames = d.getElementById('participant-add-names'), addParticipantsBtn = d.getElementById('add-participants-btn'), addLogContainer = d.getElementById('add-log-container'), addLog = d.getElementById('add-log'), participantCountEl=d.getElementById('participant-count'), deleteAllParticipantsBtn=d.getElementById('delete-all-participants-btn');
+            const participantAddTeam = d.getElementById('participant-add-team'), participantAddNames = d.getElementById('participant-add-names'), addLogContainer = d.getElementById('add-log-container'), addLog = d.getElementById('add-log'), participantCountEl=d.getElementById('participant-count'), deleteAllParticipantsBtn=d.getElementById('delete-all-participants-btn');
             const participantTeamFilter = d.getElementById('participant-team-filter');
             const participantSearch = d.getElementById('participant-search');
             const participantListAdmin = d.getElementById('participant-list-admin');
             const participantListPlaceholder = d.getElementById('participant-list-placeholder');
 
+            // Programs & Categories elements
             const categoryForm=d.getElementById('form-add-category'), categoryInput=d.getElementById('category-name'), categoryList=d.getElementById('category-list'), programForm=d.getElementById('form-add-program'), programNameInput=d.getElementById('program-name'), programCategorySelect=d.getElementById('program-category'), programList=d.getElementById('program-list');
             const programPointsFirst = d.getElementById('program-points-first');
             const programPointsSecond = d.getElementById('program-points-second');
             const programPointsThird = d.getElementById('program-points-third');
+            
+            // Results page elements
             const resultForm=d.getElementById('form-publish-result'), resultCategorySelect=d.getElementById('result-category'), resultProgramSelect=d.getElementById('result-program'), resultInputs={'first':d.getElementById('result-first'), 'second':d.getElementById('result-second'), 'third':d.getElementById('result-third')}, nameSpans={'first':d.getElementById('name-first'), 'second':d.getElementById('name-second'), 'third':d.getElementById('name-third')};
+            
+            // Teams page elements
             const teamForm=d.getElementById('form-add-team'), teamListAdmin=d.getElementById('team-list-admin');
+            
+            // Homepage elements
             const homepageForm=d.getElementById('form-homepage'), homepageFields={'header_title':d.getElementById('homepage-header-title'), 'logo_url':d.getElementById('homepage-logo-url'), 'main_title':d.getElementById('homepage-main-title'), 'subtitle':d.getElementById('homepage-subtitle'), 'about_title':d.getElementById('homepage-about-title'), 'about_subtitle':d.getElementById('homepage-about-subtitle'), 'about':d.getElementById('homepage-about'), 'about_image_url':d.getElementById('homepage-about-image-url'), 'gallery':d.getElementById('homepage-gallery'), 'total_programs':d.getElementById('homepage-total-programs'), 'total_participants':d.getElementById('homepage-total-participants'), 'total_categories':d.getElementById('homepage-total-categories'), 'total_teams':d.getElementById('homepage-total-teams'), 'institution_name':d.getElementById('homepage-institution-name'), 'copyright_text':d.getElementById('homepage-copyright-text'), 'social_instagram':d.getElementById('homepage-social-instagram'), 'social_youtube':d.getElementById('homepage-social-youtube'), 'social_facebook':d.getElementById('homepage-social-facebook')};
 
             // ===================================
@@ -397,7 +404,7 @@
                  if (pageId === 'page-dashboard') loadHomepageContent();
                  if (pageId === 'page-participants') { loadTeamsForAdmin(); loadAllParticipants(); } // Load teams for both dropdowns
                  if (pageId === 'page-programs') { loadCategories(); loadPrograms(); }
-                 if (pageId === 'page-results') { loadCategoriesForResults(); /* Only load categories first */ }
+                 if (pageId === 'page-results') { loadCategoriesForResults(); loadPrograms(); /* Load all programs for filtering */ }
                  if (pageId === 'page-teams') loadTeamsForAdmin();
             }
 
@@ -418,7 +425,8 @@
                      if (defaultNavLink) defaultNavLink.classList.add('active');
                     setTimeout(() => {
                         loadDataForPage(defaultPageId); 
-                        loadAllParticipants(); 
+                        loadAllParticipants(); // Load participants once on login
+                        loadTeamsForAdmin(); // Load teams once on login
                     }, 0);
                 } else {
                     if(loginPage) loginPage.style.display = 'flex'; 
@@ -707,7 +715,9 @@
                      alert('Deletion cancelled.');
                      return Promise.reject('Deletion cancelled by user.'); 
                  }
-                 if (!promptUser && confirmation !== 'DELETE') { 
+                 if (!promptUser && confirmation === 'DELETE') { 
+                    // This is the case for import
+                 } else if (!promptUser) {
                      return Promise.resolve(); // Silently resolve if skipping prompt
                  }
 
@@ -762,7 +772,7 @@
             if(resultForm) resultForm.addEventListener('submit', async (e) => { /* ... */ });
 
             // ===================================
-            // Teams Page (Admin)
+            // Teams Page (Admin) - UPDATED
             // ===================================
             async function loadTeamsForAdmin() { 
                 try { 
