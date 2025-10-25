@@ -266,13 +266,15 @@
 
         // --- [JavaScript Logic - Includes Authentication, Forms, Data Loading etc.] ---
         let allPrograms = []; let allCategories = []; let allParticipants = {}; let allTeamsAdmin = {}; 
-        const doc = document; // Alias for document
-        const loginPage=doc.getElementById('login-page'), adminPanel=doc.getElementById('admin-panel'), loginForm=doc.getElementById('login-form'), registerForm=doc.getElementById('register-form'), logoutButton=doc.getElementById('logout-button'), adminEmail=doc.getElementById('admin-email'), pages=doc.querySelectorAll('.admin-page'), adminMenuOverlay=doc.getElementById('admin-menu-overlay'), adminMenuBox=doc.getElementById('admin-menu-box'), adminMenuBtn=doc.getElementById('admin-menu-btn'), adminMenuCloseBtn=doc.getElementById('admin-menu-close-btn'), navLinks=doc.querySelectorAll('.menu-link');
-        const downloadTemplateBtn=doc.getElementById('download-template-btn'), importForm=doc.getElementById('form-import-csv'), fileInput=doc.getElementById('csv-file-input'), fileNameEl=doc.getElementById('csv-filename'), importLogContainer=doc.getElementById('import-log-container'), importLog=doc.getElementById('import-log'), participantCountEl=doc.getElementById('participant-count'), deleteAllParticipantsBtn=doc.getElementById('delete-all-participants-btn');
-        const categoryForm=doc.getElementById('form-add-category'), categoryInput=doc.getElementById('category-name'), categoryList=doc.getElementById('category-list'), programForm=doc.getElementById('form-add-program'), programNameInput=doc.getElementById('program-name'), programCategorySelect=doc.getElementById('program-category'), programList=doc.getElementById('program-list');
-        const resultForm=doc.getElementById('form-publish-result'), resultCategorySelect=doc.getElementById('result-category'), resultProgramSelect=doc.getElementById('result-program'), resultInputs={'first':doc.getElementById('result-first'), 'second':doc.getElementById('result-second'), 'third':doc.getElementById('result-third')}, nameSpans={'first':doc.getElementById('name-first'), 'second':doc.getElementById('name-second'), 'third':doc.getElementById('name-third')};
-        const teamForm=doc.getElementById('form-add-team'), teamListAdmin=doc.getElementById('team-list-admin');
-        const homepageForm=doc.getElementById('form-homepage'), homepageFields={'header_title':doc.getElementById('homepage-header-title'), 'logo_url':doc.getElementById('homepage-logo-url'), 'main_title':doc.getElementById('homepage-main-title'), 'subtitle':doc.getElementById('homepage-subtitle'), 'about':doc.getElementById('homepage-about'), 'about_image_url':doc.getElementById('homepage-about-image-url'), 'gallery':doc.getElementById('homepage-gallery'), 'total_programs':doc.getElementById('homepage-total-programs'), 'total_participants':doc.getElementById('homepage-total-participants'), 'total_categories':doc.getElementById('homepage-total-categories'), 'total_teams':doc.getElementById('homepage-total-teams'), 'institution_name':doc.getElementById('homepage-institution-name'), 'copyright_text':doc.getElementById('homepage-copyright-text'), 'social_instagram':doc.getElementById('homepage-social-instagram'), 'social_youtube':doc.getElementById('homepage-social-youtube'), 'social_facebook':doc.getElementById('homepage-social-facebook')};
+        
+        // FIXED: Changed `doc` to `d` to avoid conflict with firestore `doc`
+        const d = document; 
+        const loginPage=d.getElementById('login-page'), adminPanel=d.getElementById('admin-panel'), loginForm=d.getElementById('login-form'), registerForm=d.getElementById('register-form'), logoutButton=d.getElementById('logout-button'), adminEmail=d.getElementById('admin-email'), pages=d.querySelectorAll('.admin-page'), adminMenuOverlay=d.getElementById('admin-menu-overlay'), adminMenuBox=d.getElementById('admin-menu-box'), adminMenuBtn=d.getElementById('admin-menu-btn'), adminMenuCloseBtn=d.getElementById('admin-menu-close-btn'), navLinks=d.querySelectorAll('.menu-link');
+        const downloadTemplateBtn=d.getElementById('download-template-btn'), importForm=d.getElementById('form-import-csv'), fileInput=d.getElementById('csv-file-input'), fileNameEl=d.getElementById('csv-filename'), importLogContainer=d.getElementById('import-log-container'), importLog=d.getElementById('import-log'), participantCountEl=d.getElementById('participant-count'), deleteAllParticipantsBtn=d.getElementById('delete-all-participants-btn');
+        const categoryForm=d.getElementById('form-add-category'), categoryInput=d.getElementById('category-name'), categoryList=d.getElementById('category-list'), programForm=d.getElementById('form-add-program'), programNameInput=d.getElementById('program-name'), programCategorySelect=d.getElementById('program-category'), programList=d.getElementById('program-list');
+        const resultForm=d.getElementById('form-publish-result'), resultCategorySelect=d.getElementById('result-category'), resultProgramSelect=d.getElementById('result-program'), resultInputs={'first':d.getElementById('result-first'), 'second':d.getElementById('result-second'), 'third':d.getElementById('result-third')}, nameSpans={'first':d.getElementById('name-first'), 'second':d.getElementById('name-second'), 'third':d.getElementById('name-third')};
+        const teamForm=d.getElementById('form-add-team'), teamListAdmin=d.getElementById('team-list-admin');
+        const homepageForm=d.getElementById('form-homepage'), homepageFields={'header_title':d.getElementById('homepage-header-title'), 'logo_url':d.getElementById('homepage-logo-url'), 'main_title':d.getElementById('homepage-main-title'), 'subtitle':d.getElementById('homepage-subtitle'), 'about':d.getElementById('homepage-about'), 'about_image_url':d.getElementById('homepage-about-image-url'), 'gallery':d.getElementById('homepage-gallery'), 'total_programs':d.getElementById('homepage-total-programs'), 'total_participants':d.getElementById('homepage-total-participants'), 'total_categories':d.getElementById('homepage-total-categories'), 'total_teams':d.getElementById('homepage-total-teams'), 'institution_name':d.getElementById('homepage-institution-name'), 'copyright_text':d.getElementById('homepage-copyright-text'), 'social_instagram':d.getElementById('homepage-social-instagram'), 'social_youtube':d.getElementById('homepage-social-youtube'), 'social_facebook':d.getElementById('homepage-social-facebook')};
 
         // ===================================
         // Navigation Logic 
@@ -288,12 +290,11 @@
                 e.preventDefault();
                 const targetId = link.getAttribute('data-target');
                 pages.forEach(page => page.classList.add('hidden'));
-                const targetPage = document.getElementById(targetId);
+                const targetPage = d.getElementById(targetId); // FIXED
                 if (targetPage) targetPage.classList.remove('hidden');
                 navLinks.forEach(nav => nav.classList.remove('active'));
                 link.classList.add('active');
                 closeAdminNav();
-                // Ensure data is loaded *after* page is potentially visible
                 setTimeout(() => loadDataForPage(targetId), 0); 
             });
         });
@@ -317,12 +318,11 @@
                 if(adminEmail) adminEmail.textContent = user.email;
                 const defaultPageId = 'page-dashboard';
                 pages.forEach(page => page.classList.add('hidden'));
-                 const defaultPageElement = document.getElementById(defaultPageId);
+                 const defaultPageElement = d.getElementById(defaultPageId); // FIXED
                  if (defaultPageElement) defaultPageElement.classList.remove('hidden');
                 navLinks.forEach(nav => nav.classList.remove('active'));
-                const defaultNavLink = document.querySelector(`.menu-link[data-target="${defaultPageId}"]`);
+                const defaultNavLink = d.querySelector(`.menu-link[data-target="${defaultPageId}"]`); // FIXED
                  if (defaultNavLink) defaultNavLink.classList.add('active');
-                // Ensure data is loaded *after* the page might be visible
                 setTimeout(() => {
                     loadDataForPage(defaultPageId); 
                     loadAllParticipants(); 
@@ -334,15 +334,15 @@
         });
         
         // Ensure form listeners are added only after DOM is ready
-        document.addEventListener('DOMContentLoaded', () => {
-            const loginForm = document.getElementById('login-form');
-            const registerForm = document.getElementById('register-form');
+        d.addEventListener('DOMContentLoaded', () => {
+            const loginForm = d.getElementById('login-form'); // FIXED
+            const registerForm = d.getElementById('register-form'); // FIXED
             
             if(loginForm) {
                 loginForm.addEventListener('submit', async (e) => { 
                     e.preventDefault(); 
-                    const emailEl = document.getElementById('login-email');
-                    const passwordEl = document.getElementById('login-password');
+                    const emailEl = d.getElementById('login-email'); // FIXED
+                    const passwordEl = d.getElementById('login-password'); // FIXED
                     if (!emailEl || !passwordEl) return;
                     const email = emailEl.value;
                     const password = passwordEl.value;
@@ -355,8 +355,8 @@
             if(registerForm) {
                 registerForm.addEventListener('submit', async (e) => { 
                     e.preventDefault(); 
-                     const emailEl = document.getElementById('register-email');
-                     const passwordEl = document.getElementById('register-password');
+                     const emailEl = d.getElementById('register-email'); // FIXED
+                     const passwordEl = d.getElementById('register-password'); // FIXED
                      if (!emailEl || !passwordEl) return;
                      const email = emailEl.value;
                      const password = passwordEl.value;
@@ -370,7 +370,6 @@
             } else { console.error("Register form not found!"); }
         }); // End DOMContentLoaded for auth forms
 
-        // Logout button listener can be added directly as it's inside #admin-panel
         if(logoutButton) {
             logoutButton.addEventListener('click', async () => { 
                 try { await signOut(auth); } 
@@ -379,7 +378,7 @@
         } else { console.error("Logout button not found!"); }
 
         window.togglePasswordVisibility = function(inputId, button) {
-            const input = document.getElementById(inputId);
+            const input = d.getElementById(inputId); // FIXED
             const icon = button.querySelector('i');
             if (!input || !icon) return; 
             if (input.type === "password") {
