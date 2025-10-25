@@ -189,7 +189,7 @@
                      
                      <!-- Card 1: Add Participants Manually -->
                      <div class="card">
-                         <h2 class="card-header">Add Participants Automatically</h2>
+                         <h2 class="card-header">Add Participants by Team</h2>
                          <form id="form-add-participants" class="space-y-4">
                             <div>
                                 <label for="participant-add-team" class="form-label">Select Team</label>
@@ -200,7 +200,7 @@
                             </div>
                             <div>
                                 <label for="participant-add-names" class="form-label">Enter Names (One per line)</label>
-                                <textarea id="participant-add-names" class="form-textarea" rows="8" placeholder="Participant 1 Name\nParticipant 2 Name\nParticipant 3 Name" required></textarea>
+                                <textarea id="participant-add-names" class="form-textarea" rows="8" placeholder="Participant 1 Name&#10;Participant 2 Name&#10;Participant 3 Name" required></textarea>
                             </div>
                             <div class="flex justify-end">
                                  <button type="submit" id="add-participants-btn" class="btn btn-success"><i class="fas fa-plus"></i>Add Participants</button>
@@ -352,18 +352,21 @@
             const d = document; // Use 'd' for document
             // All DOM element selections moved inside DOMContentLoaded
             const loginPage=d.getElementById('login-page'), adminPanel=d.getElementById('admin-panel'), loginForm=d.getElementById('login-form'), registerForm=d.getElementById('register-form'), logoutButton=d.getElementById('logout-button'), adminEmail=d.getElementById('admin-email'), pages=d.querySelectorAll('.admin-page'), adminMenuOverlay=d.getElementById('admin-menu-overlay'), adminMenuBox=d.getElementById('admin-menu-box'), adminMenuBtn=d.getElementById('admin-menu-btn'), adminMenuCloseBtn=d.getElementById('admin-menu-close-btn'), navLinks=d.querySelectorAll('.menu-link');
-            // UPDATED: Removed CSV import elements, added new manual add elements
+            
+            // UPDATED: Participants page elements
+            const participantAddForm = d.getElementById('form-add-participants');
             const participantAddTeam = d.getElementById('participant-add-team'), participantAddNames = d.getElementById('participant-add-names'), addParticipantsBtn = d.getElementById('add-participants-btn'), addLogContainer = d.getElementById('add-log-container'), addLog = d.getElementById('add-log'), participantCountEl=d.getElementById('participant-count'), deleteAllParticipantsBtn=d.getElementById('delete-all-participants-btn');
+            const participantTeamFilter = d.getElementById('participant-team-filter');
+            const participantSearch = d.getElementById('participant-search');
+            const participantListAdmin = d.getElementById('participant-list-admin');
+            const participantListPlaceholder = d.getElementById('participant-list-placeholder');
+
             const categoryForm=d.getElementById('form-add-category'), categoryInput=d.getElementById('category-name'), categoryList=d.getElementById('category-list'), programForm=d.getElementById('form-add-program'), programNameInput=d.getElementById('program-name'), programCategorySelect=d.getElementById('program-category'), programList=d.getElementById('program-list');
             const programPointsFirst = d.getElementById('program-points-first');
             const programPointsSecond = d.getElementById('program-points-second');
             const programPointsThird = d.getElementById('program-points-third');
             const resultForm=d.getElementById('form-publish-result'), resultCategorySelect=d.getElementById('result-category'), resultProgramSelect=d.getElementById('result-program'), resultInputs={'first':d.getElementById('result-first'), 'second':d.getElementById('result-second'), 'third':d.getElementById('result-third')}, nameSpans={'first':d.getElementById('name-first'), 'second':d.getElementById('name-second'), 'third':d.getElementById('name-third')};
             const teamForm=d.getElementById('form-add-team'), teamListAdmin=d.getElementById('team-list-admin');
-            const participantTeamFilter = d.getElementById('participant-team-filter');
-            const participantSearch = d.getElementById('participant-search');
-            const participantListAdmin = d.getElementById('participant-list-admin');
-            const participantListPlaceholder = d.getElementById('participant-list-placeholder');
             const homepageForm=d.getElementById('form-homepage'), homepageFields={'header_title':d.getElementById('homepage-header-title'), 'logo_url':d.getElementById('homepage-logo-url'), 'main_title':d.getElementById('homepage-main-title'), 'subtitle':d.getElementById('homepage-subtitle'), 'about_title':d.getElementById('homepage-about-title'), 'about_subtitle':d.getElementById('homepage-about-subtitle'), 'about':d.getElementById('homepage-about'), 'about_image_url':d.getElementById('homepage-about-image-url'), 'gallery':d.getElementById('homepage-gallery'), 'total_programs':d.getElementById('homepage-total-programs'), 'total_participants':d.getElementById('homepage-total-participants'), 'total_categories':d.getElementById('homepage-total-categories'), 'total_teams':d.getElementById('homepage-total-teams'), 'institution_name':d.getElementById('homepage-institution-name'), 'copyright_text':d.getElementById('homepage-copyright-text'), 'social_instagram':d.getElementById('homepage-social-instagram'), 'social_youtube':d.getElementById('homepage-social-youtube'), 'social_facebook':d.getElementById('homepage-social-facebook')};
 
             // ===================================
@@ -487,7 +490,7 @@
                     snapshot.docs.forEach(doc => { 
                         allParticipants[doc.id] = { ...doc.data(), chestNo: doc.id }; 
                     });
-                    renderParticipantList(); 
+                    renderParticipantList(); // Render list
                     console.log('Participants data loaded:', Object.keys(allParticipants).length);
                 }, (error) => { console.error("Error loading participants:", error); });
             }
@@ -577,7 +580,6 @@
                     return;
                 }
                 
-                // Check if new chest number is numeric
                 if (!/^\d+$/.test(finalChestNo)) {
                     alert("Error: Chest Number must be numeric.");
                     return;
@@ -585,13 +587,11 @@
 
                 try {
                     if (finalChestNo === chestNo) {
-                        // Chest No not changed, just update
                         await updateDoc(doc(db, `artifacts/${appId}/public/data/participants`, chestNo), { 
                             name: finalName, 
                             team: newTeam 
                         });
                     } else {
-                        // Chest No changed, check for conflict
                         const newDocRef = doc(db, `artifacts/${appId}/public/data/participants`, finalChestNo);
                         const newDocSnap = await getDoc(newDocRef);
                         
@@ -600,7 +600,6 @@
                             return;
                         }
                         
-                        // Delete old and create new in a batch
                         const batch = writeBatch(db);
                         const oldDocRef = doc(db, `artifacts/${appId}/public/data/participants`, chestNo);
                         batch.delete(oldDocRef);
@@ -624,9 +623,8 @@
             };
             
             // NEW: Add Participants Manually
-            const addParticipantsForm = d.getElementById('form-add-participants');
-            if (addParticipantsForm) {
-                addParticipantsForm.addEventListener('submit', async (e) => {
+            if (participantAddForm) {
+                participantAddForm.addEventListener('submit', async (e) => {
                     e.preventDefault();
                     if (!participantAddTeam || !participantAddNames || !addLogContainer || !addLog) return;
                     
@@ -648,7 +646,6 @@
                     const idFrom = parseInt(team.id_from, 10);
                     const idTo = parseInt(team.id_to, 10);
                     
-                    // Get all existing chest numbers in this team's range
                     const existingNos = new Set();
                     Object.keys(allParticipants).forEach(chestNoStr => {
                         const chestNo = parseInt(chestNoStr, 10);
@@ -658,7 +655,6 @@
                     });
 
                     let nextChestNo = idFrom;
-                    // Find the first available number
                     while (existingNos.has(nextChestNo) && nextChestNo <= idTo) {
                         nextChestNo++;
                     }
@@ -670,7 +666,7 @@
                     for (const name of names) {
                         if (nextChestNo > idTo) {
                             addLog.textContent += `ERROR: Team's chest number limit (${idTo}) reached. Cannot add '${name}'.\n`;
-                            break; // Stop adding
+                            break; 
                         }
                         
                         const chestNoStr = String(nextChestNo);
@@ -682,7 +678,6 @@
                         addLog.textContent += `Added: ${name}  ->  ${chestNoStr}\n`;
                         addedCount++;
                         
-                        // Find the next available number for the next person
                         nextChestNo++;
                         while (existingNos.has(nextChestNo) && nextChestNo <= idTo) {
                             nextChestNo++;
@@ -692,7 +687,7 @@
                     try {
                         await batch.commit();
                         addLog.textContent += `\nSUCCESS: Added ${addedCount} participants to team ${teamName}.\n`;
-                        participantAddNames.value = ''; // Clear textarea
+                        participantAddNames.value = ''; 
                     } catch (error) {
                         addLog.textContent += `\nERROR: ${error.message}\n`;
                     }
@@ -724,7 +719,6 @@
                      snapshot.docs.forEach(doc => { batch.delete(doc.ref); });
                      await batch.commit();
                      if (promptUser) alert('All participants have been deleted.');
-                     // onSnapshot will auto-refresh the list
                      return Promise.resolve(); 
                  } catch (error) {
                      if (promptUser) alert(`Error deleting participants: ${error.message}`);
@@ -733,6 +727,10 @@
                  }
             }
            if(deleteAllParticipantsBtn) deleteAllParticipantsBtn.addEventListener('click', () => deleteAllParticipants(true)); 
+           
+           // Add listeners for participant list filters
+           if (participantTeamFilter) participantTeamFilter.addEventListener('change', renderParticipantList);
+           if (participantSearch) participantSearch.addEventListener('input', renderParticipantList);
 
             // ===================================
             // Programs & Categories Page
@@ -763,27 +761,7 @@
             // ===================================
             // Teams Page (Admin)
             // ===================================
-            async function loadTeamsForAdmin() { 
-                try { 
-                    const q = query(collection(db, `artifacts/${appId}/public/data/teams`)); 
-                    const snapshot = await getDocs(q); 
-                    allTeamsAdmin = {}; 
-                    snapshot.docs.forEach(doc => { allTeamsAdmin[doc.id] = { id: doc.id, ...doc.data() }; }); 
-                    renderAdminTeamList(); 
-                    
-                    // NEW: Populate dropdowns in Participants page
-                    if(participantTeamFilter) { 
-                        participantTeamFilter.innerHTML = '<option value="">All Teams</option>'; 
-                        const sortedTeamNames = Object.keys(allTeamsAdmin).sort(); 
-                        sortedTeamNames.forEach(teamName => { participantTeamFilter.innerHTML += `<option value="${teamName}">${teamName}</option>`; }); 
-                    }
-                    if(participantAddTeam) {
-                        participantAddTeam.innerHTML = '<option value="">-- Select a Team --</option>';
-                        const sortedTeamNames = Object.keys(allTeamsAdmin).sort(); 
-                        sortedTeamNames.forEach(teamName => { participantAddTeam.innerHTML += `<option value="${teamName}">${teamName}</option>`; });
-                    }
-                } catch(error) { console.error("Error loading teams for admin:", error); if(teamListAdmin) teamListAdmin.innerHTML = '<p class="text-red-500">Error loading teams.</p>'; } 
-            }
+            async function loadTeamsForAdmin() { /* ... */ }
             function renderAdminTeamList() { /* ... */ }
             if(teamForm) teamForm.addEventListener('submit', async (e) => { /* ... */ });
             async function handleUpdateTeam(e) { /* ... */ }
@@ -794,11 +772,7 @@
             // ===================================
             async function loadHomepageContent() { /* ... */ }
             if(homepageForm) homepageForm.addEventListener('submit', async (e) => { /* ... */ });
-            
-            // Add listeners for participant list filters
-            if (participantTeamFilter) participantTeamFilter.addEventListener('change', renderParticipantList);
-            if (participantSearch) participantSearch.addEventListener('input', renderParticipantList);
-
+        
         }); // End DOMContentLoaded
     </script>
 </body>
