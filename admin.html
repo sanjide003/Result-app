@@ -136,7 +136,7 @@
                  <!-- Menu Content -->
                  <div class="menu-header"> <span class="header-title">ADMIN MENU</span> <button id="admin-menu-close-btn" class="close-btn">&times;</button> </div>
                  <a href="#dashboard" data-target="page-dashboard" class="menu-link active"><i class="fas fa-home"></i>Home Page Settings</a>
-                 <a href="#participants" data-target="page-participants" class="menu-link"><i class="fas fa-id-card"></i>Manage Participants</a> <!-- UPDATED: Title -->
+                 <a href="#participants" data-target="page-participants" class="menu-link"><i class="fas fa-id-card"></i>Manage Participants</a> 
                  <a href="#programs" data-target="page-programs" class="menu-link"><i class="fas fa-calendar-alt"></i>Programs & Categories</a>
                  <a href="#teams" data-target="page-teams" class="menu-link"><i class="fas fa-users"></i>Manage Teams</a>
                  <a href="#results" data-target="page-results" class="menu-link"><i class="fas fa-poll"></i>Publish Results</a>
@@ -490,14 +490,14 @@
                     snapshot.docs.forEach(doc => { 
                         allParticipants[doc.id] = { ...doc.data(), chestNo: doc.id }; 
                     });
-                    renderParticipantList(); // Render list
+                    renderParticipantList(); 
                     console.log('Participants data loaded:', Object.keys(allParticipants).length);
                 }, (error) => { console.error("Error loading participants:", error); });
             }
             
             function loadParticipantCount() { 
                 const count = Object.keys(allParticipants).length;
-                if(participantCountEl) participantCountEl.textContent = count; 
+                // if(participantCountEl) participantCountEl.textContent = count; // Count is now filter-dependent
             }
             
             function renderParticipantList() {
@@ -520,7 +520,10 @@
                     );
                 }
                 
-                filteredParticipants.sort((a,b) => a.name.localeCompare(b.name));
+                filteredParticipants.sort((a,b) => {
+                    // Sort by chest number (as numbers)
+                    return parseInt(a.chestNo, 10) - parseInt(b.chestNo, 10);
+                });
                 
                 if(participantCountEl) participantCountEl.textContent = filteredParticipants.length; 
 
@@ -678,6 +681,7 @@
                         addLog.textContent += `Added: ${name}  ->  ${chestNoStr}\n`;
                         addedCount++;
                         
+                        existingNos.add(nextChestNo); // Add to set so next loop finds next available
                         nextChestNo++;
                         while (existingNos.has(nextChestNo) && nextChestNo <= idTo) {
                             nextChestNo++;
@@ -728,7 +732,6 @@
             }
            if(deleteAllParticipantsBtn) deleteAllParticipantsBtn.addEventListener('click', () => deleteAllParticipants(true)); 
            
-           // Add listeners for participant list filters
            if (participantTeamFilter) participantTeamFilter.addEventListener('change', renderParticipantList);
            if (participantSearch) participantSearch.addEventListener('input', renderParticipantList);
 
@@ -761,7 +764,26 @@
             // ===================================
             // Teams Page (Admin)
             // ===================================
-            async function loadTeamsForAdmin() { /* ... */ }
+            async function loadTeamsForAdmin() { 
+                try { 
+                    const q = query(collection(db, `artifacts/${appId}/public/data/teams`)); 
+                    const snapshot = await getDocs(q); 
+                    allTeamsAdmin = {}; 
+                    snapshot.docs.forEach(doc => { allTeamsAdmin[doc.id] = { id: doc.id, ...doc.data() }; }); 
+                    renderAdminTeamList(); 
+                    
+                    // UPDATED: Populate dropdowns in Participants page
+                    const sortedTeamNames = Object.keys(allTeamsAdmin).sort(); 
+                    if(participantTeamFilter) { 
+                        participantTeamFilter.innerHTML = '<option value="">All Teams</option>'; 
+                        sortedTeamNames.forEach(teamName => { participantTeamFilter.innerHTML += `<option value="${teamName}">${teamName}</option>`; }); 
+                    }
+                    if(participantAddTeam) {
+                        participantAddTeam.innerHTML = '<option value="">-- Select a Team --</option>';
+                        sortedTeamNames.forEach(teamName => { participantAddTeam.innerHTML += `<option value="${teamName}">${teamName}</option>`; });
+                    }
+                } catch(error) { console.error("Error loading teams for admin:", error); if(teamListAdmin) teamListAdmin.innerHTML = '<p class="text-red-500">Error loading teams.</p>'; } 
+            }
             function renderAdminTeamList() { /* ... */ }
             if(teamForm) teamForm.addEventListener('submit', async (e) => { /* ... */ });
             async function handleUpdateTeam(e) { /* ... */ }
