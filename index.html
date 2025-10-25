@@ -405,8 +405,36 @@
         // ===================================
         // ഡാറ്റാ പ്രോസസ്സിംഗ് (UPDATED for custom points)
         // ===================================
-        function getTeamFromChest(chestNo) { /* ... (കോഡ് മാറ്റമില്ല) ... */ }
-        function initializeTeamData() { /* ... (കോഡ് മാറ്റമില്ല) ... */ }
+        function getTeamFromChest(chestNo) {
+            if (!chestNo || typeof chestNo !== 'string') return null;
+            if (dbTeams == null || dbParticipants == null) return null; 
+            
+            for (const teamName of TEAM_NAMES) { if (chestNo.toUpperCase() === teamName) return teamName; }
+            if (dbParticipants[chestNo] && dbParticipants[chestNo].team) { return dbParticipants[chestNo].team; }
+            const chestNumberMatch = chestNo.match(/^\d+/);
+            if (chestNumberMatch) {
+                const chestNumber = parseInt(chestNumberMatch[0], 10);
+                for (const team of Object.values(dbTeams)) {
+                    const idFrom = parseInt(team.id_from, 10);
+                    const idTo = parseInt(team.id_to, 10);
+                    if (!isNaN(idFrom) && !isNaN(idTo) && chestNumber >= idFrom && chestNumber <= idTo) {
+                        return team.name;
+                    }
+                }
+            }
+            return null;
+        }
+        function initializeTeamData() { 
+            const data = {}; 
+            if (dbTeams == null || dbCategories == null) return data; 
+            TEAM_NAMES = Object.keys(dbTeams); 
+            TEAM_NAMES.forEach(team => { 
+                data[team] = { name: team, total: 0 }; 
+                dbCategories.forEach(cat => { data[team][cat.name] = 0; }); 
+                data[team]['group'] = 0; 
+            }); 
+            return data; 
+        }
 
         function processAllData(currentResults) {
             if (dbCategories == null || dbTeams == null || dbHomepage == null || dbParticipants == null || dbPrograms == null || currentResults == null) {
@@ -437,7 +465,8 @@
                 };
                 
                 const isGroupEvent = groupEvents.includes(eventName);
-                if (isGroupEvent && currentPoints.first === 5 && currentPoints.second === 3) {
+                // Group event points logic (if not set in admin, apply default group points)
+                if (isGroupEvent && program.points_first === 5 && program.points_second === 3) {
                     currentPoints.first = 10;
                     currentPoints.second = 8;
                     currentPoints.third = 5;
@@ -495,7 +524,10 @@
         // ===================================
         
         function renderAllComponents() {
-            if (dbCategories == null) return; 
+            if (dbCategories == null) {
+                console.log("Render skipped: Categories not loaded.");
+                return; 
+            }
             generateFilterButtons();
             generateTeamRankings(); // UPDATED
             renderProgramResults();
@@ -517,7 +549,10 @@
         
         // UPDATED: This function now renders Top 3 AND the "Other Teams" list
         function generateTeamRankings() {
-            const rankedTeams = Object.values(processedTeamData).sort((a, b) => b.total - a.total);
+            // FIXED: Add safety check for processedTeamData
+            const dataToRank = processedTeamData || {};
+            const rankedTeams = Object.values(dataToRank).sort((a, b) => b.total - a.total);
+            
             const container = d.getElementById('team-cards-container');
             const otherTeamsList = d.getElementById('other-teams-list');
             const otherTeamsPlaceholder = d.getElementById('other-teams-placeholder');
