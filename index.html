@@ -9,10 +9,10 @@
     <link href="https://fonts.googleapis.com/css2?family=Saira:wght@700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
-    <!-- Confetti ലൈബ്രറി (ഇപ്പോൾ ഉപയോഗിക്കുന്നില്ല, പക്ഷെ നീക്കം ചെയ്യുന്നില്ല) -->
+    <!-- Confetti ലൈബ്രറി -->
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <style>
-        /* ... (CSS കോഡ് മാറ്റമില്ലാതെ തുടരുന്നു) ... */
+        /* CSS വേരിയബിളുകൾ */
         :root {
             --primary-color: #4a90e2;
             --secondary-color: #50e3c2;
@@ -127,7 +127,7 @@
         .points { font-size: 2.4em; font-weight: bold; margin: 0; color: #222; }
         .position { font-size: 1em; margin: 5px 0 0; font-weight: 600; color: #444; }
         
-        /* ടീം ടാബിലെ വിശദമായ റാങ്കിംഗ് ടേബിൾ (RESTORED) */
+        /* ടീം ടാബിലെ വിശദമായ റാങ്കിംഗ് ടേബിൾ */
         .detailed-rankings-container { max-width: 1100px; margin: 40px auto 20px auto; background-color: var(--card-background); border-radius: 16px; padding: 25px; box-shadow: 0 4px 12px var(--shadow-color); overflow-x: auto; }
         .rankings-table-content { min-width: 950px; }
         .detailed-rankings-container h2 { margin-top: 0; margin-bottom: 5px; font-size: 1.5em; color: var(--heading-color); }
@@ -720,7 +720,6 @@
         window.getTrophyIconsHTML = function(positions) { if (!positions || positions.length === 0) return ''; return positions.map(pos => { if (pos === 1) return '<i class="fas fa-trophy trophy-icon gold"></i>'; if (pos === 2) return '<i class="fas fa-trophy trophy-icon silver"></i>'; if (pos === 3) return '<i class="fas fa-trophy trophy-icon bronze"></i>'; return ''; }).join(''); }
         window.toggleTalentDropdown = function(listId, button) { const list = d.getElementById(listId); list.classList.toggle('open'); button.textContent = list.classList.contains('open') ? 'Show Less' : 'Show More'; }
         window.updateMenuActiveState = function() { const homePageVisible = d.getElementById('home-page').style.display !== 'none'; d.querySelectorAll('.menu-link').forEach(link => link.classList.remove('active')); if (homePageVisible) { const homeLink = d.querySelector('.menu-link[data-target="home-page"]'); if (homeLink) homeLink.classList.add('active'); } else { const activeTabButton = d.querySelector('#scoreboard-page .main-tab-button.active'); if (activeTabButton) { const tabId = activeTabButton.getAttribute('onclick').match(/'([^']+)'/)[1]; const activeMenuLink = d.querySelector(`.menu-link[data-target="${tabId}"]`); if (activeMenuLink) activeMenuLink.classList.add('active'); } else { const programLink = d.querySelector('.menu-link[data-target="program-tab"]'); if (programLink) programLink.classList.add('active'); } } }
-        // REMOVED: window.fireTeamConfetti
         async function shareImage(imageUrl) { if (navigator.share) { try { await navigator.share({ title: 'Sadaye Madeena 2k25 Gallery Image', text: 'Check out this image from the fest!', url: imageUrl }); console.log('Image shared successfully'); } catch (err) { console.error('Error sharing image:', err); alert('Sharing failed.'); } } else { try { const textArea = d.createElement("textarea"); textArea.value = imageUrl; textArea.style.position = "fixed"; d.body.appendChild(textArea); textArea.focus(); textArea.select(); d.execCommand('copy'); d.body.removeChild(textArea); alert('Sharing not supported, but image link copied to clipboard!'); } catch (err) { alert('Sharing is not supported on this browser. Please copy the link manually.'); console.error('Fallback copy failed:', err); } } }
         d.getElementById('gallery').addEventListener('click', function(event) { const shareButton = event.target.closest('.share-btn'); if (shareButton) { const imageUrl = shareButton.dataset.url; if (imageUrl) { event.stopPropagation(); shareImage(imageUrl); } } });
         const scrollTopBtn = d.getElementById('scrollTopBtn');
