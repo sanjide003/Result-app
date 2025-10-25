@@ -10,12 +10,12 @@
     <!-- PapaParse CSV Library -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/papaparse/5.4.1/papaparse.min.js"></script>
     <style>
-        body { font-family: 'Inter', sans-serif; }
+        body { font-family: 'Inter', sans-serif; background-color: #f3f4f6; /* Light gray background */ }
         
-        /* UPDATED: Pill-shaped Button Styles */
+        /* Pill-shaped Button Styles */
         .btn { @apply inline-flex items-center justify-center px-6 py-2.5 rounded-full font-semibold text-white shadow-lg focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-opacity-75 transition-all duration-300 ease-in-out; transform: translateZ(0); }
-        .btn:hover { @apply shadow-xl -translate-y-0.5; }
-        .btn:active { @apply shadow-md translate-y-0; }
+        .btn:hover { @apply shadow-xl -translate-y-0.5 scale-105; }
+        .btn:active { @apply shadow-md translate-y-0 scale-100; }
         .btn i:not(.password-toggle-icon) { @apply mr-2 -ml-1 h-5 w-5; } 
         .btn-primary { @apply bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 focus:ring-indigo-500; }
         .btn-danger { @apply bg-gradient-to-r from-red-600 to-pink-600 hover:from-red-700 hover:to-pink-700 focus:ring-red-500; }
@@ -23,20 +23,20 @@
         .btn-light { @apply bg-white text-gray-700 border border-gray-300 hover:bg-gray-50 focus:ring-indigo-500; }
         .btn-success { @apply bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 focus:ring-green-500; }
         .btn-sm { @apply px-4 py-1.5 text-sm; } 
-        .btn-icon-only { @apply p-2 rounded-full w-9 h-9; /* Fixed size for icon only */ } 
-        .btn-icon-only i { @apply m-0 h-4 w-4; /* Adjusted icon size */ }
+        .btn-icon-only { @apply p-2 rounded-full w-9 h-9; } 
+        .btn-icon-only i { @apply m-0 h-4 w-4; }
         
         /* Modern Form & Card Styles */
-        .form-input, .form-select, .form-textarea { @apply block w-full px-4 py-2.5 border border-gray-300 rounded-lg bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500; transition: all 0.2s ease-in-out; }
+        .form-input, .form-select, .form-textarea { @apply block w-full px-4 py-2.5 border border-gray-300 rounded-lg bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200 ease-in-out; }
         .form-label { @apply block text-sm font-medium text-gray-700 mb-1.5; }
-        .card { @apply bg-white shadow-xl rounded-2xl p-6 md:p-8; }
-        .card-header { @apply text-2xl font-bold text-gray-900 mb-6; }
+        .card { @apply bg-white shadow-xl rounded-2xl p-6 md:p-8; } 
+        .card-header { @apply text-2xl font-bold text-gray-900 mb-6 border-b pb-3 border-gray-200; } 
         /* Password input wrapper */
         .password-wrapper { @apply relative; }
-        .password-toggle-btn { @apply absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600 cursor-pointer focus:outline-none; } /* Added focus style */
+        .password-toggle-btn { @apply absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600 cursor-pointer focus:outline-none; } 
         
         /* Malayalam Instruction Box */
-        .info-text { @apply bg-blue-50 text-blue-800 p-4 border border-blue-200 rounded-lg text-sm mb-6; }
+        .info-text { @apply bg-blue-50 text-blue-800 p-4 border border-blue-200 rounded-lg text-sm mb-6 shadow-sm; } 
         .info-text strong { @apply font-semibold; }
 
         /* Menu Overlay Styles */
@@ -55,10 +55,10 @@
         /* Custom file input */
         .file-input-label { @apply btn btn-light text-base; cursor: pointer; }
         .file-input-label i { @apply mr-2; }
-        .file-input-filename { @apply text-sm text-gray-500 ml-4; }
+        .file-input-filename { @apply text-sm text-gray-500 ml-4 inline-block align-middle; } 
 
         /* Styling for list items (programs, categories, teams) */
-        .list-item { @apply flex items-center justify-between p-4 border border-gray-200 rounded-lg mb-3 bg-white; }
+        .list-item { @apply flex items-center justify-between p-4 border border-gray-200 rounded-lg mb-3 bg-white hover:bg-gray-50 transition-colors duration-150; } 
         .list-item-content { @apply flex-grow mr-4; }
         .list-item-name { @apply font-semibold text-gray-800; }
         .list-item-details { @apply text-sm text-gray-500; }
@@ -69,21 +69,22 @@
 <body class="bg-gray-100">
 
     <!-- Login Page -->
-    <div id="login-page" class="min-h-screen flex items-center justify-center bg-gray-200 p-4">
-        <div class="w-full max-w-md">
+    <!-- UPDATED: Login Page Structure and Styles -->
+    <div id="login-page" class="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-100 via-purple-100 to-pink-100 p-4"> 
+        <div class="w-full max-w-md space-y-8"> 
             <!-- Login Card -->
-            <div class="card mb-6">
+            <div class="card">
                 <h2 class="card-header text-center">Admin Panel Login</h2>
-                <form id="login-form">
-                    <div class="mb-4">
+                <form id="login-form" class="space-y-6"> 
+                    <div> 
                         <label for="login-email" class="form-label">Email</label>
                         <input type="email" id="login-email" class="form-input" required placeholder="your@email.com">
                     </div>
-                    <div class="mb-6">
+                    <div>
                         <label for="login-password" class="form-label">Password</label>
                         <div class="password-wrapper">
                             <input type="password" id="login-password" class="form-input pr-10" required placeholder="••••••••">
-                            <button type="button" class="password-toggle-btn" onclick="togglePasswordVisibility('login-password', this)">
+                            <button type="button" aria-label="Show password" class="password-toggle-btn" onclick="togglePasswordVisibility('login-password', this)">
                                 <i class="fas fa-eye password-toggle-icon"></i>
                             </button>
                         </div>
@@ -92,18 +93,21 @@
                 </form>
             </div>
             <!-- Register Card -->
-            <div class="card">
-                <h2 class="card-header text-center text-xl">Register New Admin <span class="text-sm font-normal text-gray-500">(First Use Only)</span></h2>
-                 <form id="register-form">
-                    <div class="mb-4">
+            <div class="card bg-gray-50"> 
+                <h2 class="card-header text-center text-xl">
+                    Register New Admin 
+                    <span class="block text-xs font-normal text-gray-500 mt-1">(First Use Only - ആദ്യ ഉപയോഗത്തിന് മാത്രം)</span> 
+                </h2>
+                 <form id="register-form" class="space-y-6">
+                    <div>
                         <label for="register-email" class="form-label">Email</label>
                         <input type="email" id="register-email" class="form-input" required placeholder="newadmin@email.com">
                     </div>
-                    <div class="mb-6">
+                    <div>
                         <label for="register-password" class="form-label">Password</label>
                          <div class="password-wrapper">
                             <input type="password" id="register-password" class="form-input pr-10" required placeholder="Choose a strong password">
-                            <button type="button" class="password-toggle-btn" onclick="togglePasswordVisibility('register-password', this)">
+                            <button type="button" aria-label="Show password" class="password-toggle-btn" onclick="togglePasswordVisibility('register-password', this)">
                                 <i class="fas fa-eye password-toggle-icon"></i>
                             </button>
                         </div>
@@ -120,18 +124,13 @@
         <!-- Menu Overlay -->
         <div id="admin-menu-overlay" class="menu-overlay">
             <div id="admin-menu-box" class="menu-box">
-                <div class="menu-header">
-                    <span class="header-title">ADMIN MENU</span>
-                    <button id="admin-menu-close-btn" class="close-btn">&times;</button>
-                </div>
+                <div class="menu-header"> <span class="header-title">ADMIN MENU</span> <button id="admin-menu-close-btn" class="close-btn">&times;</button> </div>
                 <a href="#dashboard" data-target="page-dashboard" class="menu-link active"><i class="fas fa-home"></i>Home Page Settings</a>
                 <a href="#participants" data-target="page-participants" class="menu-link"><i class="fas fa-id-card"></i>Participants Import</a>
                 <a href="#programs" data-target="page-programs" class="menu-link"><i class="fas fa-calendar-alt"></i>Programs & Categories</a>
                 <a href="#teams" data-target="page-teams" class="menu-link"><i class="fas fa-users"></i>Manage Teams</a>
                 <a href="#results" data-target="page-results" class="menu-link"><i class="fas fa-poll"></i>Publish Results</a>
-                <div class="mt-6 border-t pt-4">
-                     <button id="logout-button" class="w-full btn btn-danger"><i class="fas fa-sign-out-alt"></i>Logout</button>
-                </div>
+                <div class="mt-6 border-t pt-4"> <button id="logout-button" class="w-full btn btn-danger"><i class="fas fa-sign-out-alt"></i>Logout</button> </div>
             </div>
         </div>
 
@@ -142,229 +141,133 @@
                  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div class="flex justify-between items-center h-16">
                         <div class="flex items-center">
-                             <button id="admin-menu-btn" class="text-gray-500 focus:outline-none focus:text-gray-700 mr-4">
-                                <i class="fas fa-bars text-xl"></i>
-                            </button>
+                             <button id="admin-menu-btn" aria-label="Open menu" class="text-gray-500 focus:outline-none focus:text-gray-700 mr-4 p-2 rounded-full hover:bg-gray-100"> <i class="fas fa-bars text-xl"></i> </button>
                             <h1 class="text-xl font-bold text-gray-800">Admin Panel</h1>
                         </div>
-                        <div class="text-sm text-gray-600" id="admin-email"></div>
+                        <div class="text-sm text-gray-600 font-medium" id="admin-email"></div> 
                     </div>
                  </div>
             </header>
             
             <!-- Page Content Area -->
-            <main class="p-4 md:p-8 lg:p-10 max-w-4xl mx-auto"> 
+            <main class="p-4 md:p-8 lg:p-10 max-w-4xl mx-auto space-y-8"> 
                 
-                {/* --- Home Page Settings --- */}
-                <div id="page-dashboard" class="admin-page">
-                     <h1 class="text-3xl font-bold text-gray-900 mb-6">Home Page Settings</h1>
-                    <div class="info-text">
-                       <strong>നിർദ്ദേശം:</strong> വെബ്സൈറ്റിന്റെ പ്രധാന പേജിൽ (ഹോം പേജ്) കാണിക്കേണ്ട വിവരങ്ങൾ ഇവിടെ നൽകുക. ഹെഡർ, ലോഗോ, തലക്കെട്ടുകൾ, എബൗട്ട്, ഗാലറി, സ്റ്റാറ്റ്സ്, ഫൂട്ടർ എന്നിവ ഇവിടെ മാറ്റം വരുത്താം. ചിത്രങ്ങളുടെ URL (ലിങ്ക്) ആണ് നൽകേണ്ടത്. സോഷ്യൽ മീഡിയ ലിങ്കുകളും ഇവിടെ നൽകാം.
-                    </div>
-                    <form id="form-homepage">
-                        {/* Header & Hero Content Card */}
-                        <div class="card mb-6">
+                <!-- Home Page Settings -->
+                <div id="page-dashboard" class="admin-page space-y-8"> 
+                    <h1 class="text-3xl font-bold text-gray-900">Home Page Settings</h1>
+                    <div class="info-text"> <strong>നിർദ്ദേശം:</strong> വെബ്സൈറ്റിന്റെ പ്രധാന പേജിൽ (ഹോം പേജ്) കാണിക്കേണ്ട വിവരങ്ങൾ ഇവിടെ നൽകുക. ഹെഡർ, ലോഗോ, തലക്കെട്ടുകൾ, എബൗട്ട്, ഗാലറി, സ്റ്റാറ്റ്സ്, ഫൂട്ടർ എന്നിവ ഇവിടെ മാറ്റം വരുത്താം. ചിത്രങ്ങളുടെ URL (ലിങ്ക്) ആണ് നൽകേണ്ടത്. സോഷ്യൽ മീഡിയ ലിങ്കുകളും ഇവിടെ നൽകാം. </div>
+                    <form id="form-homepage" class="space-y-8"> 
+                        <!-- Header & Hero Content Card -->
+                        <div class="card">
                             <h2 class="card-header">Header & Hero Content</h2>
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-4">
-                                <div>
-                                    <label for="homepage-header-title" class="form-label">Header Title (Top Bar)</label>
-                                    <input type="text" id="homepage-header-title" class="form-input" placeholder="e.g., Sadaye Madeena 2k25">
+                            <div class="space-y-4"> 
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <div> <label for="homepage-header-title" class="form-label">Header Title (Top Bar)</label> <input type="text" id="homepage-header-title" class="form-input" placeholder="e.g., Sadaye Madeena 2k25"> </div>
+                                    <div> <label for="homepage-logo-url" class="form-label">Logo Image URL</label> <input type="url" id="homepage-logo-url" class="form-input" placeholder="https://example.com/logo.png"> </div>
                                 </div>
-                                <div>
-                                    <label for="homepage-logo-url" class="form-label">Logo Image URL</label>
-                                    <input type="url" id="homepage-logo-url" class="form-input" placeholder="https://example.com/logo.png">
-                                </div>
-                            </div>
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-4">
-                                <div>
-                                    <label for="homepage-main-title" class="form-label">Main Title (Hero Section)</label>
-                                    <input type="text" id="homepage-main-title" class="form-input" placeholder="e.g., Sadaye Madeena 2k25">
-                                </div>
-                                <div>
-                                    <label for="homepage-subtitle" class="form-label">Subtitle (Hero Section)</label>
-                                    <input type="text" id="homepage-subtitle" class="form-input" placeholder="e.g., Inter-Madrasa Art Fest">
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <div> <label for="homepage-main-title" class="form-label">Main Title (Hero Section)</label> <input type="text" id="homepage-main-title" class="form-input" placeholder="e.g., Sadaye Madeena 2k25"> </div>
+                                    <div> <label for="homepage-subtitle" class="form-label">Subtitle (Hero Section)</label> <input type="text" id="homepage-subtitle" class="form-input" placeholder="e.g., Inter-Madrasa Art Fest"> </div>
                                 </div>
                             </div>
                         </div>
-
-                        {/* About Section Card */}
-                        <div class="card mb-6">
+                        <!-- About Section Card -->
+                        <div class="card">
                             <h2 class="card-header">About Section</h2>
-                            <div class="mb-4">
-                                <label for="homepage-about" class="form-label">About The Fest (Description)</label>
-                                <textarea id="homepage-about" class="form-textarea" rows="5" placeholder="Write something about the event..."></textarea>
-                            </div>
-                            <div>
-                                <label for="homepage-about-image-url" class="form-label">About Section Image URL</label>
-                                <input type="url" id="homepage-about-image-url" class="form-input" placeholder="https://example.com/about-image.jpg">
+                             <div class="space-y-4">
+                                <div> <label for="homepage-about" class="form-label">About The Fest (Description)</label> <textarea id="homepage-about" class="form-textarea" rows="5" placeholder="Write something about the event..."></textarea> </div>
+                                <div> <label for="homepage-about-image-url" class="form-label">About Section Image URL</label> <input type="url" id="homepage-about-image-url" class="form-input" placeholder="https://example.com/about-image.jpg"> </div>
                             </div>
                         </div>
-
-                        {/* Statistics Card */}
-                        <div class="card mb-6">
+                        <!-- Statistics Card -->
+                        <div class="card">
                             <h2 class="card-header">Statistics Texts</h2>
                              <p class="text-sm text-gray-500 mb-4">ഹോം പേജിൽ കാണിക്കേണ്ട സ്ഥിതിവിവരക്കണക്കുകൾ ടെക്സ്റ്റ് ആയി ഇവിടെ നൽകുക (ഉദാ: '50+', '150+').</p>
                             <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
-                                <div>
-                                    <label for="homepage-total-programs" class="form-label">Total Programs</label>
-                                    <input type="text" id="homepage-total-programs" class="form-input" placeholder="e.g., 50+">
-                                </div>
-                                <div>
-                                    <label for="homepage-total-participants" class="form-label">Total Contestants</label>
-                                    <input type="text" id="homepage-total-participants" class="form-input" placeholder="e.g., 200+">
-                                </div>
-                                <div>
-                                    <label for="homepage-total-categories" class="form-label">Total Categories</label>
-                                    <input type="text" id="homepage-total-categories" class="form-input" placeholder="e.g., 5">
-                                </div>
-                                <div>
-                                    <label for="homepage-total-teams" class="form-label">Total Teams</label>
-                                    <input type="text" id="homepage-total-teams" class="form-input" placeholder="e.g., 3">
-                                </div>
+                                <div> <label for="homepage-total-programs" class="form-label">Total Programs</label> <input type="text" id="homepage-total-programs" class="form-input" placeholder="e.g., 50+"> </div>
+                                <div> <label for="homepage-total-participants" class="form-label">Total Contestants</label> <input type="text" id="homepage-total-participants" class="form-input" placeholder="e.g., 200+"> </div>
+                                <div> <label for="homepage-total-categories" class="form-label">Total Categories</label> <input type="text" id="homepage-total-categories" class="form-input" placeholder="e.g., 5"> </div>
+                                <div> <label for="homepage-total-teams" class="form-label">Total Teams</label> <input type="text" id="homepage-total-teams" class="form-input" placeholder="e.g., 3"> </div>
                             </div>
                         </div>
-
-                        {/* Gallery Card */}
-                        <div class="card mb-6">
+                        <!-- Gallery Card -->
+                        <div class="card">
                              <h2 class="card-header">Image Gallery URLs</h2>
                             <label for="homepage-gallery" class="form-label">Enter Image URLs (One URL per line)</label>
                             <textarea id="homepage-gallery" class="form-textarea" rows="8" placeholder="https://example.com/image1.jpg\nhttps://example.com/image2.jpg"></textarea>
                         </div>
-
-                        {/* Footer Settings Card */}
-                        <div class="card mb-6">
+                        <!-- Footer Settings Card -->
+                        <div class="card">
                             <h2 class="card-header">Footer Settings</h2>
-                            <div class="mb-4">
-                                <label for="homepage-institution-name" class="form-label">Institution Name</label>
-                                <input type="text" id="homepage-institution-name" class="form-input" placeholder="e.g., Noorul Islam madrasa devathiyal">
-                            </div>
-                            <div class="mb-4">
-                                <label for="homepage-copyright-text" class="form-label">Copyright Text</label>
-                                <input type="text" id="homepage-copyright-text" class="form-input" placeholder="e.g., © 2025 Thirunoor Media Team. All rights reserved.">
-                            </div>
-                            <h3 class="text-lg font-semibold text-gray-800 mb-3">Social Media Links</h3>
-                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                <div>
-                                    <label for="homepage-social-instagram" class="form-label">Instagram URL</label>
-                                    <input type="url" id="homepage-social-instagram" class="form-input" placeholder="https://instagram.com/...">
+                             <div class="space-y-4">
+                                <div> <label for="homepage-institution-name" class="form-label">Institution Name</label> <input type="text" id="homepage-institution-name" class="form-input" placeholder="e.g., Noorul Islam madrasa devathiyal"> </div>
+                                <div> <label for="homepage-copyright-text" class="form-label">Copyright Text</label> <input type="text" id="homepage-copyright-text" class="form-input" placeholder="e.g., © 2025 Thirunoor Media Team. All rights reserved."> </div>
+                                <h3 class="text-lg font-semibold text-gray-800 pt-2">Social Media Links</h3>
+                                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                    <div> <label for="homepage-social-instagram" class="form-label">Instagram URL</label> <input type="url" id="homepage-social-instagram" class="form-input" placeholder="https://instagram.com/..."> </div>
+                                    <div> <label for="homepage-social-youtube" class="form-label">YouTube URL</label> <input type="url" id="homepage-social-youtube" class="form-input" placeholder="https://youtube.com/..."> </div>
+                                    <div> <label for="homepage-social-facebook" class="form-label">Facebook URL</label> <input type="url" id="homepage-social-facebook" class="form-input" placeholder="https://facebook.com/..."> </div>
                                 </div>
-                                <div>
-                                    <label for="homepage-social-youtube" class="form-label">YouTube URL</label>
-                                    <input type="url" id="homepage-social-youtube" class="form-input" placeholder="https://youtube.com/...">
-                                </div>
-                                <div>
-                                    <label for="homepage-social-facebook" class="form-label">Facebook URL</label>
-                                    <input type="url" id="homepage-social-facebook" class="form-input" placeholder="https://facebook.com/...">
-                                </div>
-                            </div>
+                             </div>
                         </div>
-
-                        {/* Save Button */}
-                        <div class="flex justify-end">
-                            <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i>Save All Settings</button>
-                        </div>
+                        <!-- Save Button -->
+                        <div class="flex justify-end pt-4"> <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i>Save All Settings</button> </div>
                     </form>
                 </div>
 
-                {/* --- Participants Import --- */}
-                <div id="page-participants" class="admin-page hidden">
-                     <h1 class="text-3xl font-bold text-gray-900 mb-6">Import Participants</h1>
-                    <div class="info-text">
-                        <strong>നിർദ്ദേശം:</strong> എല്ലാ മത്സരാർത്ഥികളെയും ഒരു CSV (Excel) ഫയൽ വഴി ഇവിടെ ഇമ്പോർട്ട് ചെയ്യാം.
-                        <br>1. ആദ്യം <strong>"Download Template"</strong> ബട്ടൺ ക്ലിക്ക് ചെയ്ത് ഫയൽ ഡൗൺലോഡ് ചെയ്യുക.
-                        <br>2. ആ Excel ഫയലിൽ <strong>Chest No, Name, Team</strong> എന്നീ കോളങ്ങൾ പൂരിപ്പിക്കുക. (ടീമിന്റെ പേര് Manage Teams-ൽ നൽകിയതുപോലെ കൃത്യമായിരിക്കണം, ഉദാ: BURAQ, DUL DUL).
-                        <br>3. ആ ഫയൽ സേവ് ചെയ്ത ശേഷം, <strong>"Choose File"</strong> ഉപയോഗിച്ച് അപ്‌ലോഡ് ചെയ്ത് "Import Data" അമർത്തുക. ഓരോ തവണ ഇമ്പോർട്ട് ചെയ്യുമ്പോഴും പഴയ ഡാറ്റ മാറ്റി പുതിയത് ചേർക്കപ്പെടും.
-                    </div>
-                    
-                    <div class="card mb-6">
-                        <h2 class="card-header">Step 1: Download Template</h2>
-                        <button id="download-template-btn" class="btn btn-secondary">
-                            <i class="fas fa-download"></i> Download Template CSV
-                        </button>
-                    </div>
-
-                    <div class="card mb-6">
+                <!-- Participants Import -->
+                <div id="page-participants" class="admin-page hidden space-y-8">
+                     <h1 class="text-3xl font-bold text-gray-900">Import Participants</h1>
+                    <div class="info-text"> <strong>നിർദ്ദേശം:</strong> ... </div>
+                    <div class="card"> <h2 class="card-header">Step 1: Download Template</h2> <button id="download-template-btn" class="btn btn-secondary"> <i class="fas fa-download"></i> Download Template CSV </button> </div>
+                    <div class="card">
                         <h2 class="card-header">Step 2: Upload CSV File</h2>
                         <form id="form-import-csv" class="space-y-4">
-                            <div class="flex items-center gap-4">
+                            <div class="flex flex-wrap items-center gap-4"> 
                                 <input type="file" id="csv-file-input" class="hidden" accept=".csv, text/csv">
-                                <label for="csv-file-input" class="btn btn-light"><i class="fas fa-upload"></i> Choose File</label>
-                                <span id="csv-filename" class="text-sm text-gray-500">No file chosen</span>
+                                <label for="csv-file-input" class="btn btn-light flex-shrink-0"><i class="fas fa-upload"></i> Choose File</label>
+                                <span id="csv-filename" class="text-sm text-gray-500 flex-grow min-w-0 break-words">No file chosen</span> 
                             </div>
                              <button type="submit" class="btn btn-success"><i class="fas fa-file-import"></i> Import Data</button>
                         </form>
-                        <div id="import-log-container" class="mt-6 hidden">
-                            <h3 class="font-semibold text-lg mb-2">Import Log:</h3>
-                            <pre id="import-log" class="bg-gray-900 text-white rounded-lg p-4 max-h-60 overflow-y-auto text-sm"></pre>
-                        </div>
+                        <div id="import-log-container" class="mt-6 hidden"> <h3 class="font-semibold text-lg mb-2">Import Log:</h3> <pre id="import-log" class="bg-gray-900 text-white rounded-lg p-4 max-h-60 overflow-y-auto text-sm"></pre> </div>
                     </div>
-
                     <div class="card">
                         <h2 class="card-header">Manage Participants Data</h2>
                         <p class="text-gray-600 mb-4">Total Participants in DB: <strong id="participant-count">0</strong></p>
-                        <button id="delete-all-participants-btn" class="btn btn-danger">
-                            <i class="fas fa-exclamation-triangle"></i> Delete All Participants
-                        </button>
+                        <button id="delete-all-participants-btn" class="btn btn-danger"> <i class="fas fa-exclamation-triangle"></i> Delete All Participants </button>
                         <p class="text-xs text-red-700 mt-2"><strong>Warning:</strong> ഇത് എല്ലാ പാർട്ടിസിപ്പന്റ് ഡാറ്റയും நிரந்தரமாக ഡിലീറ്റ് ചെയ്യും. പിന്നീട് തിരിച്ചെടുക്കാൻ സാധിക്കില്ല.</p>
                     </div>
                 </div>
 
-                {/* --- Programs & Categories --- */}
-                <div id="page-programs" class="admin-page hidden">
-                     <h1 class="text-3xl font-bold text-gray-900 mb-6">Manage Programs & Categories</h1>
-                     <div class="info-text">
-                        <strong>നിർദ്ദേശം:</strong> ഇവിടെ മത്സരങ്ങളുടെ കാറ്റഗറികളും (ഉദാ: Junior, Senior) ഓരോ മത്സരങ്ങളും ചേർക്കാം. ആദ്യം കാറ്റഗറികൾ ചേർക്കുക, പിന്നീട് പ്രോഗ്രാമുകൾ ചേർക്കുമ്പോൾ ആ കാറ്റഗറി തിരഞ്ഞെടുക്കാം.
-                     </div>
-                     {/* Manage Categories */}
-                     <div class="card mb-8">
+                <!-- Programs & Categories -->
+                <div id="page-programs" class="admin-page hidden space-y-8">
+                     <h1 class="text-3xl font-bold text-gray-900">Manage Programs & Categories</h1>
+                     <div class="info-text"> <strong>നിർദ്ദേശം:</strong> ... </div>
+                     <div class="card">
                          <h2 class="card-header">Manage Categories</h2>
-                         <form id="form-add-category" class="mb-6 flex items-end gap-4">
-                             <div class="flex-grow">
-                                <label for="category-name" class="form-label">New Category Name</label>
-                                <input type="text" id="category-name" class="form-input" placeholder="e.g., Junior" required>
-                             </div>
-                             <button type="submit" class="btn btn-success flex-shrink-0"><i class="fas fa-plus"></i>Add</button>
+                         <form id="form-add-category" class="mb-6 flex flex-col sm:flex-row items-stretch sm:items-end gap-4"> 
+                             <div class="flex-grow"> <label for="category-name" class="form-label">New Category Name</label> <input type="text" id="category-name" class="form-input" placeholder="e.g., Junior" required> </div>
+                             <button type="submit" class="btn btn-success flex-shrink-0 w-full sm:w-auto"><i class="fas fa-plus"></i>Add</button>
                          </form>
-                         <div>
-                             <h3 class="text-lg font-semibold text-gray-800 mb-3">Existing Categories</h3>
-                             <div id="category-list" class="space-y-3">
-                                 <p class="text-gray-500">Loading categories...</p>
-                             </div>
-                         </div>
+                         <div> <h3 class="text-lg font-semibold text-gray-800 mb-3">Existing Categories</h3> <div id="category-list" class="space-y-3"> <p class="text-gray-500">Loading categories...</p> </div> </div>
                      </div>
-                     {/* Manage Programs */}
                      <div class="card">
                          <h2 class="card-header">Manage Programs</h2>
-                         <form id="form-add-program" class="mb-6 grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
-                             <div class="md:col-span-1">
-                                <label for="program-name" class="form-label">New Program Name</label>
-                                <input type="text" id="program-name" class="form-input" placeholder="e.g., പ്രസംഗം" required>
-                             </div>
-                              <div class="md:col-span-1">
-                                <label for="program-category" class="form-label">Category</label>
-                                <select id="program-category" class="form-select" required>
-                                    <option value="">Select Category</option>
-                                    {/* Categories loaded by JS */}
-                                </select>
-                             </div>
-                             <button type="submit" class="btn btn-success md:col-span-1"><i class="fas fa-plus"></i>Add Program</button>
+                         <form id="form-add-program" class="mb-6 grid grid-cols-1 sm:grid-cols-3 gap-4 items-end">
+                             <div class="sm:col-span-1"> <label for="program-name" class="form-label">New Program Name</label> <input type="text" id="program-name" class="form-input" placeholder="e.g., പ്രസംഗം" required> </div>
+                             <div class="sm:col-span-1"> <label for="program-category" class="form-label">Category</label> <select id="program-category" class="form-select" required> <option value="">Select Category</option> </select> </div>
+                             <button type="submit" class="btn btn-success sm:col-span-1 w-full sm:w-auto"><i class="fas fa-plus"></i>Add Program</button>
                          </form>
-                         <div>
-                             <h3 class="text-lg font-semibold text-gray-800 mb-3">Existing Programs</h3>
-                             <div id="program-list" class="space-y-3">
-                                 <p class="text-gray-500">Loading programs...</p>
-                             </div>
-                         </div>
+                         <div> <h3 class="text-lg font-semibold text-gray-800 mb-3">Existing Programs</h3> <div id="program-list" class="space-y-3"> <p class="text-gray-500">Loading programs...</p> </div> </div>
                      </div>
                 </div>
 
-                {/* --- Manage Teams (Improved UI) --- */}
-                <div id="page-teams" class="admin-page hidden">
-                     <h1 class="text-3xl font-bold text-gray-900 mb-6">Manage Teams</h1>
-                    <div class="info-text">
-                        <strong>നിർദ്ദേശം:</strong> പുതിയ ടീമുകളെ ചേർക്കാനും നിലവിലുള്ള ടീമുകളുടെ വിവരങ്ങൾ (ലീഡർ, അസിസ്റ്റന്റ് ലീഡർ, ചെസ്റ്റ് നമ്പർ പരിധി) മാറ്റം വരുത്താനും ഇവിടെ സാധിക്കും. ചെസ്റ്റ് നമ്പർ പരിധി (From, To) കൃത്യമായി നൽകുന്നത് റിസൾട്ട് പബ്ലിഷ് ചെയ്യുമ്പോൾ ടീമിനെ ഓട്ടോമാറ്റിക് ആയി കണ്ടെത്താൻ സഹായിക്കും.
-                    </div>
-                    <div class="card mb-8">
+                <!-- Manage Teams -->
+                <div id="page-teams" class="admin-page hidden space-y-8">
+                     <h1 class="text-3xl font-bold text-gray-900">Manage Teams</h1>
+                    <div class="info-text"> <strong>നിർദ്ദേശം:</strong> ... </div>
+                    <div class="card">
                         <h2 class="card-header">Add New Team</h2>
                         <form id="form-add-team" class="space-y-4">
                             <div> <label for="team-name" class="form-label">Team Name</label> <input type="text" id="team-name" class="form-input" placeholder="e.g., BURAQ" required> </div>
@@ -386,13 +289,12 @@
                 </div>
 
 
-                {/* --- Publish Results --- */}
-                <div id="page-results" class="admin-page hidden">
-                     <h1 class="text-3xl font-bold text-gray-900 mb-6">Publish & Update Results</h1>
-                    <div class="info-text">
-                        <strong>നിർദ്ദേശം:</strong> ഒരു പ്രോഗ്രാം സെലക്ട് ചെയ്യുക. ശേഷം, വിജയിയുടെ ചെസ്റ്റ് നമ്പർ ടൈപ്പ് ചെയ്യുമ്പോൾ, പേര് ഓട്ടോമാറ്റിക്കായി വലതുവശത്ത് വരും (നിങ്ങൾ "Participants" ടാബിൽ നിന്ന് ഇമ്പോർട്ട് ചെയ്തിട്ടുണ്ടെങ്കിൽ). ഗ്രൂപ്പ് ഐറ്റം ആണെങ്കിൽ, ചെസ്റ്റ് നമ്പറിന് പകരം ടീമിന്റെ പേര് നൽകുക (ഉദാ: BURAQ). ഒന്നിൽ കൂടുതൽ വിജയികൾ ഉണ്ടെങ്കിൽ കോമ (,) ഇട്ട് വേർതിരിക്കുക.
-                    </div>
-                    <div class="card mb-6">
+                <!-- Publish Results -->
+                <div id="page-results" class="admin-page hidden space-y-8">
+                     <h1 class="text-3xl font-bold text-gray-900">Publish & Update Results</h1>
+                    <div class="info-text"> <strong>നിർദ്ദേശം:</strong> ... </div>
+                    <div class="card">
+                        <h2 class="card-header">Publish / Edit Result</h2>
                         <form id="form-publish-result">
                             <div class="mb-6"> 
                                 <label for="result-program" class="form-label">Select Program</label>
@@ -612,7 +514,7 @@
              if(importLog) importLog.textContent = 'Starting import... Please wait.\nDeleting existing participants...\n';
 
              deleteAllParticipants(false) 
-                 .then(() => { // This .then() block runs only if deletion was successful (or skipped internally)
+                 .then(() => { 
                      if(importLog) importLog.textContent += 'Existing participants deleted.\nParsing CSV file...\n';
                      Papa.parse(file, {
                          header: true, skipEmptyLines: true,
@@ -644,8 +546,12 @@
                          error: (error) => { if(importLog) importLog.textContent += `\nCSV PARSE ERROR: ${error.message}\n`; }
                      });
                  })
-                 .catch(error => { // This .catch() block runs if deletion failed or was cancelled
-                     if(importLog) importLog.textContent += `\nERROR: ${error}\nImport aborted.\n`;
+                 .catch(error => { 
+                     if (error !== 'Deletion cancelled by user.' && error !== 'Internal skip.') {
+                        if(importLog) importLog.textContent += `\nERROR DELETING OLD DATA: ${error}\nImport aborted.\n`;
+                     } else {
+                         if(importLog) importLog.textContent += '\nImport cancelled.\n'; 
+                     }
                  });
         });
 
@@ -654,46 +560,41 @@
              if (promptUser) {
                  confirmation = prompt('This will delete ALL participants. Type DELETE to confirm.');
              }
-             // FIXED: Only reject if user explicitly cancels, not if prompt is skipped
              if (promptUser && confirmation !== 'DELETE') { 
                  alert('Deletion cancelled.');
                  return Promise.reject('Deletion cancelled by user.'); 
              }
-             if (!promptUser && confirmation !== 'DELETE') { // Should not happen, but safeguard
-                 return Promise.reject('Internal skip.'); 
+             if (!promptUser && confirmation !== 'DELETE') { 
+                 console.log("Internal skip condition met, resolving.");
+                 return Promise.resolve(); // Resolve silently if skipping prompt
              }
 
              try {
                  if (promptUser) alert('Deleting participants...');
-                 const snapshot = await getDocs(collection(db, `artifacts/${appId}/public/data/participants`));
-                 
-                 // If no docs and prompting, inform user. Otherwise resolve silently.
+                 const q = query(collection(db, `artifacts/${appId}/public/data/participants`));
+                 const snapshot = await getDocs(q); // Use query to get snapshot
                  if (snapshot.empty) {
                      if (promptUser) alert('No participants found to delete.');
-                     return Promise.resolve(); // Successfully did nothing
+                     return Promise.resolve(); 
                  }
-
                  const batch = writeBatch(db);
                  snapshot.docs.forEach(doc => { batch.delete(doc.ref); });
                  await batch.commit();
-                 
                  if (promptUser) alert('All participants have been deleted.');
-                 loadAllParticipants(); // Reload count
-                 return Promise.resolve(); // Success
+                 loadAllParticipants(); 
+                 return Promise.resolve(); 
              } catch (error) {
                  if (promptUser) alert(`Error deleting participants: ${error.message}`);
-                 // Log error even if not prompting
                  console.error("Error deleting participants:", error);
-                 return Promise.reject(`Error deleting participants: ${error.message}`); // Reject with error
+                 return Promise.reject(`Error deleting participants: ${error.message}`); 
              }
         }
        if(deleteAllParticipantsBtn) deleteAllParticipantsBtn.addEventListener('click', () => deleteAllParticipants(true)); 
 
+
         // ===================================
         // Programs & Categories Page
         // ===================================
-        // ... [Programs & Categories JS Code - Unchanged] ...
-        // ... (Includes creating delete buttons with pill styles) ...
         const categoryForm = document.getElementById('form-add-category');
         const categoryInput = document.getElementById('category-name');
         const categoryList = document.getElementById('category-list');
@@ -704,7 +605,8 @@
 
         async function loadCategories() {
              try {
-                 const snapshot = await getDocs(collection(db, `artifacts/${appId}/public/data/categories`));
+                 const q = query(collection(db, `artifacts/${appId}/public/data/categories`));
+                 const snapshot = await getDocs(q);
                  allCategories = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })).sort((a,b)=>a.name.localeCompare(b.name));
                  if (categoryList) categoryList.innerHTML = ''; 
                  if (programCategorySelect) programCategorySelect.innerHTML = '<option value="">Select Category</option>'; 
@@ -713,7 +615,6 @@
                  } else {
                      allCategories.forEach(cat => {
                          if (categoryList) {
-                             // UPDATED: Delete button style
                              categoryList.innerHTML += `
                                  <div class="list-item">
                                      <span class="list-item-name">${cat.name}</span>
@@ -733,7 +634,8 @@
 
         async function loadPrograms() {
              try {
-                 const snapshot = await getDocs(collection(db, `artifacts/${appId}/public/data/programs`));
+                 const q = query(collection(db, `artifacts/${appId}/public/data/programs`));
+                 const snapshot = await getDocs(q);
                  allPrograms = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })).sort((a,b)=>a.name.localeCompare(b.name));
                  if (programList) programList.innerHTML = '';
                  if (allPrograms.length === 0) {
@@ -741,7 +643,6 @@
                  } else {
                      allPrograms.forEach(prog => {
                          if (programList) {
-                              // UPDATED: Delete button style
                              programList.innerHTML += `
                                  <div class="list-item">
                                      <div class="list-item-content">
@@ -760,10 +661,10 @@
         if(programForm && programNameInput && programCategorySelect) programForm.addEventListener('submit', async (e) => { e.preventDefault(); const name = programNameInput.value.trim(); const category = programCategorySelect.value; if (!name || !category) return; try { await addDoc(collection(db, `artifacts/${appId}/public/data/programs`), { name, category }); programNameInput.value = ''; programCategorySelect.value = ''; loadPrograms(); } catch (error) { alert(`Error: ${error.message}`); }});
         window.deleteProgram = async (id) => { if (!confirm('Are you sure you want to delete this program?')) return; try { await deleteDoc(doc(db, `artifacts/${appId}/public/data/programs`, id)); await deleteDoc(doc(db, `artifacts/${appId}/public/data/results`, id)); loadPrograms(); } catch (error) { alert(`Error: ${error.message}`); }};
 
+
         // ===================================
         // Results Page
         // ===================================
-        // ... [Results JS Code - Unchanged] ...
         const resultForm = document.getElementById('form-publish-result');
         const resultProgramSelect = document.getElementById('result-program');
         const resultInputs = { 'first': document.getElementById('result-first'), 'second': document.getElementById('result-second'), 'third': document.getElementById('result-third') };
@@ -850,7 +751,8 @@
 
         async function loadTeamsForAdmin() {
             try {
-                const snapshot = await getDocs(collection(db, `artifacts/${appId}/public/data/teams`));
+                const q = query(collection(db, `artifacts/${appId}/public/data/teams`));
+                const snapshot = await getDocs(q);
                 allTeamsAdmin = {}; 
                 snapshot.docs.forEach(doc => { allTeamsAdmin[doc.id] = { id: doc.id, ...doc.data() }; });
                 renderAdminTeamList();
@@ -868,7 +770,6 @@
              sortedTeams.forEach(team => {
                  const teamElement = document.createElement('div');
                  teamElement.className = 'border border-gray-200 rounded-lg p-4 mb-4 bg-gray-50'; 
-                 // UPDATED: Buttons use pill styles
                  teamElement.innerHTML = `
                      <h3 class="text-xl font-bold text-gray-800 mb-4">${team.name}</h3>
                      <form class="space-y-4" data-team-id="${team.id}">
@@ -971,18 +872,22 @@
 
         async function loadHomepageContent() {
              try {
-                 const docSnap = await getDoc(doc(db, `artifacts/${appId}/public/data/config`, 'homepage'));
+                 const docRef = doc(db, `artifacts/${appId}/public/data/config`, 'homepage');
+                 const docSnap = await getDoc(docRef);
                  if (docSnap.exists()) {
                      const data = docSnap.data();
                      Object.keys(homepageFields).forEach(key => {
-                         if (homepageFields[key]) {
+                         const fieldElement = homepageFields[key];
+                         if (fieldElement) { // Check if element exists
                              if (key === 'gallery') {
-                                homepageFields[key].value = (data[key] || []).join('\n');
+                                fieldElement.value = (data[key] || []).join('\n');
                              } else {
-                                homepageFields[key].value = data[key] || '';
+                                fieldElement.value = data[key] || '';
                              }
                          }
                      });
+                 } else {
+                      console.log("Homepage config document does not exist!");
                  }
             } catch(error) { console.error("Error loading homepage content:", error); alert("Could not load homepage settings."); }
         }
@@ -990,14 +895,17 @@
 
         if(homepageForm) homepageForm.addEventListener('submit', async (e) => {
              e.preventDefault();
+             // Check if gallery field exists before processing
              const galleryArray = homepageFields.gallery ? homepageFields.gallery.value.split('\n').map(url => url.trim()).filter(Boolean) : [];
+             
              const dataToSave = {};
               Object.keys(homepageFields).forEach(key => {
-                 if (homepageFields[key]) {
+                 const fieldElement = homepageFields[key];
+                 if (fieldElement) { // Check if element exists
                      if (key === 'gallery') {
                         dataToSave[key] = galleryArray;
                      } else {
-                        dataToSave[key] = homepageFields[key].value.trim();
+                        dataToSave[key] = fieldElement.value.trim();
                      }
                  }
              });
