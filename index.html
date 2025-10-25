@@ -9,10 +9,10 @@
     <link href="https://fonts.googleapis.com/css2?family=Saira:wght@700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
-    <!-- Confetti ലൈബ്രറി -->
+    <!-- Confetti ലൈബ്രറി (ഇപ്പോൾ ഉപയോഗിക്കുന്നില്ല, പക്ഷെ നീക്കം ചെയ്യുന്നില്ല) -->
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <style>
-        /* CSS വേരിയബിളുകൾ */
+        /* ... (CSS കോഡ് മാറ്റമില്ലാതെ തുടരുന്നു) ... */
         :root {
             --primary-color: #4a90e2;
             --secondary-color: #50e3c2;
@@ -126,6 +126,34 @@
         .team-name { font-size: 1.6em; font-weight: bold; margin: 10px 0; color: #333; }
         .points { font-size: 2.4em; font-weight: bold; margin: 0; color: #222; }
         .position { font-size: 1em; margin: 5px 0 0; font-weight: 600; color: #444; }
+        
+        /* ടീം ടാബിലെ വിശദമായ റാങ്കിംഗ് ടേബിൾ (RESTORED) */
+        .detailed-rankings-container { max-width: 1100px; margin: 40px auto 20px auto; background-color: var(--card-background); border-radius: 16px; padding: 25px; box-shadow: 0 4px 12px var(--shadow-color); overflow-x: auto; }
+        .rankings-table-content { min-width: 950px; }
+        .detailed-rankings-container h2 { margin-top: 0; margin-bottom: 5px; font-size: 1.5em; color: var(--heading-color); }
+        .detailed-rankings-container p { margin-top: 0; margin-bottom: 25px; color: var(--subtle-text); }
+        .ranking-header, .ranking-row { display: grid; /* Columns updated by JS */ grid-template-columns: 40px 1.5fr repeat(3, 0.8fr) 1fr 1fr; gap: 10px; align-items: center; padding: 10px 15px; font-size: 0.9em; }
+        .ranking-header { font-weight: bold; color: var(--subtle-text); text-transform: uppercase; border-bottom: 2px solid var(--border-color); padding-bottom: 15px; }
+        .ranking-row { border-bottom: 1px solid var(--border-color); }
+        .ranking-row:last-child { border-bottom: none; }
+        .rank-cell { font-weight: bold; font-size: 1.1em; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; }
+        .rank-1 { background-color: #f7b731; }
+        .rank-2 { background-color: #a7a7a7; }
+        .rank-3 { background-color: #d9895a; }
+        .team-name-cell { font-weight: bold; font-size: 1.2em; color: var(--heading-color); }
+        .points-pill { padding: 5px 10px; border-radius: 15px; font-weight: bold; text-align: center; }
+        .points-pill.default-pill-1 { background-color: #fce4ec; color: #d81b60; }
+        .points-pill.default-pill-2 { background-color: #ede7f6; color: #5e35b1; }
+        .points-pill.default-pill-3 { background-color: #e4f8f0; color: #1a9c68; }
+        .points-pill.default-pill-4 { background-color: #ffeff3; color: #e53965; }
+        .points-pill.default-pill-5 { background-color: #fff3e0; color: #ef6c00; }
+        .points-pill.default-pill-6 { background-color: #e7f3ff; color: #0d6efd; }
+        .points-pill.group { background-color: #fff9e6; color: #f7b731; }
+        .total-points-cell { font-weight: bold; font-size: 1.5em; color: var(--heading-color); }
+        .progress-circle-container { width: 60px; height: 60px; position: relative; margin: 0 auto; }
+        .progress-circle { width: 100%; height: 100%; border-radius: 50%; display: grid; place-items: center; background: conic-gradient(var(--primary-color) calc(var(--p) * 1%), var(--border-color) 0); transition: background 0.5s; }
+        .progress-circle::before { content: ""; position: absolute; border-radius: 50%; background: var(--card-background); width: calc(100% - 12px); height: calc(100% - 12px); }
+        .progress-circle-text { position: relative; font-size: 0.9em; font-weight: bold; color: var(--heading-color); }
         
         /* റിസൾട്ട് ഫിൽട്ടർ ചെയ്യാനുള്ള ഭാഗം */
         .filter-controls { background-color: var(--card-background); padding: 20px; border-radius: 16px; margin: 0 auto 25px auto; max-width: 800px; box-shadow: 0 4px 12px var(--shadow-color); }
@@ -325,14 +353,9 @@
                     <h2 style="text-align: center; color: var(--heading-color); font-family: 'Saira', sans-serif;">Live Team Point Status</h2>
                     <p id="team-results-count" style="text-align: center; margin-top: -10px; margin-bottom: 20px; color: var(--subtle-text);"></p>
                     <div class="card-container" id="team-cards-container"></div>
-                    <!-- Other Teams List -->
-                    <div class="mt-8 max-w-lg mx-auto"> 
-                        <h3 style="text-align: center; font-size: 1.6em; color: var(--heading-color); margin-bottom: 20px; font-family: 'Saira', sans-serif;">Other Teams</h3>
-                        <div id="other-teams-list-card" class="talent-category-card">
-                            <div class="talent-list" id="other-teams-list">
-                                <p id="other-teams-placeholder" class="text-gray-500">Loading other teams...</p>
-                            </div>
-                        </div>
+                    <!-- UPDATED: Restored Detailed Rankings Container -->
+                    <div class="detailed-rankings-container" id="detailed-rankings">
+                        <!-- Detailed rankings table will be built by JS -->
                     </div>
                 </div>
                 <!-- റിസൾട്ട് ടാബ് -->
@@ -465,7 +488,6 @@
                 };
                 
                 const isGroupEvent = groupEvents.includes(eventName);
-                // Group event points logic (if not set in admin, apply default group points)
                 if (isGroupEvent && program.points_first === 5 && program.points_second === 3) {
                     currentPoints.first = 10;
                     currentPoints.second = 8;
@@ -529,7 +551,8 @@
                 return; 
             }
             generateFilterButtons();
-            generateTeamRankings(); // UPDATED
+            generateTeamCards(); // UPDATED
+            generateDetailedRankings(); // RESTORED
             renderProgramResults();
             generateTalentList();
             generateScoreboard();
@@ -547,45 +570,71 @@
 
         function generateFilterButtons() { /* ... (കോഡ് മാറ്റമില്ല) ... */ }
         
-        // UPDATED: This function now renders Top 3 AND the "Other Teams" list
-        function generateTeamRankings() {
-            // FIXED: Add safety check for processedTeamData
+        // UPDATED: This function now renders Top 3 
+        function generateTeamCards() {
             const dataToRank = processedTeamData || {};
             const rankedTeams = Object.values(dataToRank).sort((a, b) => b.total - a.total);
             
             const container = d.getElementById('team-cards-container');
-            const otherTeamsList = d.getElementById('other-teams-list');
-            const otherTeamsPlaceholder = d.getElementById('other-teams-placeholder');
-
-            if (!container || !otherTeamsList || !otherTeamsPlaceholder) { console.error("Team containers not found"); return; }
-
+            if (!container) { console.error("Team card container not found"); return; }
             container.innerHTML = ''; 
-            otherTeamsList.innerHTML = ''; 
             
             const cardClasses = ['champion', 'first-runner-up', 'second-runner-up'];
             const positionTexts = ['Champions', 'First Runners-up', 'Second Runners-up'];
             const iconClasses = ['fas fa-crown', 'fas fa-medal', 'fas fa-medal'];
-            let otherTeamsHtml = '';
-
-            rankedTeams.forEach((team, i) => {
-                if (i < 3) {
-                    container.innerHTML += `<div class="team-card ${cardClasses[i] || ''}"><div class="icon"><i class="${iconClasses[i] || 'fas fa-award'}"></i></div><div class="team-name">${team.name}</div><p class="points"><b>${team.total}</b></p><p class="position">${positionTexts[i] || `#${i + 1} Position`}</p></div>`;
-                } else {
-                    otherTeamsHtml += `<div class="winner-entry"><span class="medal-icon" style="font-size: 1.1em; color: var(--subtle-text); width: 40px;">#${i + 1}</span><div class="winner-details"><div class="name" style="font-size: 1.2em;">${team.name}</div></div><div class="winner-points"><div class="points-value" style="font-size: 1.2em;">${team.total}</div><div class="points-label">points</div></div></div>`;
-                }
+            
+            rankedTeams.slice(0, 3).forEach((team, i) => { // Only top 3
+                container.innerHTML += `<div class="team-card ${cardClasses[i] || ''}"><div class="icon"><i class="${iconClasses[i] || 'fas fa-award'}"></i></div><div class="team-name">${team.name}</div><p class="points"><b>${team.total}</b></p><p class="position">${positionTexts[i] || `#${i + 1} Position`}</p></div>`;
             });
 
             if (rankedTeams.length === 0) {
                  container.innerHTML = '<p class="text-gray-500">No teams have scored yet.</p>';
-                 otherTeamsPlaceholder.textContent = '...';
-                 otherTeamsPlaceholder.style.display = 'block';
-            } else if (rankedTeams.length <= 3) {
-                otherTeamsPlaceholder.textContent = 'No other teams to display.';
-                otherTeamsPlaceholder.style.display = 'block';
-            } else {
-                otherTeamsPlaceholder.style.display = 'none';
-                otherTeamsList.innerHTML = otherTeamsHtml;
             }
+        }
+        
+        // RESTORED: generateDetailedRankings
+        function generateDetailedRankings() {
+            const container = d.getElementById('detailed-rankings');
+            if (!container) return; // Safety check
+            
+            const dataToRank = processedTeamData || {};
+            const rankedTeams = Object.values(dataToRank).sort((a, b) => b.total - a.total);
+            
+            const maxScore = rankedTeams.length > 0 ? rankedTeams[0].total : 0;
+            let headerCols = '', gridTemplateCols = '40px 1.5fr';
+            
+            (dbCategories || []).forEach(cat => { 
+                headerCols += `<div>${cat.name}</div>`; 
+                gridTemplateCols += ' 0.8fr'; 
+            });
+            headerCols += `<div>Group</div>`; 
+            gridTemplateCols += ' 0.8fr 1fr 1fr'; 
+            
+            let tableHtml = `<div class="rankings-table-content" style="min-width: ${700 + (dbCategories || []).length * 80}px;">
+                                <div class="ranking-header" style="grid-template-columns: ${gridTemplateCols};">
+                                    <div>Rank</div><div>Team</div>${headerCols}<div>Total</div><div>Progress</div>
+                                </div>`;
+            
+            rankedTeams.forEach((team, index) => {
+                const rank = index + 1;
+                const progress = maxScore > 0 ? (team.total / maxScore) * 100 : 0;
+                let pointsCols = '';
+                (dbCategories || []).forEach((cat, i) => {
+                    pointsCols += `<div><span class="points-pill default-pill-${(i % 6) + 1}">${team[cat.name] || 0}</span></div>`;
+                });
+                pointsCols += `<div><span class="points-pill group">${team['group'] || 0}</span></div>`;
+                
+                tableHtml += `<div class="ranking-row" style="grid-template-columns: ${gridTemplateCols};">
+                                <div><span class="rank-cell ${rank === 1 ? 'rank-1' : (rank === 2 ? 'rank-2' : (rank === 3 ? 'rank-3' : ''))}">${rank}</span></div>
+                                <div class="team-name-cell">${team.name}</div>
+                                ${pointsCols}
+                                <div class="total-points-cell">${team.total}</div>
+                                <td><div class="progress-circle-container"><div class="progress-circle" style="--p:${progress};"><span class="progress-circle-text">${Math.round(progress)}%</span></div></div></td>
+                              </div>`;
+            });
+            
+            tableHtml += '</div>';
+            container.innerHTML = `<h2>Detailed Rankings</h2><p>Complete scoreboard with detailed breakdown by category</p>${tableHtml}`;
         }
         
         // റിസൾട്ട് കാർഡുകൾ ഉണ്ടാക്കുന്നു (UPDATED for custom points)
@@ -663,14 +712,15 @@
         window.openNav = function() { d.getElementById("menu-overlay").style.display = "flex"; d.getElementById("main-content").style.filter = 'blur(4px)'; setTimeout(() => d.getElementById("menu-overlay").style.opacity = '1', 10); }
         window.closeNav = function() { d.getElementById("menu-overlay").style.opacity = '0'; setTimeout(() => d.getElementById("menu-overlay").style.display = "none", 300); d.getElementById("main-content").style.filter = 'none'; }
         window.showPage = function(pageId) { d.getElementById('home-page').style.display = pageId === 'home-page' ? 'block' : 'none'; d.getElementById('scoreboard-page').style.display = pageId === 'scoreboard-page' ? 'block' : 'none'; const scrollTopBtn = d.getElementById('scrollTopBtn'); if (scrollTopBtn) { if (pageId === 'home-page') { handleScroll(); } else { scrollTopBtn.classList.remove('show'); } } updateMenuActiveState(); }
-        window.showMainTab = function(tabId) { const currentActiveButton = d.querySelector('#scoreboard-page .main-tab-button.active'); const clickedButton = d.querySelector(`.main-tab-button[onclick*="'${tabId}'"]`); if (clickedButton && clickedButton.isSameNode(currentActiveButton)) return; if (currentActiveButton) currentActiveButton.classList.remove('active'); d.querySelectorAll('.main-tab-content').forEach(tab => tab.classList.remove('active')); d.getElementById(tabId).classList.add('active'); if (clickedButton) clickedButton.classList.add('active'); updateMenuActiveState(); if (tabId === 'team-tab') fireTeamConfetti(); }
+        // UPDATED: Removed confetti
+        window.showMainTab = function(tabId) { const currentActiveButton = d.querySelector('#scoreboard-page .main-tab-button.active'); const clickedButton = d.querySelector(`.main-tab-button[onclick*="'${tabId}'"]`); if (clickedButton && clickedButton.isSameNode(currentActiveButton)) return; if (currentActiveButton) currentActiveButton.classList.remove('active'); d.querySelectorAll('.main-tab-content').forEach(tab => tab.classList.remove('active')); d.getElementById(tabId).classList.add('active'); if (clickedButton) clickedButton.classList.add('active'); updateMenuActiveState(); }
         window.filterResults = function(category = 'all') { d.querySelectorAll('#program-tab .filter-btn').forEach(btn => btn.classList.remove('active')); d.querySelector(`#program-tab .filter-btn[data-filter="${category}"]`).classList.add('active'); const searchTerm = d.getElementById('search-input').value.toLowerCase(); d.querySelectorAll('.event-result-card').forEach(card => { const categoryMatch = (category === 'all' || card.dataset.category === category); const searchMatch = (card.dataset.searchText.includes(searchTerm)); card.style.display = (categoryMatch && searchMatch) ? 'block' : 'none'; }); }
         window.filterScoreboard = function(category) { if (!category) return; d.querySelectorAll('#scoreboard-filter-buttons .filter-btn').forEach(btn => btn.classList.remove('active')); const activeButton = d.querySelector(`#scoreboard-filter-buttons .filter-btn[data-filter="${category}"]`); if (activeButton) activeButton.classList.add('active'); const totalsToShow = processedScoreboardData.categoryTotals[category]; const totalCard = d.getElementById('scoreboard-total-card'); const countElement = d.getElementById('scoreboard-category-count'); if (totalCard && totalsToShow) { TEAM_NAMES.forEach(team => { const teamSpan = totalCard.querySelector(`span[data-team="${team}"]`); if (teamSpan) teamSpan.textContent = totalsToShow[team] || 0; }); } if (countElement) { const count = processedScoreboardData.categoryCounts[category] || 0; countElement.textContent = `Published Results: ${count}`; } d.querySelectorAll('#scoreboard-container .scoreboard-card:not(.total-card)').forEach(card => { const eventName = card.dataset.eventName; const eventData = eventName ? processedScoreboardData.eventPoints[eventName] : undefined; if (!eventData) { card.style.display = 'none'; return; } const isGroup = groupEvents.includes(eventName); const eventCategory = isGroup ? 'group' : eventData.category; card.style.display = (category === eventCategory) ? 'block' : 'none'; }); }
         window.updateResultCounts = function() { const el = d.getElementById('team-results-count'); if (el) el.innerText = `Team point status after ${publishedResultsCount} results`; }
         window.getTrophyIconsHTML = function(positions) { if (!positions || positions.length === 0) return ''; return positions.map(pos => { if (pos === 1) return '<i class="fas fa-trophy trophy-icon gold"></i>'; if (pos === 2) return '<i class="fas fa-trophy trophy-icon silver"></i>'; if (pos === 3) return '<i class="fas fa-trophy trophy-icon bronze"></i>'; return ''; }).join(''); }
         window.toggleTalentDropdown = function(listId, button) { const list = d.getElementById(listId); list.classList.toggle('open'); button.textContent = list.classList.contains('open') ? 'Show Less' : 'Show More'; }
         window.updateMenuActiveState = function() { const homePageVisible = d.getElementById('home-page').style.display !== 'none'; d.querySelectorAll('.menu-link').forEach(link => link.classList.remove('active')); if (homePageVisible) { const homeLink = d.querySelector('.menu-link[data-target="home-page"]'); if (homeLink) homeLink.classList.add('active'); } else { const activeTabButton = d.querySelector('#scoreboard-page .main-tab-button.active'); if (activeTabButton) { const tabId = activeTabButton.getAttribute('onclick').match(/'([^']+)'/)[1]; const activeMenuLink = d.querySelector(`.menu-link[data-target="${tabId}"]`); if (activeMenuLink) activeMenuLink.classList.add('active'); } else { const programLink = d.querySelector('.menu-link[data-target="program-tab"]'); if (programLink) programLink.classList.add('active'); } } }
-        window.fireTeamConfetti = function() { if (!window.confetti) return; const end = Date.now() + (2 * 1000); (function frame() { if (Date.now() > end) return; confetti({ particleCount: 2, angle: 60, spread: 55, origin: { x: 0 } }); confetti({ particleCount: 2, angle: 120, spread: 55, origin: { x: 1 } }); requestAnimationFrame(frame); }()); }
+        // REMOVED: window.fireTeamConfetti
         async function shareImage(imageUrl) { if (navigator.share) { try { await navigator.share({ title: 'Sadaye Madeena 2k25 Gallery Image', text: 'Check out this image from the fest!', url: imageUrl }); console.log('Image shared successfully'); } catch (err) { console.error('Error sharing image:', err); alert('Sharing failed.'); } } else { try { const textArea = d.createElement("textarea"); textArea.value = imageUrl; textArea.style.position = "fixed"; d.body.appendChild(textArea); textArea.focus(); textArea.select(); d.execCommand('copy'); d.body.removeChild(textArea); alert('Sharing not supported, but image link copied to clipboard!'); } catch (err) { alert('Sharing is not supported on this browser. Please copy the link manually.'); console.error('Fallback copy failed:', err); } } }
         d.getElementById('gallery').addEventListener('click', function(event) { const shareButton = event.target.closest('.share-btn'); if (shareButton) { const imageUrl = shareButton.dataset.url; if (imageUrl) { event.stopPropagation(); shareImage(imageUrl); } } });
         const scrollTopBtn = d.getElementById('scrollTopBtn');
