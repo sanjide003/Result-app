@@ -62,11 +62,11 @@
         .list-header { @apply grid grid-cols-3 gap-4 px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-b border-gray-200 bg-gray-50 rounded-t-lg; }
         .list-item { @apply grid grid-cols-3 gap-4 px-4 py-3 items-center border-b border-gray-200 bg-white hover:bg-gray-50 transition-colors duration-150; }
         .list-item:last-child { @apply rounded-b-lg border-b-0; }
-        .list-item-content { @apply col-span-1; } /* Takes 1 column */
-        .list-item-actions { @apply col-span-2 flex justify-end gap-2; } /* Takes 2 columns, aligns right */
+        .list-item-content { @apply col-span-1; }
+        .list-item-actions { @apply col-span-2 flex justify-end gap-2; }
         .list-item-name { @apply font-semibold text-gray-800 break-words; }
         .list-item-details { @apply text-sm text-gray-500 block; }
-        .list-item-points { @apply text-sm text-blue-600 font-medium block; } /* For showing points */
+        .list-item-points { @apply text-sm text-blue-600 font-medium block; }
 
     </style>
 </head>
@@ -158,20 +158,12 @@
                 
                 <!-- Home Page Settings -->
                 <div id="page-dashboard" class="admin-page space-y-8"> 
+                   <!-- Home Page Settings Form -->
                    <h1 class="text-3xl font-bold text-gray-900">Home Page Settings</h1>
-                    <div class="info-text"> <strong>നിർദ്ദേശം:</strong> വെബ്സൈറ്റിന്റെ പ്രധാന പേജിൽ (ഹോം പേജ്) കാണിക്കേണ്ട വിവരങ്ങൾ ഇവിടെ നൽകുക. </div>
+                    <div class="info-text"> <strong>നിർദ്ദേശം:</strong> വെബ്സൈറ്റിന്റെ പ്രധാന പേജിൽ (ഹോം പേജ്) കാണിക്കേണ്ട വിവരങ്ങൾ ഇവിടെ നൽകുക. ഹെഡർ, ലോഗോ, തലക്കെട്ടുകൾ, എബൗട്ട്, ഗാലറി, സ്റ്റാറ്റ്സ്, ഫൂട്ടർ എന്നിവ ഇവിടെ മാറ്റം വരുത്താം. ചിത്രങ്ങളുടെ URL (ലിങ്ക്) ആണ് നൽകേണ്ടത്. സോഷ്യൽ മീഡിയ ലിങ്കുകളും ഇവിടെ നൽകാം. </div>
                     <form id="form-homepage" class="space-y-8"> 
                         <div class="card"> <h2 class="card-header">Header & Hero Content</h2> <div class="space-y-4"> <div class="grid grid-cols-1 md:grid-cols-2 gap-6"> <div> <label for="homepage-header-title" class="form-label">Header Title (Top Bar)</label> <input type="text" id="homepage-header-title" class="form-input" placeholder="e.g., Sadaye Madeena 2k25"> </div> <div> <label for="homepage-logo-url" class="form-label">Logo Image URL</label> <input type="url" id="homepage-logo-url" class="form-input" placeholder="https://example.com/logo.png"> </div> </div> <div class="grid grid-cols-1 md:grid-cols-2 gap-6"> <div> <label for="homepage-main-title" class="form-label">Main Title (Hero Section)</label> <input type="text" id="homepage-main-title" class="form-input" placeholder="e.g., Sadaye Madeena 2k25"> </div> <div> <label for="homepage-subtitle" class="form-label">Subtitle (Hero Section)</label> <input type="text" id="homepage-subtitle" class="form-input" placeholder="e.g., Inter-Madrasa Art Fest"> </div> </div> </div> </div>
-                        <!-- UPDATED: About Section Card with new fields -->
-                        <div class="card"> 
-                            <h2 class="card-header">About Section</h2> 
-                            <div class="space-y-4">
-                                <div> <label for="homepage-about-title" class="form-label">About Section Title</label> <input type="text" id="homepage-about-title" class="form-input" placeholder="e.g., About The Fest"> </div>
-                                <div> <label for="homepage-about-subtitle" class="form-label">About Section Subtitle</label> <input type="text" id="homepage-about-subtitle" class="form-input" placeholder="e.g., Thirunoor'25"> </div>
-                                <div> <label for="homepage-about" class="form-label">About The Fest (Description)</label> <textarea id="homepage-about" class="form-textarea" rows="5" placeholder="Write something about the event..."></textarea> </div> 
-                                <div> <label for="homepage-about-image-url" class="form-label">About Section Image URL</label> <input type="url" id="homepage-about-image-url" class="form-input" placeholder="https://example.com/about-image.jpg"> </div> 
-                            </div> 
-                        </div>
+                        <div class="card"> <h2 class="card-header">About Section</h2> <div class="space-y-4"> <div> <label for="homepage-about-title" class="form-label">About Section Title</label> <input type="text" id="homepage-about-title" class="form-input" placeholder="e.g., About The Fest"> </div> <div> <label for="homepage-about-subtitle" class="form-label">About Section Subtitle</label> <input type="text" id="homepage-about-subtitle" class="form-input" placeholder="e.g., Thirunoor'25"> </div> <div> <label for="homepage-about" class="form-label">About The Fest (Description)</label> <textarea id="homepage-about" class="form-textarea" rows="5" placeholder="Write something about the event..."></textarea> </div> <div> <label for="homepage-about-image-url" class="form-label">About Section Image URL</label> <input type="url" id="homepage-about-image-url" class="form-input" placeholder="https://example.com/about-image.jpg"> </div> </div> </div>
                         <div class="card"> <h2 class="card-header">Statistics Texts</h2> <p class="text-sm text-gray-500 mb-4">...</p> <div class="grid grid-cols-2 md:grid-cols-4 gap-6"> <div> <label for="homepage-total-programs" class="form-label">Total Programs</label> <input type="text" id="homepage-total-programs" class="form-input" placeholder="e.g., 50+"> </div> <div> <label for="homepage-total-participants" class="form-label">Total Contestants</label> <input type="text" id="homepage-total-participants" class="form-input" placeholder="e.g., 200+"> </div> <div> <label for="homepage-total-categories" class="form-label">Total Categories</label> <input type="text" id="homepage-total-categories" class="form-input" placeholder="e.g., 5"> </div> <div> <label for="homepage-total-teams" class="form-label">Total Teams</label> <input type="text" id="homepage-total-teams" class="form-input" placeholder="e.g., 3"> </div> </div> </div>
                         <div class="card"> <h2 class="card-header">Image Gallery URLs</h2> <label for="homepage-gallery" class="form-label">Enter Image URLs (One URL per line)</label> <textarea id="homepage-gallery" class="form-textarea" rows="8" placeholder="https://example.com/image1.jpg\nhttps://example.com/image2.jpg"></textarea> </div>
                         <div class="card"> <h2 class="card-header">Footer Settings</h2> <div class="space-y-4"> <div> <label for="homepage-institution-name" class="form-label">Institution Name</label> <input type="text" id="homepage-institution-name" class="form-input" placeholder="e.g., Noorul Islam madrasa devathiyal"> </div> <div> <label for="homepage-copyright-text" class="form-label">Copyright Text</label> <input type="text" id="homepage-copyright-text" class="form-input" placeholder="e.g., © 2025 Thirunoor Media Team. All rights reserved."> </div> <h3 class="text-lg font-semibold text-gray-800 pt-2">Social Media Links</h3> <div class="grid grid-cols-1 md:grid-cols-3 gap-4"> <div> <label for="homepage-social-instagram" class="form-label">Instagram URL</label> <input type="url" id="homepage-social-instagram" class="form-input" placeholder="https://instagram.com/..."> </div> <div> <label for="homepage-social-youtube" class="form-label">YouTube URL</label> <input type="url" id="homepage-social-youtube" class="form-input" placeholder="https://youtube.com/..."> </div> <div> <label for="homepage-social-facebook" class="form-label">Facebook URL</label> <input type="url" id="homepage-social-facebook" class="form-input" placeholder="https://facebook.com/..."> </div> </div> </div> </div>
@@ -187,8 +179,7 @@
                 <!-- Programs & Categories -->
                 <div id="page-programs" class="admin-page hidden space-y-8">
                      <h1 class="text-3xl font-bold text-gray-900">Manage Programs & Categories</h1>
-                     <div class="info-text"> <strong>നിർദ്ദേശം:</strong> ഇവിടെ കാറ്റഗറികളും പ്രോഗ്രാമുകളും ചേർക്കാം/എഡിറ്റ് ചെയ്യാം. ഓരോ പ്രോഗ്രാമിനും ലഭിക്കുന്ന പോയിന്റുകൾ ഇവിടെയാണ് നിശ്ചയിക്കേണ്ടത്. </div>
-                     <!-- Manage Categories Card -->
+                     <div class="info-text"> <strong>നിർദ്ദേശം:</strong> ഇവിടെ കാറ്റഗറികളും പ്രോഗ്രാമുകളും ചേർക്കാം/എഡിറ്റ് ചെയ്യാം... </div>
                      <div class="card">
                          <h2 class="card-header">Manage Categories</h2>
                          <form id="form-add-category" class="mb-6 flex flex-col sm:flex-row items-stretch sm:items-end gap-4"> 
@@ -203,10 +194,8 @@
                             </div>
                          </div>
                      </div>
-                     <!-- Manage Programs Card -->
                      <div class="card">
                          <h2 class="card-header">Manage Programs</h2>
-                         <!-- UPDATED: Add Program form with points -->
                          <form id="form-add-program" class="space-y-4 mb-6">
                              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                  <div> <label for="program-name" class="form-label">New Program Name</label> <input type="text" id="program-name" class="form-input" placeholder="e.g., പ്രസംഗം" required> </div>
@@ -217,18 +206,12 @@
                                  <div> <label for="program-points-second" class="form-label">2nd Points</label> <input type="number" id="program-points-second" class="form-input" placeholder="e.g., 3" required> </div>
                                  <div> <label for="program-points-third" class="form-label">3rd Points</label> <input type="number" id="program-points-third" class="form-input" placeholder="e.g., 1" required> </div>
                              </div>
-                             <div class="flex justify-end pt-2">
-                                <button type="submit" class="btn btn-success"><i class="fas fa-plus"></i>Add Program</button>
-                             </div>
+                             <div class="flex justify-end pt-2"> <button type="submit" class="btn btn-success"><i class="fas fa-plus"></i>Add Program</button> </div>
                          </form>
                          <div> 
                              <h3 class="text-lg font-semibold text-gray-800 mb-3">Existing Programs</h3> 
                              <div class="border border-gray-200 rounded-lg overflow-hidden">
-                                 <!-- UPDATED: Program list header -->
-                                 <div class="list-header"> 
-                                     <span>Program (Category)</span> 
-                                     <span class="col-span-2 text-right">Points (1st, 2nd, 3rd) & Actions</span> 
-                                 </div>
+                                 <div class="list-header"> <span>Program (Category)</span> <span class="col-span-2 text-right">Points (1/2/3) & Actions</span> </div>
                                  <div id="program-list" class="divide-y divide-gray-200"> <p class="text-gray-500 p-4">Loading programs...</p> </div> 
                              </div>
                          </div>
@@ -289,101 +272,80 @@
         const auth = getAuth(app);
         const db = getFirestore(app);
 
-        // --- [JavaScript Logic - Includes Authentication, Forms, Data Loading etc.] ---
-        let allPrograms = []; let allCategories = []; let allParticipants = {}; let allTeamsAdmin = {}; 
+        // --- [JavaScript Logic] ---
         
-        const d = document; // Use 'd' instead of 'doc'
-        const loginPage=d.getElementById('login-page'), adminPanel=d.getElementById('admin-panel'), loginForm=d.getElementById('login-form'), registerForm=d.getElementById('register-form'), logoutButton=d.getElementById('logout-button'), adminEmail=d.getElementById('admin-email'), pages=d.querySelectorAll('.admin-page'), adminMenuOverlay=d.getElementById('admin-menu-overlay'), adminMenuBox=d.getElementById('admin-menu-box'), adminMenuBtn=d.getElementById('admin-menu-btn'), adminMenuCloseBtn=d.getElementById('admin-menu-close-btn'), navLinks=d.querySelectorAll('.menu-link');
-        const downloadTemplateBtn=d.getElementById('download-template-btn'), importForm=d.getElementById('form-import-csv'), fileInput=d.getElementById('csv-file-input'), fileNameEl=d.getElementById('csv-filename'), importLogContainer=d.getElementById('import-log-container'), importLog=d.getElementById('import-log'), participantCountEl=d.getElementById('participant-count'), deleteAllParticipantsBtn=d.getElementById('delete-all-participants-btn');
-        const categoryForm=d.getElementById('form-add-category'), categoryInput=d.getElementById('category-name'), categoryList=d.getElementById('category-list'), programForm=d.getElementById('form-add-program'), programNameInput=d.getElementById('program-name'), programCategorySelect=d.getElementById('program-category'), programList=d.getElementById('program-list');
-        // UPDATED: Added program points inputs
-        const programPointsFirst = d.getElementById('program-points-first');
-        const programPointsSecond = d.getElementById('program-points-second');
-        const programPointsThird = d.getElementById('program-points-third');
-        
-        const resultForm=d.getElementById('form-publish-result'), resultCategorySelect=d.getElementById('result-category'), resultProgramSelect=d.getElementById('result-program'), resultInputs={'first':d.getElementById('result-first'), 'second':d.getElementById('result-second'), 'third':d.getElementById('result-third')}, nameSpans={'first':d.getElementById('name-first'), 'second':d.getElementById('name-second'), 'third':d.getElementById('name-third')};
-        const teamForm=d.getElementById('form-add-team'), teamListAdmin=d.getElementById('team-list-admin');
-        const homepageForm=d.getElementById('form-homepage'), homepageFields={
-            'header_title':d.getElementById('homepage-header-title'), 
-            'logo_url':d.getElementById('homepage-logo-url'), 
-            'main_title':d.getElementById('homepage-main-title'), 
-            'subtitle':d.getElementById('homepage-subtitle'), 
-            'about_title':d.getElementById('homepage-about-title'), // NEW
-            'about_subtitle':d.getElementById('homepage-about-subtitle'), // NEW
-            'about':d.getElementById('homepage-about'), 
-            'about_image_url':d.getElementById('homepage-about-image-url'), 
-            'gallery':d.getElementById('homepage-gallery'), 
-            'total_programs':d.getElementById('homepage-total-programs'), 
-            'total_participants':d.getElementById('homepage-total-participants'), 
-            'total_categories':d.getElementById('homepage-total-categories'), 
-            'total_teams':d.getElementById('homepage-total-teams'), 
-            'institution_name':d.getElementById('homepage-institution-name'), 
-            'copyright_text':d.getElementById('homepage-copyright-text'), 
-            'social_instagram':d.getElementById('homepage-social-instagram'), 
-            'social_youtube':d.getElementById('homepage-social-youtube'), 
-            'social_facebook':d.getElementById('homepage-social-facebook')
-        };
+        // Wait for the DOM to be fully loaded before running any script
+        document.addEventListener('DOMContentLoaded', () => {
+            let allPrograms = []; let allCategories = []; let allParticipants = {}; let allTeamsAdmin = {}; 
+            
+            const d = document; // Use 'd' for document
+            const loginPage=d.getElementById('login-page'), adminPanel=d.getElementById('admin-panel'), loginForm=d.getElementById('login-form'), registerForm=d.getElementById('register-form'), logoutButton=d.getElementById('logout-button'), adminEmail=d.getElementById('admin-email'), pages=d.querySelectorAll('.admin-page'), adminMenuOverlay=d.getElementById('admin-menu-overlay'), adminMenuBox=d.getElementById('admin-menu-box'), adminMenuBtn=d.getElementById('admin-menu-btn'), adminMenuCloseBtn=d.getElementById('admin-menu-close-btn'), navLinks=d.querySelectorAll('.menu-link');
+            const downloadTemplateBtn=d.getElementById('download-template-btn'), importForm=d.getElementById('form-import-csv'), fileInput=d.getElementById('csv-file-input'), fileNameEl=d.getElementById('csv-filename'), importLogContainer=d.getElementById('import-log-container'), importLog=d.getElementById('import-log'), participantCountEl=d.getElementById('participant-count'), deleteAllParticipantsBtn=d.getElementById('delete-all-participants-btn');
+            const categoryForm=d.getElementById('form-add-category'), categoryInput=d.getElementById('category-name'), categoryList=d.getElementById('category-list'), programForm=d.getElementById('form-add-program'), programNameInput=d.getElementById('program-name'), programCategorySelect=d.getElementById('program-category'), programList=d.getElementById('program-list');
+            const programPointsFirst = d.getElementById('program-points-first');
+            const programPointsSecond = d.getElementById('program-points-second');
+            const programPointsThird = d.getElementById('program-points-third');
+            
+            const resultForm=d.getElementById('form-publish-result'), resultCategorySelect=d.getElementById('result-category'), resultProgramSelect=d.getElementById('result-program'), resultInputs={'first':d.getElementById('result-first'), 'second':d.getElementById('result-second'), 'third':d.getElementById('result-third')}, nameSpans={'first':d.getElementById('name-first'), 'second':d.getElementById('name-second'), 'third':d.getElementById('name-third')};
+            const teamForm=d.getElementById('form-add-team'), teamListAdmin=d.getElementById('team-list-admin');
+            const homepageForm=d.getElementById('form-homepage'), homepageFields={'header_title':d.getElementById('homepage-header-title'), 'logo_url':d.getElementById('homepage-logo-url'), 'main_title':d.getElementById('homepage-main-title'), 'subtitle':d.getElementById('homepage-subtitle'), 'about_title':d.getElementById('homepage-about-title'), 'about_subtitle':d.getElementById('homepage-about-subtitle'), 'about':d.getElementById('homepage-about'), 'about_image_url':d.getElementById('homepage-about-image-url'), 'gallery':d.getElementById('homepage-gallery'), 'total_programs':d.getElementById('homepage-total-programs'), 'total_participants':d.getElementById('homepage-total-participants'), 'total_categories':d.getElementById('homepage-total-categories'), 'total_teams':d.getElementById('homepage-total-teams'), 'institution_name':d.getElementById('homepage-institution-name'), 'copyright_text':d.getElementById('homepage-copyright-text'), 'social_instagram':d.getElementById('homepage-social-instagram'), 'social_youtube':d.getElementById('homepage-social-youtube'), 'social_facebook':d.getElementById('homepage-social-facebook')};
 
-        // ===================================
-        // Navigation Logic 
-        // ===================================
-        function openAdminNav() { if(adminMenuOverlay && adminMenuBox) { adminMenuOverlay.style.display = 'block'; setTimeout(() => { adminMenuOverlay.style.opacity = '1'; adminMenuBox.classList.add('open'); }, 10); } }
-        function closeAdminNav() { if(adminMenuOverlay && adminMenuBox) { adminMenuOverlay.style.opacity = '0'; adminMenuBox.classList.remove('open'); setTimeout(() => { adminMenuOverlay.style.display = 'none'; }, 300); } }
-        if(adminMenuBtn) adminMenuBtn.addEventListener('click', openAdminNav);
-        if(adminMenuCloseBtn) adminMenuCloseBtn.addEventListener('click', closeAdminNav);
-        if(adminMenuOverlay) adminMenuOverlay.addEventListener('click', (e) => { if (e.target === adminMenuOverlay) { closeAdminNav(); } });
+            // ===================================
+            // Navigation Logic 
+            // ===================================
+            function openAdminNav() { if(adminMenuOverlay && adminMenuBox) { adminMenuOverlay.style.display = 'block'; setTimeout(() => { adminMenuOverlay.style.opacity = '1'; adminMenuBox.classList.add('open'); }, 10); } }
+            function closeAdminNav() { if(adminMenuOverlay && adminMenuBox) { adminMenuOverlay.style.opacity = '0'; adminMenuBox.classList.remove('open'); setTimeout(() => { adminMenuOverlay.style.display = 'none'; }, 300); } }
+            if(adminMenuBtn) adminMenuBtn.addEventListener('click', openAdminNav);
+            if(adminMenuCloseBtn) adminMenuCloseBtn.addEventListener('click', closeAdminNav);
+            if(adminMenuOverlay) adminMenuOverlay.addEventListener('click', (e) => { if (e.target === adminMenuOverlay) { closeAdminNav(); } });
 
-        navLinks.forEach(link => {
-            link.addEventListener('click', (e) => {
-                e.preventDefault();
-                const targetId = link.getAttribute('data-target');
-                pages.forEach(page => page.classList.add('hidden'));
-                const targetPage = d.getElementById(targetId);
-                if (targetPage) targetPage.classList.remove('hidden');
-                navLinks.forEach(nav => nav.classList.remove('active'));
-                link.classList.add('active');
-                closeAdminNav();
-                setTimeout(() => loadDataForPage(targetId), 0); 
+            navLinks.forEach(link => {
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const targetId = link.getAttribute('data-target');
+                    pages.forEach(page => page.classList.add('hidden'));
+                    const targetPage = d.getElementById(targetId);
+                    if (targetPage) targetPage.classList.remove('hidden');
+                    navLinks.forEach(nav => nav.classList.remove('active'));
+                    link.classList.add('active');
+                    closeAdminNav();
+                    setTimeout(() => loadDataForPage(targetId), 0); 
+                });
             });
-        });
 
-        function loadDataForPage(pageId) {
-             console.log("Loading data for:", pageId);
-             if (pageId === 'page-dashboard') loadHomepageContent();
-             if (pageId === 'page-participants') loadParticipantCount();
-             if (pageId === 'page-programs') { loadCategories(); loadPrograms(); }
-             if (pageId === 'page-results') { loadCategoriesForResults(); /* Only load categories first */ }
-             if (pageId === 'page-teams') loadTeamsForAdmin();
-        }
-
-        // ===================================
-        // Authentication (FIXED & COMPLETE)
-        // ===================================
-        onAuthStateChanged(auth, (user) => {
-            if (user) {
-                if(loginPage) loginPage.style.display = 'none'; 
-                if(adminPanel) adminPanel.style.display = 'block';
-                if(adminEmail) adminEmail.textContent = user.email;
-                const defaultPageId = 'page-dashboard';
-                pages.forEach(page => page.classList.add('hidden'));
-                 const defaultPageElement = d.getElementById(defaultPageId);
-                 if (defaultPageElement) defaultPageElement.classList.remove('hidden');
-                navLinks.forEach(nav => nav.classList.remove('active'));
-                const defaultNavLink = d.querySelector(`.menu-link[data-target="${defaultPageId}"]`);
-                 if (defaultNavLink) defaultNavLink.classList.add('active');
-                setTimeout(() => {
-                    loadDataForPage(defaultPageId); 
-                    loadAllParticipants(); 
-                }, 0);
-            } else {
-                if(loginPage) loginPage.style.display = 'flex'; 
-                if(adminPanel) adminPanel.style.display = 'none';
+            function loadDataForPage(pageId) {
+                 console.log("Loading data for:", pageId);
+                 if (pageId === 'page-dashboard') loadHomepageContent();
+                 if (pageId === 'page-participants') loadParticipantCount();
+                 if (pageId === 'page-programs') { loadCategories(); loadPrograms(); }
+                 if (pageId === 'page-results') { loadCategoriesForResults(); /* Only load categories first */ }
+                 if (pageId === 'page-teams') loadTeamsForAdmin();
             }
-        });
-        
-        d.addEventListener('DOMContentLoaded', () => {
-            const loginForm = d.getElementById('login-form'); 
-            const registerForm = d.getElementById('register-form'); 
+
+            // ===================================
+            // Authentication (FIXED & COMPLETE)
+            // ===================================
+            onAuthStateChanged(auth, (user) => {
+                if (user) {
+                    if(loginPage) loginPage.style.display = 'none'; 
+                    if(adminPanel) adminPanel.style.display = 'block';
+                    if(adminEmail) adminEmail.textContent = user.email;
+                    const defaultPageId = 'page-dashboard';
+                    pages.forEach(page => page.classList.add('hidden'));
+                     const defaultPageElement = d.getElementById(defaultPageId);
+                     if (defaultPageElement) defaultPageElement.classList.remove('hidden');
+                    navLinks.forEach(nav => nav.classList.remove('active'));
+                    const defaultNavLink = d.querySelector(`.menu-link[data-target="${defaultPageId}"]`);
+                     if (defaultNavLink) defaultNavLink.classList.add('active');
+                    setTimeout(() => {
+                        loadDataForPage(defaultPageId); 
+                        loadAllParticipants(); 
+                    }, 0);
+                } else {
+                    if(loginPage) loginPage.style.display = 'flex'; 
+                    if(adminPanel) adminPanel.style.display = 'none';
+                }
+            });
             
             if(loginForm) {
                 loginForm.addEventListener('submit', async (e) => { 
@@ -415,293 +377,130 @@
                     } catch (error) { alert(`Registration Failed: ${error.message}`); }
                 });
             } else { console.error("Register form not found!"); }
-        }); // End DOMContentLoaded for auth forms
 
-        if(logoutButton) {
-            logoutButton.addEventListener('click', async () => { 
-                try { await signOut(auth); } 
-                catch(error) { alert(`Logout Failed: ${error.message}`); }
-            });
-        } else { console.error("Logout button not found!"); }
+            if(logoutButton) {
+                logoutButton.addEventListener('click', async () => { 
+                    try { await signOut(auth); } 
+                    catch(error) { alert(`Logout Failed: ${error.message}`); }
+                });
+            } else { console.error("Logout button not found!"); }
 
-        window.togglePasswordVisibility = function(inputId, button) {
-            const input = d.getElementById(inputId); 
-            const icon = button.querySelector('i');
-            if (!input || !icon) return; 
-            if (input.type === "password") {
-                input.type = "text";
-                icon.classList.remove("fa-eye");
-                icon.classList.add("fa-eye-slash");
-            } else {
-                input.type = "password";
-                icon.classList.remove("fa-eye-slash");
-                icon.classList.add("fa-eye");
-            }
-        }
-
-        // ===================================
-        // Participants Page 
-        // ===================================
-        function loadAllParticipants() { /* ... */ }
-        function loadParticipantCount() { /* ... */ }
-        if(downloadTemplateBtn) downloadTemplateBtn.addEventListener('click', () => { /* ... */ });
-        if(fileInput) fileInput.addEventListener('change', (e) => { /* ... */ });
-        if(importForm) importForm.addEventListener('submit', (e) => { /* ... */ });
-        async function deleteAllParticipants(promptUser = true) { /* ... */ }
-        if(deleteAllParticipantsBtn) deleteAllParticipantsBtn.addEventListener('click', () => deleteAllParticipants(true)); 
-
-        // ===================================
-        // Programs & Categories Page (UPDATED)
-        // ===================================
-        async function loadCategories() {
-             try {
-                 const q = query(collection(db, `artifacts/${appId}/public/data/categories`));
-                 const snapshot = await getDocs(q);
-                 allCategories = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })).sort((a,b)=>a.name.localeCompare(b.name));
-                 if (categoryList) categoryList.innerHTML = ''; 
-                 if (programCategorySelect) programCategorySelect.innerHTML = '<option value="">Select Category</option>'; 
-                 if (allCategories.length === 0) {
-                     if (categoryList) categoryList.innerHTML = '<p class="text-gray-500 italic p-4">No categories added yet.</p>';
-                 } else {
-                     allCategories.forEach(cat => {
-                         if (categoryList) {
-                             categoryList.innerHTML += `
-                                 <div class="list-item">
-                                     <div class="list-item-content">
-                                         <span class="list-item-name">${cat.name}</span>
-                                     </div>
-                                     <div class="list-item-actions">
-                                         <button class="btn btn-warning btn-sm btn-icon-only" onclick="editCategory('${cat.id}', '${cat.name}')" title="Edit Category">
-                                             <i class="fas fa-edit"></i>
-                                         </button>
-                                         <button class="btn btn-danger btn-sm btn-icon-only" onclick="deleteCategory('${cat.id}')" title="Delete Category">
-                                             <i class="fas fa-trash-alt"></i>
-                                         </button>
-                                     </div>
-                                 </div>`;
-                         }
-                         if (programCategorySelect) programCategorySelect.innerHTML += `<option value="${cat.name}">${cat.name}</option>`;
-                     });
-                 }
-             } catch(error) { console.error("Error loading categories:", error); if (categoryList) categoryList.innerHTML = '<p class="text-red-500 p-4">Error loading categories.</p>';}
-        }
-
-        if(categoryForm && categoryInput) categoryForm.addEventListener('submit', async (e) => { e.preventDefault(); const name = categoryInput.value.trim(); if (!name) return; try { await addDoc(collection(db, `artifacts/${appId}/public/data/categories`), { name }); categoryInput.value = ''; await loadCategories(); } catch (error) { alert(`Error: ${error.message}`); }});
-        window.deleteCategory = async (id) => { if (!confirm('Are you sure you want to delete this category?')) return; try { await deleteDoc(doc(db, `artifacts/${appId}/public/data/categories`, id)); await loadCategories(); } catch (error) { alert(`Error: ${error.message}`); }};
-        
-        window.editCategory = async (id, currentName) => {
-            const newName = prompt("Enter the new name for the category:", currentName);
-            if (newName && newName.trim() !== '' && newName.trim() !== currentName) {
-                try {
-                    await updateDoc(doc(db, `artifacts/${appId}/public/data/categories`, id), { name: newName.trim() });
-                    alert('Category updated!');
-                    await loadCategories(); 
-                    await loadPrograms(); 
-                } catch (error) { alert(`Error updating category: ${error.message}`); }
-            }
-        };
-
-        async function loadPrograms() {
-             try {
-                 const q = query(collection(db, `artifacts/${appId}/public/data/programs`));
-                 const snapshot = await getDocs(q);
-                 allPrograms = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })).sort((a,b)=>a.name.localeCompare(b.name)); // Store globally
-                 if (programList) programList.innerHTML = '';
-                 if (allPrograms.length === 0) {
-                      if (programList) programList.innerHTML = '<p class="text-gray-500 italic p-4">No programs added yet.</p>';
-                 } else {
-                     allPrograms.forEach(prog => {
-                         if (programList) {
-                             programList.innerHTML += `
-                                 <div class="list-item">
-                                     <div class="list-item-content">
-                                        <span class="list-item-name">${prog.name}</span>
-                                        <span class="list-item-details">${prog.category}</span>
-                                     </div>
-                                     <div class="list-item-actions">
-                                         <span class="list-item-points">${prog.points_first || 0}, ${prog.points_second || 0}, ${prog.points_third || 0}</span>
-                                         <button class="btn btn-warning btn-sm btn-icon-only" onclick="editProgram('${prog.id}', \`${prog.name}\`, '${prog.category}', '${prog.points_first || 0}', '${prog.points_second || 0}', '${prog.points_third || 0}')" title="Edit Program">
-                                             <i class="fas fa-edit"></i>
-                                         </button>
-                                         <button class="btn btn-danger btn-sm btn-icon-only" onclick="deleteProgram('${prog.id}')" title="Delete Program">
-                                             <i class="fas fa-trash-alt"></i>
-                                         </button>
-                                     </div>
-                                 </div>`;
-                         }
-                     });
-                 }
-            } catch(error) { console.error("Error loading programs:", error); if (programList) programList.innerHTML = '<p class="text-red-500 p-4">Error loading programs.</p>';}
-        }
-        
-        if(programForm && programNameInput && programCategorySelect) programForm.addEventListener('submit', async (e) => { 
-            e.preventDefault(); 
-            const name = programNameInput.value.trim(); 
-            const category = programCategorySelect.value; 
-            const points_first = parseInt(programPointsFirst.value, 10);
-            const points_second = parseInt(programPointsSecond.value, 10);
-            const points_third = parseInt(programPointsThird.value, 10);
-
-            if (!name || !category || isNaN(points_first) || isNaN(points_second) || isNaN(points_third)) {
-                alert('Please fill in all fields, including points.');
-                return;
-            } 
-            try { 
-                await addDoc(collection(db, `artifacts/${appId}/public/data/programs`), { 
-                    name, 
-                    category, 
-                    points_first, 
-                    points_second, 
-                    points_third 
-                }); 
-                programForm.reset(); // Reset the form
-                await loadPrograms(); 
-            } catch (error) { alert(`Error: ${error.message}`); }
-        });
-        
-        window.deleteProgram = async (id) => { if (!confirm('Are you sure you want to delete this program?')) return; try { await deleteDoc(doc(db, `artifacts/${appId}/public/data/programs`, id)); await deleteDoc(doc(db, `artifacts/${appId}/public/data/results`, id)); await loadPrograms(); } catch (error) { alert(`Error: ${error.message}`); }};
-
-        window.editProgram = async (id, currentName, currentCategory, p1, p2, p3) => {
-            const newName = prompt("Enter the new name for the program:", currentName);
-            
-            let categoryOptions = allCategories.map((cat, index) => `${index + 1}: ${cat.name}`).join('\n');
-            let categoryPromptMsg = `Enter the number for the new category (current: '${currentCategory}'):\n${categoryOptions}`;
-            const categoryChoiceIndex = prompt(categoryPromptMsg);
-            
-            const newP1 = prompt("Enter new 1st place points:", p1);
-            const newP2 = prompt("Enter new 2nd place points:", p2);
-            const newP3 = prompt("Enter new 3rd place points:", p3);
-
-            let newCategory = currentCategory; 
-            if (categoryChoiceIndex && !isNaN(categoryChoiceIndex)) {
-                let index = parseInt(categoryChoiceIndex) - 1;
-                if (index >= 0 && index < allCategories.length) { newCategory = allCategories[index].name; } 
-                else { alert("Invalid category number. Keeping original category."); }
-            }
-
-            const dataToUpdate = {
-                name: (newName && newName.trim() !== '') ? newName.trim() : currentName,
-                category: newCategory,
-                points_first: (newP1 && !isNaN(newP1)) ? parseInt(newP1, 10) : parseInt(p1, 10),
-                points_second: (newP2 && !isNaN(newP2)) ? parseInt(newP2, 10) : parseInt(p2, 10),
-                points_third: (newP3 && !isNaN(newP3)) ? parseInt(newP3, 10) : parseInt(p3, 10)
-            };
-
-            try {
-                await updateDoc(doc(db, `artifacts/${appId}/public/data/programs`, id), dataToUpdate);
-                alert('Program updated!');
-                await loadPrograms(); 
-            } catch (error) { alert(`Error updating program: ${error.message}`); }
-        };
-
-
-        // ===================================
-        // Results Page (UPDATED)
-        // ===================================
-        function updateWinnerName(position) { /* ... (Unchanged) ... */ }
-        if(resultInputs.first) resultInputs.first.addEventListener('input', () => updateWinnerName('first'));
-        if(resultInputs.second) resultInputs.second.addEventListener('input', () => updateWinnerName('second'));
-        if(resultInputs.third) resultInputs.third.addEventListener('input', () => updateWinnerName('third'));
-        function clearNamePreviews() { /* ... (Unchanged) ... */ }
-
-        // Load Categories into the first dropdown
-        async function loadCategoriesForResults() {
-            await loadCategories(); // Ensure allCategories is populated
-            if (!resultCategorySelect) return;
-            resultCategorySelect.innerHTML = '<option value="">-- Select Category --</option>'; 
-            allCategories.forEach(cat => {
-                 resultCategorySelect.innerHTML += `<option value="${cat.name}">${cat.name}</option>`; 
-            });
-        }
-
-        // Load Programs based on selected category
-        async function loadProgramsForResults(selectedCategory = null) { 
-            await loadPrograms(); // Ensure allPrograms is populated
-            if (!resultProgramSelect) return; 
-            
-            resultProgramSelect.innerHTML = '<option value="">-- Select Program --</option>'; 
-            const filteredPrograms = selectedCategory ? allPrograms.filter(p => p.category === selectedCategory) : []; 
-            filteredPrograms.sort((a,b) => a.name.localeCompare(b.name)); 
-
-            if (filteredPrograms.length > 0) {
-                filteredPrograms.forEach(program => { 
-                    resultProgramSelect.innerHTML += `<option value="${program.id}">${program.name}</option>`; 
-                }); 
-                resultProgramSelect.disabled = false; 
-            } else {
-                 resultProgramSelect.innerHTML = `<option value="">${selectedCategory ? 'No programs in category' : '-- Select Category First --'}</option>`;
-                 resultProgramSelect.disabled = true; 
-            }
-        }
-
-        // Event listener for Category dropdown
-        if(resultCategorySelect) {
-            resultCategorySelect.addEventListener('change', (e) => {
-                const selectedCategory = e.target.value;
-                if(resultForm) resultForm.reset(); 
-                clearNamePreviews();
-                d.getElementById('result-category').value = selectedCategory; // Keep category selected
-                loadProgramsForResults(selectedCategory); 
-                resultProgramSelect.disabled = !selectedCategory; 
-            });
-        }
-
-        // Event listener for Program dropdown
-        if(resultProgramSelect) resultProgramSelect.addEventListener('change', async (e) => {
-            const programId = e.target.value;
-            // Only reset winners, keep category and program selected
-            if(resultInputs.first) resultInputs.first.value = '';
-            if(resultInputs.second) resultInputs.second.value = '';
-            if(resultInputs.third) resultInputs.third.value = '';
-            clearNamePreviews();
-            
-            if (!programId) return;
-
-            try {
-                const docSnap = await getDoc(doc(db, `artifacts/${appId}/public/data/results`, programId));
-                if (docSnap.exists()) {
-                    const data = docSnap.data();
-                    if(resultInputs.first) resultInputs.first.value = data.first ? data.first.map(w => w.chest).join(', ') : '';
-                    if(resultInputs.second) resultInputs.second.value = data.second ? data.second.map(w => w.chest).join(', ') : '';
-                    if(resultInputs.third) resultInputs.third.value = data.third ? data.third.map(w => w.chest).join(', ') : '';
-                    updateWinnerName('first'); updateWinnerName('second'); updateWinnerName('third');
+            window.togglePasswordVisibility = function(inputId, button) {
+                const input = d.getElementById(inputId); 
+                const icon = button.querySelector('i');
+                if (!input || !icon) return; 
+                if (input.type === "password") {
+                    input.type = "text";
+                    icon.classList.remove("fa-eye");
+                    icon.classList.add("fa-eye-slash");
+                } else {
+                    input.type = "password";
+                    icon.classList.remove("fa-eye-slash");
+                    icon.classList.add("fa-eye");
                 }
-             } catch(error){ console.error("Error fetching result:", error);}
-        });
+            }
 
-       if(resultForm) resultForm.addEventListener('submit', async (e) => {
-            e.preventDefault(); 
-            const programId = resultProgramSelect ? resultProgramSelect.value : null; 
-            if (!programId) { alert('Please select a program.'); return; }
-            const mapToWinnerData = (id) => { 
-                const inputElement = d.getElementById(id);
-                if (!inputElement) return []; 
-                const chestList = inputElement.value.split(',').map(s => s.trim()).filter(Boolean); 
-                return chestList.map(chest => ({ chest: chest, name: allParticipants[chest]?.name || (Object.keys(allTeamsAdmin).includes(chest.toUpperCase()) ? chest.toUpperCase() : 'Unknown') })); 
-            };
-            const resultData = { first: mapToWinnerData('result-first'), second: mapToWinnerData('result-second'), third: mapToWinnerData('result-third') };
-            try { 
-                await setDoc(doc(db, `artifacts/${appId}/public/data/results`, programId), resultData); 
-                alert('Result published/updated!'); 
-            } catch (error) { alert(`Error: ${error.message}`); }
-        });
+            // ===================================
+            // Participants Page 
+            // ===================================
+            function loadAllParticipants() { /* ... */ }
+            function loadParticipantCount() { /* ... */ }
+            if(downloadTemplateBtn) downloadTemplateBtn.addEventListener('click', () => { /* ... */ });
+            if(fileInput) fileInput.addEventListener('change', (e) => { /* ... */ });
+            if(importForm) importForm.addEventListener('submit', (e) => { /* ... */ });
+            async function deleteAllParticipants(promptUser = true) { /* ... */ }
+            if(deleteAllParticipantsBtn) deleteAllParticipantsBtn.addEventListener('click', () => deleteAllParticipants(true)); 
 
+            // ===================================
+            // Programs & Categories Page
+            // ===================================
+            async function loadCategories() { /* ... */ }
+            if(categoryForm && categoryInput) categoryForm.addEventListener('submit', async (e) => { /* ... */ });
+            window.deleteCategory = async (id) => { /* ... */ };
+            window.editCategory = async (id, currentName) => { /* ... */ };
+            async function loadPrograms() { /* ... */ }
+            if(programForm && programNameInput && programCategorySelect) programForm.addEventListener('submit', async (e) => { /* ... */ });
+            window.deleteProgram = async (id) => { /* ... */ };
+            window.editProgram = async (id, currentName, currentCategory, p1, p2, p3) => { /* ... */ };
 
-        // ===================================
-        // Teams Page (Admin)
-        // ===================================
-        async function loadTeamsForAdmin() { /* ... */ }
-        function renderAdminTeamList() { /* ... (Uses btn-warning) ... */ }
-        if(teamForm) teamForm.addEventListener('submit', async (e) => { /* ... */ });
-        async function handleUpdateTeam(e) { /* ... */ }
-        window.deleteTeam = async (id) => { /* ... */ };
+            // ===================================
+            // Results Page
+            // ===================================
+            function updateWinnerName(position) { /* ... */ }
+            if(resultInputs.first) resultInputs.first.addEventListener('input', () => updateWinnerName('first'));
+            if(resultInputs.second) resultInputs.second.addEventListener('input', () => updateWinnerName('second'));
+            if(resultInputs.third) resultInputs.third.addEventListener('input', () => updateWinnerName('third'));
+            function clearNamePreviews() { /* ... */ }
+            async function loadCategoriesForResults() { /* ... */ }
+            async function loadProgramsForResults(selectedCategory = null) { /* ... */ }
+            if(resultCategorySelect) { resultCategorySelect.addEventListener('change', (e) => { /* ... */ }); }
+            if(resultProgramSelect) resultProgramSelect.addEventListener('change', async (e) => { /* ... */ });
+            if(resultForm) resultForm.addEventListener('submit', async (e) => { /* ... */ });
 
-        // ===================================
-        // Home Page Content (Admin) 
-        // ===================================
-        async function loadHomepageContent() { /* ... */ }
-        if(homepageForm) homepageForm.addEventListener('submit', async (e) => { /* ... */ });
+            // ===================================
+            // Teams Page (Admin)
+            // ===================================
+            async function loadTeamsForAdmin() { /* ... */ }
+            function renderAdminTeamList() { /* ... */ }
+            if(teamForm) teamForm.addEventListener('submit', async (e) => { /* ... */ });
+            async function handleUpdateTeam(e) { /* ... */ }
+            window.deleteTeam = async (id) => { /* ... */ };
 
+            // ===================================
+            // Home Page Content (Admin) 
+            // ===================================
+            async function loadHomepageContent() { /* ... */ }
+            if(homepageForm) homepageForm.addEventListener('submit', async (e) => { /* ... */ });
+
+            // ---------------------------------
+            // ALL FUNCTION DEFINITIONS
+            // (These are safe to define here)
+            // ---------------------------------
+            
+            // --- Participants ---
+            function loadAllParticipants() { const participantsRef = collection(db, `artifacts/${appId}/public/data/participants`); onSnapshot(participantsRef, (snapshot) => { allParticipants = {}; snapshot.docs.forEach(doc => { allParticipants[doc.id] = doc.data(); }); loadParticipantCount(); console.log('Participants data loaded:', Object.keys(allParticipants).length); }, (error) => { console.error("Error loading participants:", error); }); }
+            function loadParticipantCount() { if(participantCountEl) participantCountEl.textContent = Object.keys(allParticipants).length; }
+            async function deleteAllParticipants(promptUser = true) { let confirmation = 'DELETE'; if (promptUser) { confirmation = prompt('This will delete ALL participants. Type DELETE to confirm.'); } if (promptUser && confirmation !== 'DELETE') { alert('Deletion cancelled.'); return Promise.reject('Deletion cancelled by user.'); } if (!promptUser && confirmation !== 'DELETE') { console.log("Internal skip condition met, resolving."); return Promise.resolve(); } try { if (promptUser) alert('Deleting participants...'); const q = query(collection(db, `artifacts/${appId}/public/data/participants`)); const snapshot = await getDocs(q); if (snapshot.empty) { if (promptUser) alert('No participants found to delete.'); return Promise.resolve(); } const batch = writeBatch(db); snapshot.docs.forEach(doc => { batch.delete(doc.ref); }); await batch.commit(); if (promptUser) alert('All participants have been deleted.'); loadAllParticipants(); return Promise.resolve(); } catch (error) { if (promptUser) alert(`Error deleting participants: ${error.message}`); console.error("Error deleting participants:", error); return Promise.reject(`Error deleting participants: ${error.message}`); } }
+            
+            // --- Categories & Programs ---
+            async function loadCategories() { try { const q = query(collection(db, `artifacts/${appId}/public/data/categories`)); const snapshot = await getDocs(q); allCategories = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })).sort((a,b)=>a.name.localeCompare(b.name)); if (categoryList) categoryList.innerHTML = ''; if (programCategorySelect) programCategorySelect.innerHTML = '<option value="">Select Category</option>'; if (allCategories.length === 0) { if (categoryList) categoryList.innerHTML = '<p class="text-gray-500 italic p-4">No categories added yet.</p>'; } else { allCategories.forEach(cat => { if (categoryList) { categoryList.innerHTML += ` <div class="list-item"> <div class="list-item-content"> <span class="list-item-name">${cat.name}</span> </div> <div class="list-item-actions"> <button class="btn btn-warning btn-sm btn-icon-only" onclick="editCategory('${cat.id}', '${cat.name}')" title="Edit Category"> <i class="fas fa-edit"></i> </button> <button class="btn btn-danger btn-sm btn-icon-only" onclick="deleteCategory('${cat.id}')" title="Delete Category"> <i class="fas fa-trash-alt"></i> </button> </div> </div>`; } if (programCategorySelect) programCategorySelect.innerHTML += `<option value="${cat.name}">${cat.name}</option>`; }); } } catch(error) { console.error("Error loading categories:", error); if (categoryList) categoryList.innerHTML = '<p class="text-red-500 p-4">Error loading categories.</p>';} }
+            window.deleteCategory = async (id) => { if (!confirm('Are you sure you want to delete this category?')) return; try { await deleteDoc(doc(db, `artifacts/${appId}/public/data/categories`, id)); await loadCategories(); } catch (error) { alert(`Error: ${error.message}`); }};
+            window.editCategory = async (id, currentName) => { const newName = prompt("Enter the new name for the category:", currentName); if (newName && newName.trim() !== '' && newName.trim() !== currentName) { try { await updateDoc(doc(db, `artifacts/${appId}/public/data/categories`, id), { name: newName.trim() }); alert('Category updated!'); await loadCategories(); await loadPrograms(); } catch (error) { alert(`Error updating category: ${error.message}`); } } };
+            async function loadPrograms() { try { const q = query(collection(db, `artifacts/${appId}/public/data/programs`)); const snapshot = await getDocs(q); allPrograms = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })).sort((a,b)=>a.name.localeCompare(b.name)); if (programList) programList.innerHTML = ''; if (allPrograms.length === 0) { if (programList) programList.innerHTML = '<p class="text-gray-500 italic p-4">No programs added yet.</p>'; } else { allPrograms.forEach(prog => { if (programList) { programList.innerHTML += ` <div class="list-item"> <div class="list-item-content"> <span class="list-item-name">${prog.name}</span> <span class="list-item-details">${prog.category}</span> </div> <div class="list-item-actions"> <span class="list-item-points">${prog.points_first || 0}, ${prog.points_second || 0}, ${prog.points_third || 0}</span> <button class="btn btn-warning btn-sm btn-icon-only" onclick="editProgram('${prog.id}', \`${prog.name}\`, '${prog.category}', '${prog.points_first || 0}', '${prog.points_second || 0}', '${prog.points_third || 0}')" title="Edit Program"> <i class="fas fa-edit"></i> </button> <button class="btn btn-danger btn-sm btn-icon-only" onclick="deleteProgram('${prog.id}')" title="Delete Program"> <i class="fas fa-trash-alt"></i> </button> </div> </div>`; } }); } } catch(error) { console.error("Error loading programs:", error); if (programList) programList.innerHTML = '<p class="text-red-500 p-4">Error loading programs.</p>';} }
+            window.deleteProgram = async (id) => { if (!confirm('Are you sure you want to delete this program?')) return; try { await deleteDoc(doc(db, `artifacts/${appId}/public/data/programs`, id)); await deleteDoc(doc(db, `artifacts/${appId}/public/data/results`, id)); await loadPrograms(); } catch (error) { alert(`Error: ${error.message}`); }};
+            window.editProgram = async (id, currentName, currentCategory, p1, p2, p3) => { const newName = prompt("Enter the new name for the program:", currentName); let categoryOptions = allCategories.map((cat, index) => `${index + 1}: ${cat.name}`).join('\n'); let categoryPromptMsg = `Enter the number for the new category (current: '${currentCategory}'):\n${categoryOptions}`; const categoryChoiceIndex = prompt(categoryPromptMsg); const newP1 = prompt("Enter new 1st place points:", p1); const newP2 = prompt("Enter new 2nd place points:", p2); const newP3 = prompt("Enter new 3rd place points:", p3); let newCategory = currentCategory; if (categoryChoiceIndex && !isNaN(categoryChoiceIndex)) { let index = parseInt(categoryChoiceIndex) - 1; if (index >= 0 && index < allCategories.length) { newCategory = allCategories[index].name; } else { alert("Invalid category number. Keeping original category."); } } const dataToUpdate = { name: (newName && newName.trim() !== '') ? newName.trim() : currentName, category: newCategory, points_first: (newP1 && !isNaN(newP1)) ? parseInt(newP1, 10) : parseInt(p1, 10), points_second: (newP2 && !isNaN(newP2)) ? parseInt(newP2, 10) : parseInt(p2, 10), points_third: (newP3 && !isNaN(newP3)) ? parseInt(newP3, 10) : parseInt(p3, 10) }; try { await updateDoc(doc(db, `artifacts/${appId}/public/data/programs`, id), dataToUpdate); alert('Program updated!'); await loadPrograms(); } catch (error) { alert(`Error updating program: ${error.message}`); } };
+
+            // --- Results ---
+            function updateWinnerName(position) { const inputElement = resultInputs[position]; const spanElement = nameSpans[position]; if (!inputElement || !spanElement) return; const chestNoInput = inputElement.value.trim(); const chestNos = chestNoInput.split(',').map(s => s.trim()).filter(Boolean); const names = chestNos.map(cn => allParticipants[cn]?.name || (Object.keys(allTeamsAdmin).includes(cn.toUpperCase()) ? cn.toUpperCase() : 'Unknown')).join(', '); spanElement.textContent = names; }
+            function clearNamePreviews() { if(nameSpans.first) nameSpans.first.textContent = ''; if(nameSpans.second) nameSpans.second.textContent = ''; if(nameSpans.third) nameSpans.third.textContent = ''; }
+            async function loadCategoriesForResults() { await loadCategories(); if (!resultCategorySelect) return; resultCategorySelect.innerHTML = '<option value="">-- Select Category --</option>'; allCategories.forEach(cat => { resultCategorySelect.innerHTML += `<option value="${cat.name}">${cat.name}</option>`; }); }
+            async function loadProgramsForResults(selectedCategory = null) { await loadPrograms(); if (!resultProgramSelect) return; resultProgramSelect.innerHTML = '<option value="">-- Select Program --</option>'; const filteredPrograms = selectedCategory ? allPrograms.filter(p => p.category === selectedCategory) : []; filteredPrograms.sort((a,b) => a.name.localeCompare(b.name)); if (filteredPrograms.length > 0) { filteredPrograms.forEach(program => { resultProgramSelect.innerHTML += `<option value="${program.id}">${program.name}</option>`; }); resultProgramSelect.disabled = false; } else { resultProgramSelect.innerHTML = `<option value="">${selectedCategory ? 'No programs in category' : '-- Select Category First --'}</option>`; resultProgramSelect.disabled = true; } }
+            
+            // --- Teams ---
+            async function loadTeamsForAdmin() { try { const q = query(collection(db, `artifacts/${appId}/public/data/teams`)); const snapshot = await getDocs(q); allTeamsAdmin = {}; snapshot.docs.forEach(doc => { allTeamsAdmin[doc.id] = { id: doc.id, ...doc.data() }; }); renderAdminTeamList(); } catch(error) { console.error("Error loading teams for admin:", error); if(teamListAdmin) teamListAdmin.innerHTML = '<p class="text-red-500">Error loading teams.</p>'; } }
+            function renderAdminTeamList() { if (!teamListAdmin) return; teamListAdmin.innerHTML = ''; if (Object.keys(allTeamsAdmin).length === 0) { teamListAdmin.innerHTML = '<p class="text-gray-500 italic">No teams added yet.</p>'; return; } const sortedTeams = Object.values(allTeamsAdmin).sort((a, b) => a.name.localeCompare(b.name)); sortedTeams.forEach(team => { const teamElement = d.createElement('div'); teamElement.className = 'border border-gray-200 rounded-lg p-4 mb-4 bg-gray-50'; teamElement.innerHTML = ` <h3 class="text-xl font-bold text-gray-800 mb-4">${team.name}</h3> <form class="space-y-4" data-team-id="${team.id}"> <div class="grid grid-cols-1 md:grid-cols-2 gap-4"> <div><label class="form-label">Leader Name</label><input type="text" class="form-input" value="${team.leader || ''}" data-field="leader"></div> <div><label class="form-label">Asst. Leader Name</label><input type="text" class="form-input" value="${team.asst || ''}" data-field="asst"></div> </div> <div class="grid grid-cols-1 md:grid-cols-2 gap-4"> <div><label class="form-label">Chest No From</label><input type="number" class="form-input" value="${team.id_from || ''}" data-field="id_from"></div> <div><label class="form-label">Chest No To</label><input type="number" class="form-input" value="${team.id_to || ''}" data-field="id_to"></div> </div> <div class="flex justify-end gap-3 pt-2"> <button type="button" class="btn btn-danger btn-sm btn-icon-only" onclick="deleteTeam('${team.id}')"><i class="fas fa-trash-alt"></i></button> <button type="submit" class="btn btn-secondary btn-sm"><i class="fas fa-sync-alt"></i>Update Team</button> </div> </form>`; teamListAdmin.appendChild(teamElement); const updateForm = teamElement.querySelector('form'); if(updateForm) updateForm.addEventListener('submit', handleUpdateTeam); }); }
+            async function handleUpdateTeam(e) { e.preventDefault(); const form = e.target; const teamId = form.dataset.teamId; if (!teamId) return; const updatedData = { name: teamId }; form.querySelectorAll('input[data-field]').forEach(input => { const field = input.dataset.field; let value = input.value.trim(); if (field === 'id_from' || field === 'id_to') { value = value ? parseInt(value, 10) : null; } updatedData[field] = value; }); try { await setDoc(doc(db, `artifacts/${appId}/public/data/teams`, teamId), updatedData); alert(`Team ${teamId} updated successfully!`); allTeamsAdmin[teamId] = { id: teamId, ...updatedData }; } catch (error) { alert(`Error updating team: ${error.message}`); } }
+            window.deleteTeam = async (id) => { if (!confirm(`Are you sure you want to delete team ${id}? This cannot be undone.`)) return; try { await deleteDoc(doc(db, `artifacts/${appId}/public/data/teams`, id)); alert(`Team ${id} deleted successfully!`); delete allTeamsAdmin[id]; renderAdminTeamList(); } catch (error) { alert(`Error deleting team: ${error.message}`); }};
+            
+            // --- Homepage ---
+            async function loadHomepageContent() { try { const docRef = doc(db, `artifacts/${appId}/public/data/config`, 'homepage'); const docSnap = await getDoc(docRef); if (docSnap.exists()) { const data = docSnap.data(); Object.keys(homepageFields).forEach(key => { const fieldElement = homepageFields[key]; if (fieldElement) { if (key === 'gallery') { fieldElement.value = (data[key] || []).join('\n'); } else { fieldElement.value = data[key] || ''; } } }); } else { console.log("Homepage config document does not exist!"); } } catch(error) { console.error("Error loading homepage content:", error); alert("Could not load homepage settings."); } }
+            
+            
+            // --- ADD EVENT LISTENERS ---
+            // (These are safe now because they are inside DOMContentLoaded)
+            
+            if(teamForm) teamForm.addEventListener('submit', async (e) => { e.preventDefault(); const nameInput = d.getElementById('team-name'); const leaderInput = d.getElementById('team-leader'); const asstInput = d.getElementById('team-asst'); const idFromInput = d.getElementById('team-id-from'); const idToInput = d.getElementById('team-id-to'); if (!nameInput || !leaderInput || !asstInput || !idFromInput || !idToInput) return; const name = nameInput.value.trim().toUpperCase(); const leader = leaderInput.value.trim(); const asst = asstInput.value.trim(); const id_from = idFromInput.value; const id_to = idToInput.value; if (!name) { alert("Team Name is required."); return; } const teamData = { name, leader, asst }; if (id_from) teamData.id_from = parseInt(id_from, 10); if (id_to) teamData.id_to = parseInt(id_to, 10); try { await setDoc(doc(db, `artifacts/${appId}/public/data/teams`, name), teamData); alert(`Team ${name} added successfully!`); teamForm.reset(); loadTeamsForAdmin(); } catch (error) { alert(`Error adding team: ${error.message}`); } });
+            if(homepageForm) homepageForm.addEventListener('submit', async (e) => { e.preventDefault(); const galleryArray = homepageFields.gallery ? homepageFields.gallery.value.split('\n').map(url => url.trim()).filter(Boolean) : []; const dataToSave = {}; Object.keys(homepageFields).forEach(key => { const fieldElement = homepageFields[key]; if (fieldElement) { if (key === 'gallery') { dataToSave[key] = galleryArray; } else { dataToSave[key] = fieldElement.value.trim(); } } }); try { await setDoc(doc(db, `artifacts/${appId}/public/data/config`, 'homepage'), dataToSave); alert('Homepage settings saved!'); } catch (error) { alert(`Error saving settings: ${error.message}`); } });
+            if(programForm && programNameInput && programCategorySelect) programForm.addEventListener('submit', async (e) => { e.preventDefault(); const name = programNameInput.value.trim(); const category = programCategorySelect.value; const points_first = parseInt(programPointsFirst.value, 10); const points_second = parseInt(programPointsSecond.value, 10); const points_third = parseInt(programPointsThird.value, 10); if (!name || !category || isNaN(points_first) || isNaN(points_second) || isNaN(points_third)) { alert('Please fill in all fields, including points.'); return; } try { await addDoc(collection(db, `artifacts/${appId}/public/data/programs`), { name, category, points_first, points_second, points_third }); programForm.reset(); await loadPrograms(); } catch (error) { alert(`Error: ${error.message}`); } });
+            if(categoryForm && categoryInput) categoryForm.addEventListener('submit', async (e) => { e.preventDefault(); const name = categoryInput.value.trim(); if (!name) return; try { await addDoc(collection(db, `artifacts/${appId}/public/data/categories`), { name }); categoryInput.value = ''; await loadCategories(); } catch (error) { alert(`Error: ${error.message}`); }});
+            if(resultCategorySelect) { resultCategorySelect.addEventListener('change', (e) => { const selectedCategory = e.target.value; if(resultForm) resultForm.reset(); clearNamePreviews(); d.getElementById('result-category').value = selectedCategory; loadProgramsForResults(selectedCategory); resultProgramSelect.disabled = !selectedCategory; }); }
+            if(resultProgramSelect) resultProgramSelect.addEventListener('change', async (e) => { const programId = e.target.value; if(resultInputs.first) resultInputs.first.value = ''; if(resultInputs.second) resultInputs.second.value = ''; if(resultInputs.third) resultInputs.third.value = ''; clearNamePreviews(); if (!programId) return; try { const docSnap = await getDoc(doc(db, `artifacts/${appId}/public/data/results`, programId)); if (docSnap.exists()) { const data = docSnap.data(); if(resultInputs.first) resultInputs.first.value = data.first ? data.first.map(w => w.chest).join(', ') : ''; if(resultInputs.second) resultInputs.second.value = data.second ? data.second.map(w => w.chest).join(', ') : ''; if(resultInputs.third) resultInputs.third.value = data.third ? data.third.map(w => w.chest).join(', ') : ''; updateWinnerName('first'); updateWinnerName('second'); updateWinnerName('third'); } } catch(error){ console.error("Error fetching result:", error);} });
+            if(resultForm) resultForm.addEventListener('submit', async (e) => { e.preventDefault(); const programId = resultProgramSelect ? resultProgramSelect.value : null; if (!programId) { alert('Please select a program.'); return; } const mapToWinnerData = (id) => { const inputElement = d.getElementById(id); if (!inputElement) return []; const chestList = inputElement.value.split(',').map(s => s.trim()).filter(Boolean); return chestList.map(chest => ({ chest: chest, name: allParticipants[chest]?.name || (Object.keys(allTeamsAdmin).includes(chest.toUpperCase()) ? chest.toUpperCase() : 'Unknown') })); }; const resultData = { first: mapToWinnerData('result-first'), second: mapToWinnerData('result-second'), third: mapToWinnerData('result-third') }; try { await setDoc(doc(db, `artifacts/${appId}/public/data/results`, programId), resultData); alert('Result published/updated!'); } catch (error) { alert(`Error: ${error.message}`); } });
+            if(resultInputs.first) resultInputs.first.addEventListener('input', () => updateWinnerName('first'));
+            if(resultInputs.second) resultInputs.second.addEventListener('input', () => updateWinnerName('second'));
+            if(resultInputs.third) resultInputs.third.addEventListener('input', () => updateWinnerName('third'));
+        
+        }); // End DOMContentLoaded
     </script>
 </body>
 </html>
