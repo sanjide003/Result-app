@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- Version 2.3 - Scoreboard Layout & Filter Fix -->
+<!-- Version 2.4 - Enhanced Loading Debug -->
 <html lang="ml">
 <head>
     <meta charset="UTF-8">
@@ -187,13 +187,13 @@
         .scoreboard-team-row:last-child { border-bottom: none; }
         .scoreboard-team-row span:first-child { color: var(--text-color); font-weight: 500; }
         .scoreboard-team-row span:last-child { font-weight: bold; font-size: 1.1em; color: var(--heading-color); display: flex; align-items: center; gap: 10px; }
-        /* Total card specific styles (appears at the bottom now via JS) */
+        /* Total card specific styles */
         .total-card { background: #f9fafb; border: 1px solid var(--border-color); margin-top: 10px; /* Adjust margin if needed */ }
         .total-card h3 { font-family: 'Saira', sans-serif; font-size: 1.8em; color: var(--heading-color); text-align: center; margin-top: 0; margin-bottom: 10px; }
         .total-card .category-count-text { text-align: center; color: var(--subtle-text); margin-top: -5px; margin-bottom: 20px; font-size: 0.9em; }
         .total-card .scoreboard-team-row span:first-child { font-weight: bold; color: var(--heading-color); font-size: 1.1em; }
         .total-card .scoreboard-team-row span:last-child { font-size: 1.6em; color: var(--primary-color); }
-        /* Legend styles (appears last now via JS) */
+        /* Legend styles */
         .scoreboard-legend { display: flex; justify-content: center; gap: 20px; margin-top: 10px; /* Reduced top margin */ padding: 15px; background-color: var(--card-background); border-radius: 12px; box-shadow: 0 4px 12px var(--shadow-color); color: var(--subtle-text); font-size: 0.9em; max-width: fit-content; margin-left: auto; margin-right: auto; }
         .scoreboard-legend span { display: flex; align-items: center; gap: 8px; }
         .trophy-icon { font-size: 1.1em; }
@@ -325,7 +325,10 @@
     <footer>
         <div class="footer-content">
             <div class="social-icons" id="footer-social-icons">
-                <a href="#" target="_blank"><i class="fab fa-instagram"></i></a> <a href="#" target="_blank"><i class="fab fa-youtube"></i></a> <a href="#" target="_blank"><i class="fab fa-facebook-f"></i></a>
+                 <!-- Social links will be populated by generateStaticContent -->
+                 <a href="#" target="_blank" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                 <a href="#" target="_blank" aria-label="YouTube"><i class="fab fa-youtube"></i></a>
+                 <a href="#" target="_blank" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
             </div>
             <p class="institution-name" id="footer-institution-name">Institution Name</p>
             <p class="copyright" id="footer-copyright">© Year Org Name.</p>
@@ -381,8 +384,10 @@
         let loadCheckTimeout = null;
 
         // --- Helper Functions ---
-        const setText = (id, value, fallback = '') => { const el = d.getElementById(id); if (el) el.textContent = value || fallback; };
-        const setSrc = (id, value, fallback) => { const el = d.getElementById(id); if (el) el.src = value || fallback; };
+        const setText = (id, value, fallback = '') => { const el = d.getElementById(id); if (el) el.textContent = value || fallback; else console.warn(`Element not found: ${id}`); };
+        const setSrc = (id, value, fallback) => { const el = d.getElementById(id); if (el) el.src = value || fallback; else console.warn(`Element not found: ${id}`); };
+        const setHref = (selector, value) => { const el = d.querySelector(selector); if(el && value) el.href = value; else if(el) el.style.display='none'; else console.warn(`Selector not found: ${selector}`); }
+
 
         function updateLoadingMessage(message) {
             const loadingOverlay = d.getElementById('loading-overlay');
@@ -458,8 +463,10 @@
 
         function initializeTeamData() {
             const data = {};
-            if (!dbTeams || !dbCategories || dbCategories.length === 0) {
-                 console.warn("initializeTeamData: dbTeams or dbCategories null/empty.");
+            // Ensure dbTeams and dbCategories are valid before proceeding
+            if (!dbTeams || typeof dbTeams !== 'object' || Object.keys(dbTeams).length === 0 ||
+                !dbCategories || !Array.isArray(dbCategories) || dbCategories.length === 0) {
+                 console.warn("initializeTeamData: dbTeams or dbCategories null/empty/invalid.");
                  TEAM_NAMES = []; // Reset team names
                  return data;
             }
@@ -470,8 +477,13 @@
                  // Ensure dbTeams[teamName] exists before accessing name
                 const teamData = dbTeams[teamName];
                 if (teamData) {
-                    data[teamName] = { name: teamData.name || teamName, total: 0 }; // Use name from object, fallback to key
-                    dbCategories.forEach(cat => { data[teamName][cat.name] = 0; });
+                    // Use the key (teamName) as the canonical name for consistency
+                    data[teamName] = { name: teamName, total: 0 };
+                    dbCategories.forEach(cat => {
+                         if (cat && cat.name) { // Check if category object and name are valid
+                            data[teamName][cat.name] = 0;
+                         }
+                    });
                     data[teamName]['group'] = 0;
                 } else {
                     console.warn(`Team data missing for key: ${teamName} during initialization.`);
@@ -517,10 +529,12 @@
                 processedScoreboardData = { eventPoints: {}, categoryTotals: {}, categoryCounts: {} };
                 let currentResultsCount = 0; // Use local count
 
-                const categoryNames = dbCategories.map(cat => cat.name);
+                // Filter out invalid categories before mapping names
+                const validCategories = dbCategories.filter(cat => cat && cat.name);
+                const categoryNames = validCategories.map(cat => cat.name);
                 categoryNames.push('group'); // Keep 'group' for internal logic
 
-                // Initialize Scoreboard Totals/Counts
+                // Initialize Scoreboard Totals/Counts using valid category names
                 categoryNames.forEach(catName => {
                     processedScoreboardData.categoryTotals[catName] = {};
                     TEAM_NAMES.forEach(team => { processedScoreboardData.categoryTotals[catName][team] = 0; });
@@ -531,7 +545,7 @@
                 for (const programId in dbResults) {
                   try { // Inner try-catch for individual result processing
                         const program = dbPrograms[programId];
-                        if (!program) { console.warn(`Program data missing for result ID: ${programId}`); continue; }
+                        if (!program || !program.name || !program.category) { console.warn(`Program data missing or invalid for result ID: ${programId}`); continue; }
 
                         const eventName = program.name;
                         const categoryName = program.category;
@@ -563,8 +577,13 @@
 
                         // Process winners for each position
                         for (const position of ['first', 'second', 'third']) {
-                            if (winners[position]) {
+                            if (winners[position] && Array.isArray(winners[position])) { // Ensure it's an array
                                 winners[position].forEach(winner => {
+                                    // Basic validation for winner object
+                                    if (!winner || !winner.chest || !winner.name) {
+                                         console.warn(`Invalid winner data in ${eventName}, position ${position}:`, winner);
+                                         return; // Skip this invalid winner entry
+                                    }
                                     const team = getTeamFromChest(winner.chest);
                                     if (team && processedTeamData[team]) { // Ensure team is valid and exists in processed data
                                         const pointValue = currentPoints[position];
@@ -572,9 +591,15 @@
                                         processedTeamData[team].total += pointValue;
                                         // Update category/group total for the team
                                         const pointCategoryKey = isGroupEvent ? 'group' : categoryName;
-                                        if (processedTeamData[team][pointCategoryKey] !== undefined) {
+                                        // Check if the key exists before adding points
+                                        if (processedTeamData[team].hasOwnProperty(pointCategoryKey)) {
                                             processedTeamData[team][pointCategoryKey] += pointValue;
+                                        } else {
+                                             console.warn(`Category key '${pointCategoryKey}' not found for team '${team}' during point allocation for ${eventName}.`);
+                                             // Initialize if missing? Or just warn? Let's warn for now.
+                                             // processedTeamData[team][pointCategoryKey] = pointValue;
                                         }
+
                                         // Add to talent points if individual event
                                         if (!isGroupEvent) {
                                             const winnerId = `${winner.chest} ${winner.name}`; // Combine chest and name
@@ -587,7 +612,7 @@
                                             eventScore[team].positions.push(position === 'first' ? 1 : (position === 'second' ? 2 : 3));
                                         }
                                     } else if (team) {
-                                         console.warn(`Team '${team}' (from chest '${winner.chest}') not found in processedTeamData for event '${eventName}'.`);
+                                         console.warn(`Team '${team}' (from chest '${winner.chest}') not found in processedTeamData for event '${eventName}'. Check team names and initialization.`);
                                     } else {
                                          console.warn(`Could not determine team for chest '${winner.chest}' in event '${eventName}'.`);
                                     }
@@ -599,6 +624,7 @@
 
                         // Update scoreboard category totals and counts
                         const scoreboardCat = isGroupEvent ? 'group' : categoryName;
+                         // Ensure scoreboardCat exists in the initialized totals
                         if (processedScoreboardData.categoryTotals[scoreboardCat]) {
                             TEAM_NAMES.forEach(team => {
                                 if (eventScore[team]) { // Ensure team score exists for this event
@@ -607,7 +633,7 @@
                             });
                             processedScoreboardData.categoryCounts[scoreboardCat]++;
                         } else {
-                            console.warn(`Scoreboard category '${scoreboardCat}' not found in totals for event '${eventName}'.`);
+                            console.warn(`Scoreboard category '${scoreboardCat}' not found in totals for event '${eventName}'. Check category names.`);
                         }
 
                         // Store data needed for the Results tab
@@ -620,11 +646,16 @@
                 processedTalentData = {};
                 for (const studentKey in talentPoints) {
                     const { points, category } = talentPoints[studentKey];
-                    if (!processedTalentData[category]) processedTalentData[category] = [];
-                    processedTalentData[category].push({ name: studentKey, points });
+                     // Ensure category exists before pushing
+                     if (category) {
+                        if (!processedTalentData[category]) processedTalentData[category] = [];
+                        processedTalentData[category].push({ name: studentKey, points });
+                     } else {
+                         console.warn(`Talent entry missing category: ${studentKey}`);
+                     }
                 }
                 for (const category in processedTalentData) {
-                    processedTalentData[category].sort((a, b) => b.points - a.points); // Sort by points descending
+                    processedTalentData[category].sort((a, b) => (b.points || 0) - (a.points || 0)); // Sort by points descending, with fallback
                 }
 
                 publishedResultsCount = currentResultsCount; // Update global count
@@ -645,16 +676,15 @@
 
         // --- Rendering Functions ---
         function renderAllComponents() {
-            // Essential Data Check - Repeat check here as data might arrive between process and render calls
+            // Essential Data Check - Repeat check here
             if (!dbCategories || dbCategories.length === 0 || !dbTeams || Object.keys(dbTeams).length === 0) {
                 const missing = !dbTeams || Object.keys(dbTeams).length === 0 ? 'Teams' : 'Categories';
                 console.log(`Render skipped: ${missing} not loaded or empty.`);
-                // Keep showing loading message if essential config is missing
                 updateLoadingMessage(`Waiting for ${missing} configuration...`);
                 return;
             }
             if (TEAM_NAMES.length === 0) {
-                 initializeTeamData(); // Attempt to initialize again
+                 initializeTeamData();
                  if (TEAM_NAMES.length === 0) {
                     console.log("Render skipped: TEAM_NAMES could not be initialized.");
                     updateLoadingMessage("Waiting for Team configuration...");
@@ -664,7 +694,7 @@
 
             console.log("Rendering all components...");
 
-            // Execute rendering functions safely with individual try-catch
+            // Execute rendering functions safely
             try { generateFilterButtons(); } catch (e) { console.error("Error in generateFilterButtons:", e); }
             try { generateTeamCards(); } catch (e) { console.error("Error in generateTeamCards:", e); }
             try { generateDetailedRankings(); } catch (e) { console.error("Error in generateDetailedRankings:", e); }
@@ -674,24 +704,19 @@
             try { generateStaticContent(); } catch (e) { console.error("Error in generateStaticContent:", e); }
             try { updateResultCounts(); } catch (e) { console.error("Error in updateResultCounts:", e); }
 
-            // Apply default scoreboard filter ('All') AFTER scoreboard is generated
-            // Moved the filter call inside generateScoreboard to ensure elements exist
-
             // --- Hide Loading Overlay ---
             const loadingOverlay = d.getElementById('loading-overlay');
             const mainContent = d.getElementById('main-content');
-            // Check if overlay is still displayed and no error is shown
             if (loadingOverlay && loadingOverlay.style.display !== 'none' && !loadingOverlay.innerHTML.includes('color: red')) {
-                clearTimeout(loadingTimeout); // Clear timeout once rendering starts successfully
+                clearTimeout(loadingTimeout);
                 loadingOverlay.style.opacity = '0';
                 setTimeout(() => {
                     if (loadingOverlay) loadingOverlay.style.display = 'none';
                     if (mainContent) mainContent.style.visibility = 'visible';
                     console.log("UI is now visible.");
-                    hasRenderedOnce = true; // Mark that rendering has happened once
-                }, 500); // Wait for fade out transition
+                    hasRenderedOnce = true;
+                }, 500);
             } else if (mainContent && mainContent.style.visibility !== 'visible') {
-                // If overlay somehow got hidden but content is still hidden, show content
                 clearTimeout(loadingTimeout);
                 mainContent.style.visibility = 'visible';
                 console.log("Loading overlay was hidden/in error state, making content visible.");
@@ -699,7 +724,6 @@
             } else if (hasRenderedOnce) {
                  console.log("RenderAllComponents called again, UI likely already visible.");
             } else if (!loadingOverlay) {
-                // Fallback if loading overlay element doesn't exist
                  if (mainContent) mainContent.style.visibility = 'visible';
                  console.warn("Loading overlay element not found.");
                  hasRenderedOnce = true;
@@ -714,9 +738,8 @@
             }
 
             let progHTML = `<button class="filter-btn active" data-filter="all" onclick="filterResults('all')">All</button>`;
-            let scoreHTML = `<button class="filter-btn active" data-filter="All" onclick="filterScoreboard('All')">All</button>`; // 'All' is default active
+            let scoreHTML = `<button class="filter-btn active" data-filter="All" onclick="filterScoreboard('All')">All</button>`;
 
-            // Check if there are group points before adding Group button
             const hasGroupPoints = processedTeamData && Object.values(processedTeamData).some(team => team && typeof team.group === 'number' && team.group > 0);
             if (hasGroupPoints) {
                 progHTML += `<button class="filter-btn" data-filter="group" onclick="filterResults('group')">Group</button>`;
@@ -724,7 +747,7 @@
             }
 
             (dbCategories || []).forEach(cat => {
-                 if (cat && cat.name) { // Ensure category and name exist
+                 if (cat && cat.name) {
                     progHTML += `<button class="filter-btn" data-filter="${cat.name}" onclick="filterResults('${cat.name}')">${cat.name}</button>`;
                     scoreHTML += `<button class="filter-btn" data-filter="${cat.name}" onclick="filterScoreboard('${cat.name}')">${cat.name}</button>`;
                  }
@@ -732,15 +755,13 @@
 
             programFiltersEl.innerHTML = progHTML;
 
-            // Check if only the 'All' button exists for scoreboard
             if (!hasGroupPoints && (!dbCategories || dbCategories.length === 0)) {
                 scoreboardFiltersEl.innerHTML = "<p class='text-gray-500'>No categories or group results yet.</p>";
             } else {
                 scoreboardFiltersEl.innerHTML = scoreHTML;
-                // Ensure 'All' is active initially after setting HTML
                 const allBtn = scoreboardFiltersEl.querySelector('[data-filter="All"]');
-                 scoreboardFiltersEl.querySelectorAll('.filter-btn.active').forEach(b => b.classList.remove('active')); // Remove active from others
-                if (allBtn) allBtn.classList.add('active'); // Set 'All' as active
+                 scoreboardFiltersEl.querySelectorAll('.filter-btn.active').forEach(b => b.classList.remove('active'));
+                if (allBtn) allBtn.classList.add('active');
             }
         }
 
@@ -748,10 +769,10 @@
         function generateTeamCards() {
             const container = d.getElementById('team-cards-container');
             if (!container) { console.error("Team card container not found"); return; }
-            container.innerHTML = ''; // Clear previous content
+            container.innerHTML = '';
 
             const dataToRank = processedTeamData || {};
-            const rankedTeams = Object.values(dataToRank).sort((a, b) => (b.total || 0) - (a.total || 0)); // Add fallback for total
+            const rankedTeams = Object.values(dataToRank).sort((a, b) => (b.total || 0) - (a.total || 0));
 
             const cardClasses = ['champion', 'first-runner-up', 'second-runner-up'];
             const positionTexts = ['Champions', '1st Runners-up', '2nd Runners-up'];
@@ -763,9 +784,8 @@
             }
 
             rankedTeams.slice(0, 3).forEach((team, i) => {
-                 // Ensure team.name exists
                  const teamName = team.name || 'Unknown Team';
-                 const totalPoints = team.total || 0; // Add fallback for points
+                 const totalPoints = team.total || 0;
                 container.innerHTML += `
                     <div class="team-card ${cardClasses[i] || ''}">
                         <div class="icon"><i class="${iconClasses[i] || 'fas fa-award'}"></i></div>
@@ -788,11 +808,10 @@
                 return;
             }
 
-            const maxScore = rankedTeams.length > 0 ? (rankedTeams[0].total || 1) : 1; // Avoid division by zero, use 1 if max is 0
+            const maxScore = rankedTeams.length > 0 ? (rankedTeams[0].total || 1) : 1;
             let headerColsHTML = '', gridTemplateStyle = '40px 1.5fr';
-            let colCount = 2; // Rank + Team Name
+            let colCount = 2;
 
-             // Check if group points exist before adding column
             const hasGroupPoints = Object.values(dataToRank).some(team => team && typeof team.group === 'number' && team.group > 0);
             if (hasGroupPoints) {
                 headerColsHTML += `<div>Group</div>`;
@@ -801,31 +820,29 @@
             }
 
             (dbCategories || []).forEach(cat => {
-                 if (cat && cat.name) { // Ensure category and name exist
+                 if (cat && cat.name) {
                     headerColsHTML += `<div>${cat.name}</div>`;
                     gridTemplateStyle += ' 0.8fr';
                     colCount++;
                  }
             });
 
-            gridTemplateStyle += ' 1fr 1fr'; // Add for Total and Progress
+            gridTemplateStyle += ' 1fr 1fr';
             colCount += 2;
 
-            // Adjust min-width based on actual columns added
-            const minTableWidth = 40 + 150 + (colCount - 4) * 80 + 100 + 100; // Adjusted calculation based on columns
+            const minTableWidth = 40 + 150 + (colCount - 4) * 80 + 100 + 100;
 
             let tableRowsHTML = '';
             rankedTeams.forEach((team, index) => {
                 const rank = index + 1;
-                const teamTotal = team.total || 0; // Fallback for total
-                // Calculate progress safely, ensure it's between 0 and 100
+                const teamTotal = team.total || 0;
                 const progress = maxScore > 0 ? Math.max(0, Math.min(100, (teamTotal / maxScore) * 100)) : 0;
                 let pointsColsHTML = '';
                 if (hasGroupPoints) {
                     pointsColsHTML += `<div><span class="points-pill group">${team['group'] || 0}</span></div>`;
                 }
                 (dbCategories || []).forEach((cat, i) => {
-                     if (cat && cat.name) { // Ensure category and name exist
+                     if (cat && cat.name) {
                         pointsColsHTML += `<div><span class="points-pill default-pill-${(i % 6) + 1}">${team[cat.name] || 0}</span></div>`;
                      }
                 });
@@ -855,7 +872,7 @@
              const grid = d.getElementById('program-results-grid');
             if (!grid) { console.error("program-results-grid not found"); return; }
             if (!processedProgramData || processedProgramData.length === 0) { grid.innerHTML = '<p class="text-gray-500 p-4 text-center">No results have been published yet.</p>'; return; }
-            grid.innerHTML = ''; // Clear placeholder/previous
+            grid.innerHTML = '';
             const sortedPrograms = processedProgramData.sort((a, b) => a.eventName.localeCompare(b.eventName));
             sortedPrograms.forEach(program => {
                 let winnersHtml = '';
@@ -866,7 +883,6 @@
                 positions.forEach(position => {
                     if (program.winners[position] && program.winners[position].length > 0) {
                         program.winners[position].forEach(winner => {
-                             // Defensive check for winner properties
                              const winnerName = winner.name || 'Unknown';
                              const winnerChest = winner.chest || '?';
                              const teamName = getTeamFromChest(winnerChest) || 'N/A';
@@ -897,7 +913,6 @@
                         </div>
                     </div>`;
             });
-            // Re-apply filter after rendering
             const activeFilterButton = d.querySelector('#program-tab .filter-btn.active');
             filterResults(activeFilterButton ? activeFilterButton.dataset.filter : 'all');
          }
@@ -907,19 +922,18 @@
             if (!container) { console.error("talent-list-container not found"); return; }
             const categories = Object.keys(processedTalentData || {}).sort();
             if (!processedTalentData || categories.length === 0) { container.innerHTML = '<p class="text-gray-500 p-4 text-center">Individual talent points will appear here once results are published.</p>'; return; }
-            container.innerHTML = ''; // Clear placeholder/previous
+            container.innerHTML = '';
             categories.forEach(category => {
                 const students = processedTalentData[category];
-                const listId = `talent-list-${category.replace(/[^a-zA-Z0-9]/g, '-')}`; // Sanitize ID
+                const listId = `talent-list-${category.replace(/[^a-zA-Z0-9]/g, '-')}`;
                 let listHtml = '<div class="talent-list">';
                 let dropdownHtml = '';
                 const positionIcons = { 0: '<i class="medal-icon fas fa-trophy"></i>', 1: '<i class="medal-icon fas fa-medal silver"></i>', 2: '<i class="medal-icon fas fa-medal bronze"></i>' };
                 const positionClasses = { 0: 'first-place', 1: 'second-place', 2: 'third-place' };
                 students.forEach((student, index) => {
-                     // Defensive check for student name
                      const studentNameStr = student.name || '';
                     const nameParts = studentNameStr.split(' ');
-                    const chest = nameParts.length > 1 ? nameParts[0] : studentNameStr; // Use full string if no space
+                    const chest = nameParts.length > 1 ? nameParts[0] : studentNameStr;
                     const name = nameParts.length > 1 ? nameParts.slice(1).join(' ') : 'Unknown Name';
                     const teamName = getTeamFromChest(chest) || 'N/A';
                     const entryHtml = `
@@ -934,16 +948,15 @@
                                 <div class="points-label">Points</div>
                             </div>
                         </div>`;
-                    if (index < 5 || students.length <= 8) { // Show first 5 or all if 8 or less
+                    if (index < 5 || students.length <= 8) {
                         listHtml += entryHtml;
                     } else {
                         dropdownHtml += entryHtml;
                     }
                 });
                 listHtml += '</div>';
-                if (dropdownHtml) { // Add dropdown and button only if there are hidden items
+                if (dropdownHtml) {
                     listHtml += `<div id="${listId}" class="talent-dropdown-list">${dropdownHtml}</div>`;
-                    // Ensure onclick uses correct escaping for the ID
                     listHtml += `<button class="show-more-btn" onclick="toggleTalentDropdown('${listId.replace(/'/g, "\\'")}', this)">Show More</button>`;
                 }
                 container.innerHTML += `
@@ -958,30 +971,28 @@
         function generateScoreboard() {
             const container = d.getElementById('scoreboard-container');
             if (!container) { console.error("Scoreboard container not found"); return; }
-            container.innerHTML = ''; // Clear everything initially
+            container.innerHTML = ''; // Clear previous content
 
-            // Check if data is ready
-            if (!processedScoreboardData || !processedScoreboardData.eventPoints || Object.keys(processedScoreboardData.eventPoints).length === 0 || TEAM_NAMES.length === 0) {
+            if (!processedScoreboardData || !processedScoreboardData.eventPoints || Object.keys(processedScoreboardData.eventPoints).length === 0 || !TEAM_NAMES || TEAM_NAMES.length === 0) {
                 container.innerHTML = '<p id="scoreboard-placeholder" class="text-gray-500 text-center py-10">No scoreboard data available yet.</p>';
                 return;
             }
 
-            const sortedTeams = [...TEAM_NAMES].sort(); // Create a sorted copy for consistent order
+            const sortedTeams = [...TEAM_NAMES].sort();
             let eventCardsHTML = '';
             const sortedEvents = Object.keys(processedScoreboardData.eventPoints).sort();
 
-            // Generate HTML for individual event cards first
+            // Generate HTML for individual event cards
             sortedEvents.forEach(eventName => {
                 const eventData = processedScoreboardData.eventPoints[eventName];
                 let eventRows = '';
-                sortedTeams.forEach(team => { // Iterate using sorted teams
+                sortedTeams.forEach(team => {
                     const teamData = eventData[team];
-                    // Ensure teamData exists and points are positive before adding row
                     if (teamData && typeof teamData.points === 'number' && teamData.points > 0) {
                         eventRows += `<div class="scoreboard-team-row"><span>${team}</span><span>${getTrophyIconsHTML(teamData.positions)}${teamData.points}</span></div>`;
                     }
                 });
-                if (eventRows) { // Only add card if there are rows (points scored)
+                if (eventRows) {
                     const cardCategory = eventData.isGroup ? 'group' : eventData.category;
                     eventCardsHTML += `
                         <div class="scoreboard-card" data-event-name="${eventName}" data-category="${cardCategory}" style="display: none;"> <!-- Start hidden -->
@@ -994,7 +1005,7 @@
             // Generate HTML for the total card
             let totalRows = '';
             sortedTeams.forEach(team => {
-                totalRows += `<div class="scoreboard-team-row"><span>${team}</span><span data-team="${team}">0</span></div>`; // Initial points set to 0, updated by filter
+                totalRows += `<div class="scoreboard-team-row"><span>${team}</span><span data-team="${team}">0</span></div>`;
             });
             const totalCardHTML = `
                 <div class="scoreboard-card total-card" id="scoreboard-total-card">
@@ -1014,10 +1025,10 @@
             // Assemble the scoreboard container: Event Cards -> Total Card -> Legend
             container.innerHTML = eventCardsHTML + totalCardHTML + legendHTML;
 
-             // Apply the default 'All' filter immediately after rendering
+             // Apply the default 'All' filter immediately after rendering all elements
              try {
                 if (typeof filterScoreboard === 'function') {
-                    filterScoreboard('All');
+                    filterScoreboard('All'); // Apply filter to set initial visibility and totals
                 } else {
                      console.error("filterScoreboard function not defined when applying default in generateScoreboard.");
                 }
@@ -1030,38 +1041,34 @@
         function generateStaticContent() {
              const setText = (id, value, fallback = '') => { const el = d.getElementById(id); if (el) el.textContent = value || fallback; else console.warn(`Element not found: ${id}`); };
             const setSrc = (id, value, fallback) => { const el = d.getElementById(id); if (el) el.src = value || fallback; else console.warn(`Element not found: ${id}`); };
-            const setHref = (el, value) => { if(el && value) el.href = value; else if(el) el.style.display='none'; }
+            const setHref = (selector, value) => { const el = d.querySelector(selector); if(el && value) { el.href = value; el.style.display='';} else if(el) el.style.display='none'; else console.warn(`Selector not found: ${selector}`); }
+
 
             const leadersSection = d.getElementById('leaders');
             const gallerySection = d.getElementById('gallery');
+            const socialIconsContainer = d.getElementById('footer-social-icons');
 
-            if (!dbHomepage) {
+
+            if (!dbHomepage || Object.keys(dbHomepage).length === 0 ) { // Check if empty object too
                 console.warn("Static content render skipped: dbHomepage is null/empty.");
-                // Set minimal defaults if homepage data is missing
-                setText('dynamic-header-title', 'Results 2025');
-                setText('hero-main-title', 'Event Results');
-                setText('hero-subtitle', 'Live Updates');
-                setText('about-text', 'Details about the event will be updated soon.');
-                if(leadersSection) leadersSection.style.display = 'none'; // Hide sections
-                if(gallerySection) gallerySection.style.display = 'none';
-                setText('footer-institution-name', 'Institution Name');
-                setText('footer-copyright', `© ${new Date().getFullYear()} Event Organizers`);
-                const socialIcons = d.getElementById('footer-social-icons'); if(socialIcons) socialIcons.style.display = 'none';
-                // Clear placeholders in case they weren't updated
-                setText('stats-programs-public', '-'); setText('stats-participants-public', '-');
-                setText('stats-categories-public', '-'); setText('stats-teams-public', '-');
+                // Set minimal defaults
+                setText('dynamic-header-title', 'Results 2025'); setText('hero-main-title', 'Event Results'); setText('hero-subtitle', 'Live Updates'); setText('about-text', 'Details about the event will be updated soon.');
+                if(leadersSection) leadersSection.style.display = 'none'; if(gallerySection) gallerySection.style.display = 'none';
+                setText('footer-institution-name', 'Institution Name'); setText('footer-copyright', `© ${new Date().getFullYear()} Event Organizers`); if(socialIconsContainer) socialIconsContainer.style.display = 'none';
+                setText('stats-programs-public', '-'); setText('stats-participants-public', '-'); setText('stats-categories-public', '-'); setText('stats-teams-public', '-');
                 const leaderPlaceholder = d.getElementById('leader-placeholder'); if(leaderPlaceholder) leaderPlaceholder.textContent = "Leader info unavailable.";
                 const galleryPlaceholder = d.getElementById('gallery-placeholder'); if(galleryPlaceholder) galleryPlaceholder.textContent = "Gallery unavailable.";
                 return;
             }
 
-            // Ensure sections are visible only if data exists
+            const data = dbHomepage;
+
+            // Ensure sections are visible only if relevant data exists
              const hasLeaders = dbTeams && Object.keys(dbTeams).length > 0;
-             const hasGallery = dbHomepage.gallery && dbHomepage.gallery.length > 0;
+             const hasGallery = data.gallery && data.gallery.length > 0;
              if(leadersSection) leadersSection.style.display = hasLeaders ? 'block' : 'none';
              if(gallerySection) gallerySection.style.display = hasGallery ? 'block' : 'none';
 
-            const data = dbHomepage;
 
             // Header & Hero
             setText('dynamic-header-title', data.header_title, 'Sadaye Madeena 2k25');
@@ -1086,7 +1093,7 @@
            const leaderPlaceholder = d.getElementById('leader-placeholder');
            if (leaderContainer) {
                leaderContainer.innerHTML = ''; // Clear previous content
-               if (hasLeaders) { // Use the flag checked earlier
+               if (hasLeaders) {
                    if(leaderPlaceholder) leaderPlaceholder.style.display = 'none';
                    const sortedTeams = Object.values(dbTeams).sort((a,b) => (a.name || '').localeCompare(b.name || ''));
                    sortedTeams.forEach(team => {
@@ -1109,16 +1116,16 @@
             // Gallery Section
             const galleryContainer = d.getElementById('gallery-rows-container');
             const galleryPlaceholder = d.getElementById('gallery-placeholder');
-            const galleryUrls = data.gallery || []; // Assumes gallery is an array of URLs
+            const galleryUrls = data.gallery || [];
             const rowElements = [d.getElementById('gallery-row-0'), d.getElementById('gallery-row-1'), d.getElementById('gallery-row-2')];
 
-            rowElements.forEach(row => { if(row) row.innerHTML = ''; }); // Clear existing content
+            rowElements.forEach(row => { if(row) row.innerHTML = ''; });
 
             if (galleryUrls.length > 0) {
                 if(galleryPlaceholder) galleryPlaceholder.style.display = 'none';
                 galleryUrls.forEach((url, index) => {
-                     if (url && typeof url === 'string') { // Basic validation for URL
-                        const rowIndex = index % 3; // Distribute images across 3 rows
+                     if (url && typeof url === 'string') {
+                        const rowIndex = index % 3;
                         if(rowElements[rowIndex]){
                             rowElements[rowIndex].innerHTML += `
                                 <div class="gallery-item-wrapper">
@@ -1126,9 +1133,7 @@
                                     <button class="share-btn" data-url="${url}"><i class="fas fa-share-alt"></i></button>
                                 </div>`;
                         }
-                     } else {
-                         console.warn(`Invalid URL found in gallery data at index ${index}:`, url);
-                     }
+                     } else { console.warn(`Invalid URL in gallery at index ${index}:`, url); }
                 });
             } else if (galleryPlaceholder) {
                 galleryPlaceholder.textContent = 'No gallery images added yet.';
@@ -1138,10 +1143,8 @@
             // Footer
             setText('footer-institution-name', data.institution_name, 'Institution Name');
             setText('footer-copyright', data.copyright_text, `© ${new Date().getFullYear()} Org Name. All rights reserved.`);
-            const socialIconsContainer = d.getElementById('footer-social-icons');
             if(socialIconsContainer){
-                socialIconsContainer.innerHTML = ''; // Clear previous icons
-                let hasSocials = false;
+                 // Use querySelector within the container to find links
                  const igLink = socialIconsContainer.querySelector('a[aria-label="Instagram"]');
                  const ytLink = socialIconsContainer.querySelector('a[aria-label="YouTube"]');
                  const fbLink = socialIconsContainer.querySelector('a[aria-label="Facebook"]');
@@ -1150,8 +1153,9 @@
                  setHref(ytLink, data.social_youtube);
                  setHref(fbLink, data.social_facebook);
 
-                 hasSocials = !!(data.social_instagram || data.social_youtube || data.social_facebook);
-                 socialIconsContainer.style.display = hasSocials ? 'block' : 'none'; // Show/hide container
+                 // Show/hide the whole container based on whether any links exist
+                 const hasSocials = !!(data.social_instagram || data.social_youtube || data.social_facebook);
+                 socialIconsContainer.style.display = hasSocials ? 'flex' : 'none'; // Use flex if visible
             }
          }
 
@@ -1211,21 +1215,6 @@
                     card.style.display = shouldShow ? 'block' : 'none';
                     if (shouldShow) resultsFound = true;
                 });
-                // Optional: Show message if no results match filter
-                // const grid = d.getElementById('program-results-grid');
-                // let noResultsMsg = grid.querySelector('.no-results-message');
-                // if (!resultsFound && grid) {
-                //     if (!noResultsMsg) {
-                //         noResultsMsg = d.createElement('p');
-                //         noResultsMsg.className = 'text-gray-500 p-4 text-center no-results-message';
-                //         grid.appendChild(noResultsMsg);
-                //     }
-                //     noResultsMsg.textContent = "No results match your current filter.";
-                //     noResultsMsg.style.display = 'block';
-                // } else if (noResultsMsg) {
-                //     noResultsMsg.style.display = 'none';
-                // }
-
              } catch(e) { console.error("Error in filterResults:", e); }
         }
         window.filterScoreboard = function(category) {
@@ -1237,28 +1226,38 @@
                 d.querySelectorAll('#scoreboard-filter-buttons .filter-btn').forEach(btn => btn.classList.remove('active'));
                 const activeButton = d.querySelector(`#scoreboard-filter-buttons .filter-btn[data-filter="${category}"]`);
                 if (activeButton) { activeButton.classList.add('active'); }
-                else { console.warn(`Scoreboard filter button not found for '${category}'.`); /* No default fallback here, might indicate issue */ }
+                else {
+                    console.warn(`Scoreboard filter button not found for '${category}', defaulting to 'All'.`);
+                    const allButton = d.querySelector('#scoreboard-filter-buttons .filter-btn[data-filter="All"]');
+                    if (allButton) allButton.classList.add('active');
+                    category = 'All'; // Explicitly fallback to 'All' if button not found
+                }
+
 
                 const totalCard = d.getElementById('scoreboard-total-card');
                 const countElement = d.getElementById('scoreboard-category-count');
 
                 // Update totals in the total card
                 if (totalCard && TEAM_NAMES && TEAM_NAMES.length > 0) {
+                     // Get the correct totals based on the selected category
                      const totalsToShow = category === 'All' ? processedTeamData : (processedScoreboardData.categoryTotals[category] || {});
                      TEAM_NAMES.forEach(team => {
                          const teamSpan = totalCard.querySelector(`span[data-team="${team}"]`);
                          if (teamSpan) {
                               const points = category === 'All'
-                                   ? (processedTeamData[team]?.total || 0) // Overall total from processedTeamData
-                                   : (totalsToShow[team] || 0);            // Category total from processedScoreboardData
+                                   ? (processedTeamData[team]?.total || 0) // Overall total
+                                   : (totalsToShow[team] || 0);            // Category total
                               teamSpan.textContent = points;
                          } else {
                               console.warn(`Team span not found for ${team} in total card.`);
                          }
                      });
+                 } else if (totalCard) {
+                     console.warn("TEAM_NAMES not ready for scoreboard filter update.");
                  } else {
-                      console.warn("Total card or TEAM_NAMES not ready for scoreboard filter update.");
+                     console.warn("Total card not found for scoreboard filter update.");
                  }
+
 
                 // Update result count display
                 if (countElement) {
@@ -1271,29 +1270,12 @@
                 // Show/hide individual event cards based on category
                 let cardsShown = 0;
                 d.querySelectorAll('#scoreboard-container .scoreboard-card:not(.total-card)').forEach(card => {
-                    const cardCategory = card.dataset.category; // This is 'group' or the specific category name
+                    const cardCategory = card.dataset.category; // This is 'group' or the specific category name from the event data
                     const shouldShow = (category === 'All' || category === cardCategory);
                     card.style.display = shouldShow ? 'block' : 'none';
                     if(shouldShow) cardsShown++;
                 });
                 console.log(`Cards shown for category '${category}': ${cardsShown}`);
-
-                // Optional: Show message if no cards match filter
-                // const container = d.getElementById('scoreboard-container');
-                // let noResultsMsg = container.querySelector('.no-results-message');
-                // if (cardsShown === 0 && category !== 'All' && container) {
-                //     if (!noResultsMsg) {
-                //         noResultsMsg = d.createElement('p');
-                //         noResultsMsg.className = 'text-gray-500 p-4 text-center no-results-message';
-                //         // Insert before total card or legend
-                //         const legend = container.querySelector('.scoreboard-legend');
-                //         container.insertBefore(noResultsMsg, legend);
-                //     }
-                //     noResultsMsg.textContent = `No results published for category: ${category}`;
-                //     noResultsMsg.style.display = 'block';
-                // } else if (noResultsMsg) {
-                //     noResultsMsg.style.display = 'none';
-                // }
 
              } catch (e) { console.error("Error in filterScoreboard:", e); }
         }
@@ -1303,7 +1285,7 @@
         }
         window.getTrophyIconsHTML = function(positions) {
              if (!positions || positions.length === 0) return '';
-             const uniquePositions = [...new Set(positions)].sort(); // Ensure unique icons
+             const uniquePositions = [...new Set(positions)].sort();
              return uniquePositions.map(pos => {
                  if (pos === 1) return '<i class="fas fa-trophy trophy-icon gold"></i>';
                  if (pos === 2) return '<i class="fas fa-trophy trophy-icon silver"></i>';
@@ -1346,7 +1328,6 @@
              } else {
                  try {
                      const textArea = d.createElement("textarea"); textArea.value = imageUrl; textArea.style.position = "fixed"; textArea.style.left = "-9999px"; d.body.appendChild(textArea); textArea.select();
-                     // Use Clipboard API if available, fallback to execCommand
                      if (navigator.clipboard && navigator.clipboard.writeText) { await navigator.clipboard.writeText(imageUrl); alert('Sharing not supported, link copied!'); }
                      else { document.execCommand('copy'); alert('Sharing not supported, link copied!'); }
                      d.body.removeChild(textArea);
@@ -1434,23 +1415,23 @@
                  catch (checkError) { console.error(`Error calling checkAllDataLoaded after ${sourceName} error:`, checkError); }
             };
             // Define listeners with safer data processing in callbacks
-            onSnapshot(query(collection(db, `artifacts/${appId}/public/data/results`)), (snapshot) => { try { const data = {}; snapshot.docs.forEach(doc => { data[doc.id] = doc.data(); }); dbResults = data; loadStatus.results = true; checkAllDataLoaded('results'); } catch (e) { createErrorHandler('results')(e); } }, createErrorHandler('results'));
-            onSnapshot(query(collection(db, `artifacts/${appId}/public/data/programs`)), (snapshot) => { try { const data = {}; snapshot.docs.forEach(doc => { data[doc.id] = doc.data(); }); dbPrograms = data; loadStatus.programs = true; checkAllDataLoaded('programs'); } catch (e) { createErrorHandler('programs')(e); } }, createErrorHandler('programs'));
-            onSnapshot(query(collection(db, `artifacts/${appId}/public/data/teams`)), (snapshot) => { try { const data = {}; snapshot.docs.forEach(doc => { data[doc.id] = {name: doc.id, ...doc.data()}; }); dbTeams = data; loadStatus.teams = true; checkAllDataLoaded('teams'); } catch (e) { createErrorHandler('teams')(e); } }, createErrorHandler('teams'));
-            onSnapshot(doc(db, `artifacts/${appId}/public/data/config`, 'homepage'), (docSnap) => { try { dbHomepage = docSnap.exists() ? docSnap.data() : {}; loadStatus.homepage = true; checkAllDataLoaded('homepage'); } catch (e) { createErrorHandler('homepage')(e); } }, createErrorHandler('homepage'));
-            onSnapshot(query(collection(db, `artifacts/${appId}/public/data/categories`)), (snapshot) => { try { dbCategories = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })).sort((a, b) => (a.name||'').localeCompare(b.name||'')); loadStatus.categories = true; checkAllDataLoaded('categories'); } catch (e) { createErrorHandler('categories')(e); } }, createErrorHandler('categories'));
-            onSnapshot(query(collection(db, `artifacts/${appId}/public/data/participants`)), (snapshot) => { try { const data = {}; snapshot.docs.forEach(doc => { data[doc.id] = doc.data(); }); dbParticipants = data; loadStatus.participants = true; checkAllDataLoaded('participants'); } catch (e) { createErrorHandler('participants')(e); } }, createErrorHandler('participants'));
+            onSnapshot(query(collection(db, `artifacts/${appId}/public/data/results`)), (snapshot) => { try { console.log(`Received ${snapshot.docs.length} results.`); const data = {}; snapshot.docs.forEach(doc => { data[doc.id] = doc.data(); }); dbResults = data; loadStatus.results = true; checkAllDataLoaded('results'); } catch (e) { createErrorHandler('results')(e); } }, createErrorHandler('results'));
+            onSnapshot(query(collection(db, `artifacts/${appId}/public/data/programs`)), (snapshot) => { try { console.log(`Received ${snapshot.docs.length} programs.`); const data = {}; snapshot.docs.forEach(doc => { data[doc.id] = doc.data(); }); dbPrograms = data; loadStatus.programs = true; checkAllDataLoaded('programs'); } catch (e) { createErrorHandler('programs')(e); } }, createErrorHandler('programs'));
+            onSnapshot(query(collection(db, `artifacts/${appId}/public/data/teams`)), (snapshot) => { try { console.log(`Received ${snapshot.docs.length} teams.`); const data = {}; snapshot.docs.forEach(doc => { data[doc.id] = {name: doc.id, ...doc.data()}; }); dbTeams = data; loadStatus.teams = true; checkAllDataLoaded('teams'); } catch (e) { createErrorHandler('teams')(e); } }, createErrorHandler('teams'));
+            onSnapshot(doc(db, `artifacts/${appId}/public/data/config`, 'homepage'), (docSnap) => { try { console.log(`Received homepage config: ${docSnap.exists()}`); dbHomepage = docSnap.exists() ? docSnap.data() : {}; loadStatus.homepage = true; checkAllDataLoaded('homepage'); } catch (e) { createErrorHandler('homepage')(e); } }, createErrorHandler('homepage'));
+            onSnapshot(query(collection(db, `artifacts/${appId}/public/data/categories`)), (snapshot) => { try { console.log(`Received ${snapshot.docs.length} categories.`); dbCategories = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })).sort((a, b) => (a.name||'').localeCompare(b.name||'')); loadStatus.categories = true; checkAllDataLoaded('categories'); } catch (e) { createErrorHandler('categories')(e); } }, createErrorHandler('categories'));
+            onSnapshot(query(collection(db, `artifacts/${appId}/public/data/participants`)), (snapshot) => { try { console.log(`Received ${snapshot.docs.length} participants.`); const data = {}; snapshot.docs.forEach(doc => { data[doc.id] = doc.data(); }); dbParticipants = data; loadStatus.participants = true; checkAllDataLoaded('participants'); } catch (e) { createErrorHandler('participants')(e); } }, createErrorHandler('participants'));
              console.log("Firestore listeners attached.");
         }
 
         // Start loading timeout
         loadingTimeout = setTimeout(() => {
             if (!allDataLoaded) { // Only trigger if data hasn't loaded successfully
-                 console.error("Loading timeout reached (20 seconds).");
+                 console.error("Loading timeout reached (30 seconds)."); // Increased timeout
                  const pending = Object.keys(loadStatus).filter(k => !loadStatus[k]).join(', ') || 'initial checks';
                  displayGlobalError( "Loading Timeout", `Could not load: ${pending}. Check connection & Admin Panel config (Teams/Categories).` );
             }
-        }, 20000); // 20 seconds timeout
+        }, 30000); // 30 seconds timeout
 
         // --- Initialize App ---
         if (db) { // Ensure db is initialized before setting listeners
@@ -1465,8 +1446,7 @@
                 console.log("Window onload event triggered.");
                 showPage('home-page'); // Show home page initially
                 updateMenuActiveState(); // Set active menu link
-                // Set team tab active by default within scoreboard page (even if hidden initially)
-                // This ensures correct state if user directly navigates or refreshes on scoreboard page
+                // Set team tab active by default within scoreboard page
                 const teamTabButton = d.querySelector('.main-tab-button[onclick*="\'team-tab\'"]');
                 const teamTabContent = d.getElementById('team-tab');
                 d.querySelectorAll('.main-tab-button.active').forEach(b => b.classList.remove('active'));
