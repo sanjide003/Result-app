@@ -552,15 +552,15 @@
                 return; 
             }
             generateFilterButtons();
-            generateTeamCards(); // FIXED
-            generateDetailedRankings(); 
+            generateTeamCards(); // FIXED: Call the correct function
+            generateDetailedRankings(); // RESTORED
             renderProgramResults();
             generateTalentList();
             generateScoreboard();
             generateStaticContent(); 
             updateResultCounts();
             
-            // UPDATED: Default filter
+            // Default scoreboard filter
             const defaultScoreboardFilter = (dbCategories && dbCategories.length > 0) ? dbCategories[0].name : '';
             if (defaultScoreboardFilter) {
                 filterScoreboard(defaultScoreboardFilter);
@@ -584,14 +584,14 @@
             (dbCategories || []).forEach(cat => { 
                 buttonsHtml += `<button class="filter-btn" data-filter="${cat.name}" onclick="filterResults('${cat.name}')">${cat.name}</button>`; 
             }); 
-            // 'Group' button removed from here
+            // 'Group' button removed
             if (programFiltersEl) programFiltersEl.innerHTML = buttonsHtml;
             
             let scoreboardButtonsHtml = ''; 
             (dbCategories || []).forEach((cat, index) => { 
                 scoreboardButtonsHtml += `<button class="filter-btn ${index === 0 ? 'active' : ''}" data-filter="${cat.name}" onclick="filterScoreboard('${cat.name}')">${cat.name}</button>`; 
             }); 
-            // 'Group' button removed from here
+            // 'Group' button removed
             if (scoreboardFiltersEl) {
                 if(scoreboardButtonsHtml === '') {
                     scoreboardButtonsHtml = "<p class='text-gray-500'>No categories added yet.</p>";
@@ -612,7 +612,7 @@
             const positionTexts = ['Champions', 'First Runners-up', 'Second Runners-up'];
             const iconClasses = ['fas fa-crown', 'fas fa-medal', 'fas fa-medal'];
             
-            rankedTeams.slice(0, 3).forEach((team, i) => { 
+            rankedTeams.slice(0, 3).forEach((team, i) => { // Only top 3
                 container.innerHTML += `<div class="team-card ${cardClasses[i] || ''}"><div class="icon"><i class="${iconClasses[i] || 'fas fa-award'}"></i></div><div class="team-name">${team.name}</div><p class="points"><b>${team.total}</b></p><p class="position">${positionTexts[i] || `#${i + 1} Position`}</p></div>`;
             });
 
@@ -621,7 +621,7 @@
             }
         }
         
-        // UPDATED: Removed 'Group' column
+        // RESTORED: generateDetailedRankings (UPDATED to remove 'Group')
         function generateDetailedRankings() {
             const container = d.getElementById('detailed-rankings');
             if (!container) return; 
@@ -666,9 +666,27 @@
             container.innerHTML = `<h2>Detailed Rankings</h2><p>Complete scoreboard with detailed breakdown by category</p>${tableHtml}`;
         }
         
+        // റിസൾട്ട് കാർഡുകൾ ഉണ്ടാക്കുന്നു (UPDATED for custom points)
         function renderProgramResults() { /* ... (കോഡ് മാറ്റമില്ല) ... */ }
+        
+        // ടാലന്റ് ലിസ്റ്റ് ഉണ്ടാക്കുന്നു (UPDATED for custom points)
         function generateTalentList() { /* ... (കോഡ് മാറ്റമില്ല) ... */ }
-        function generateScoreboard() { /* ... (കോഡ് മാറ്റമില്ല) ... */ }
+
+        // UPDATED: generateScoreboard (Removed 'Group' logic)
+        function generateScoreboard() { 
+            const container = d.getElementById('scoreboard-table-content'); 
+            if (!container) return;
+            let scoreboardHtml = ''; 
+            for (const eventName in processedScoreboardData.eventPoints) { 
+                const eventData = processedScoreboardData.eventPoints[eventName];
+                // Don't filter out group events, just show them under their category
+                scoreboardHtml += `<div class="scoreboard-card" data-category="${eventData.category}" data-event-name="${eventName}"><div class="scoreboard-event-header"><span>Program Name:</span><span>${eventName.replace('________NO ONE','')}</span></div>${TEAM_NAMES.map(team => `<div class="scoreboard-team-row"><span>${team}:</span><span>${eventData[team].points} ${getTrophyIconsHTML(eventData[team].positions)}</span></div>`).join('')}</div>`; 
+            } 
+            scoreboardHtml += `<div class="scoreboard-card total-card" id="scoreboard-total-card"><h3>TOTALS</h3><p id="scoreboard-category-count" class="category-count-text"></p>${TEAM_NAMES.map(team => `<div class="scoreboard-team-row"><span>${team}:</span> <span data-team="${team}">0</span></div>`).join('')}</div><div class="scoreboard-legend"><span><i class="fas fa-trophy gold"></i> Gold</span> <span><i class="fas fa-trophy silver"></i> Silver</span> <span><i class="fas fa-trophy bronze"></i> Bronze</span></div>`; 
+            container.innerHTML = scoreboardHtml; 
+        }
+        
+        // ഹോം പേജിലെ സ്റ്റാറ്റിക് ഉള്ളടക്കം ഉണ്ടാക്കുന്നു (UPDATED for new fields)
         function generateStaticContent() { /* ... (കോഡ് മാറ്റമില്ല) ... */ }
         
         // ===================================
@@ -680,7 +698,8 @@
         // UPDATED: Removed confetti
         window.showMainTab = function(tabId) { const currentActiveButton = d.querySelector('#scoreboard-page .main-tab-button.active'); const clickedButton = d.querySelector(`.main-tab-button[onclick*="'${tabId}'"]`); if (clickedButton && clickedButton.isSameNode(currentActiveButton)) return; if (currentActiveButton) currentActiveButton.classList.remove('active'); d.querySelectorAll('.main-tab-content').forEach(tab => tab.classList.remove('active')); d.getElementById(tabId).classList.add('active'); if (clickedButton) clickedButton.classList.add('active'); updateMenuActiveState(); }
         window.filterResults = function(category = 'all') { d.querySelectorAll('#program-tab .filter-btn').forEach(btn => btn.classList.remove('active')); d.querySelector(`#program-tab .filter-btn[data-filter="${category}"]`).classList.add('active'); const searchTerm = d.getElementById('search-input').value.toLowerCase(); d.querySelectorAll('.event-result-card').forEach(card => { const categoryMatch = (category === 'all' || card.dataset.category === category); const searchMatch = (card.dataset.searchText.includes(searchTerm)); card.style.display = (categoryMatch && searchMatch) ? 'block' : 'none'; }); }
-        window.filterScoreboard = function(category) { if (!category) return; d.querySelectorAll('#scoreboard-filter-buttons .filter-btn').forEach(btn => btn.classList.remove('active')); const activeButton = d.querySelector(`#scoreboard-filter-buttons .filter-btn[data-filter="${category}"]`); if (activeButton) activeButton.classList.add('active'); const totalsToShow = processedScoreboardData.categoryTotals[category]; const totalCard = d.getElementById('scoreboard-total-card'); const countElement = d.getElementById('scoreboard-category-count'); if (totalCard && totalsToShow) { TEAM_NAMES.forEach(team => { const teamSpan = totalCard.querySelector(`span[data-team="${team}"]`); if (teamSpan) teamSpan.textContent = totalsToShow[team] || 0; }); } if (countElement) { const count = processedScoreboardData.categoryCounts[category] || 0; countElement.textContent = `Published Results: ${count}`; } d.querySelectorAll('#scoreboard-container .scoreboard-card:not(.total-card)').forEach(card => { const eventName = card.dataset.eventName; const eventData = eventName ? processedScoreboardData.eventPoints[eventName] : undefined; if (!eventData) { card.style.display = 'none'; return; } const isGroup = groupEvents.includes(eventName); const eventCategory = isGroup ? 'group' : eventData.category; card.style.display = (category === eventCategory) ? 'block' : 'none'; }); }
+        // UPDATED: filterScoreboard (Removed 'Group' logic)
+        window.filterScoreboard = function(category) { if (!category) return; d.querySelectorAll('#scoreboard-filter-buttons .filter-btn').forEach(btn => btn.classList.remove('active')); const activeButton = d.querySelector(`#scoreboard-filter-buttons .filter-btn[data-filter="${category}"]`); if (activeButton) activeButton.classList.add('active'); const totalsToShow = processedScoreboardData.categoryTotals[category]; const totalCard = d.getElementById('scoreboard-total-card'); const countElement = d.getElementById('scoreboard-category-count'); if (totalCard && totalsToShow) { TEAM_NAMES.forEach(team => { const teamSpan = totalCard.querySelector(`span[data-team="${team}"]`); if (teamSpan) teamSpan.textContent = totalsToShow[team] || 0; }); } if (countElement) { const count = processedScoreboardData.categoryCounts[category] || 0; countElement.textContent = `Published Results: ${count}`; } d.querySelectorAll('#scoreboard-container .scoreboard-card:not(.total-card)').forEach(card => { const eventData = card.dataset.eventName ? processedScoreboardData.eventPoints[card.dataset.eventName] : undefined; if (!eventData) { card.style.display = 'none'; return; } card.style.display = (category === eventData.category) ? 'block' : 'none'; }); }
         window.updateResultCounts = function() { const el = d.getElementById('team-results-count'); if (el) el.innerText = `Team point status after ${publishedResultsCount} results`; }
         window.getTrophyIconsHTML = function(positions) { if (!positions || positions.length === 0) return ''; return positions.map(pos => { if (pos === 1) return '<i class="fas fa-trophy trophy-icon gold"></i>'; if (pos === 2) return '<i class="fas fa-trophy trophy-icon silver"></i>'; if (pos === 3) return '<i class="fas fa-trophy trophy-icon bronze"></i>'; return ''; }).join(''); }
         window.toggleTalentDropdown = function(listId, button) { const list = d.getElementById(listId); list.classList.toggle('open'); button.textContent = list.classList.contains('open') ? 'Show Less' : 'Show More'; }
@@ -725,4 +744,3 @@
     </script>
 </body>
 </html>
-
