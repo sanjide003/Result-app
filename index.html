@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- Version 2.5 - Loading Debug -->
+<!-- Version 2.4 - Enhanced Loading Debug -->
 <html lang="ml">
 <head>
     <meta charset="UTF-8">
@@ -350,14 +350,12 @@
         // --- Firebase Imports & Init ---
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js";
         import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-auth.js";
-        import { getFirestore, doc, onSnapshot, collection, query, enableNetwork } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-firestore.js"; // Added enableNetwork
+        import { getFirestore, doc, onSnapshot, collection, query } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-firestore.js";
         let app, auth, db;
         try {
             app = initializeApp(finalFirebaseConfig);
             auth = getAuth(app);
             db = getFirestore(app);
-            // Explicitly enable network - might help if it was accidentally disabled
-            // enableNetwork(db).then(() => console.log("Firestore network enabled.")).catch(err => console.error("Error enabling network:", err));
             console.log("Firebase Initialized.");
             signInAnonymously(auth).then(() => console.log("Signed in anonymously."))
                 .catch(error => {
@@ -372,7 +370,7 @@
 
         // --- Data Variables ---
         let TEAM_NAMES = [];
-        const groupEvents = [ "മദ്ഹുന്നബി സംഘഗാനം", "മുനാഖശ", "മാഷപ്പ്", "സംഘഗാനം (അറബി)", "സംഘഗാനം (മലയാളം)","മൗലിദ് പാരായണം", "ബുർദ ആലാപനം", "മാലപ്പാട്ട്", "ഇസ്ലാമിക് സമൂഹഗാനം (മലയാളം)", "പത്ര നിർമ്മാണം", "മാഗസിൻ നിർമ്മാണം", "ഡിജിital ക്വിസ്" ]; // Typo fixed
+        const groupEvents = [ "മദ്ഹുന്നബി സംഘഗാനം", "മുനാഖശ", "മാഷപ്പ്", "സംഘഗാനം (അറബി)", "സംഘഗാനം (മലയാളം)","മൗലിദ് പാരായണം", "ബുർദ ആലാപനം", "മാലപ്പാട്ട്", "ഇസ്ലാമിക് സമൂഹഗാനം (മലയാളം)", "പത്ര നിർമ്മാണം", "മാഗസിൻ നിർമ്മാണം", "ഡിജിറ്റൽ ക്വിസ്" ];
         let processedTeamData = {}, processedProgramData = [], processedTalentData = {}, processedScoreboardData = {};
         let publishedResultsCount = 0;
         let dbPrograms = null, dbTeams = null, dbCategories = null, dbHomepage = null, dbParticipants = null, dbResults = null;
@@ -389,21 +387,19 @@
         const setText = (id, value, fallback = '') => { const el = d.getElementById(id); if (el) el.textContent = value || fallback; else console.warn(`Element not found: ${id}`); };
         const setSrc = (id, value, fallback) => { const el = d.getElementById(id); if (el) el.src = value || fallback; else console.warn(`Element not found: ${id}`); };
         const setHref = (selector, value) => {
+             // Use querySelector for flexibility (e.g., selecting by aria-label)
              const el = d.querySelector(selector);
              if(el && value) {
                 el.href = value;
-                el.style.display=''; // Reset display property if URL exists
-                const parentContainer = d.getElementById('footer-social-icons');
-                if (parentContainer) parentContainer.style.display = 'flex'; // Ensure container is visible
+                // Ensure the link or its container is visible if it has a URL
+                el.style.display=''; // Reset display property
+                // If the link is inside a container that might be hidden, show container too
+                const parentContainer = d.getElementById('footer-social-icons'); // Example specific to footer
+                if (parentContainer) parentContainer.style.display = 'flex';
              } else if (el) {
                  el.style.display='none'; // Hide the specific link if no URL
-                 // Check if all siblings are hidden, then hide parent
-                 const parentContainer = d.getElementById('footer-social-icons');
-                 if (parentContainer && Array.from(parentContainer.children).every(child => child.style.display === 'none')) {
-                     parentContainer.style.display = 'none';
-                 }
              } else {
-                 // console.warn(`Selector not found: ${selector}`); // Reduce console noise for default icons
+                 console.warn(`Selector not found: ${selector}`);
              }
          }
 
@@ -411,7 +407,7 @@
         function updateLoadingMessage(message) {
             const loadingOverlay = d.getElementById('loading-overlay');
             if (loadingOverlay && loadingOverlay.style.display !== 'none') {
-                const msgElement = loadingOverlay.querySelector('p:not(.error-details)'); // Target main message p
+                const msgElement = loadingOverlay.querySelector('p');
                 if (msgElement && !msgElement.style.color.includes('red')) { // Don't overwrite error messages
                      msgElement.textContent = message;
                 }
@@ -424,15 +420,18 @@
             if (loadingOverlay) {
                 const spinner = loadingOverlay.querySelector('.spinner');
                 if (spinner) spinner.style.display = 'none'; // Hide spinner
-                let msgElement = loadingOverlay.querySelector('p:not(.error-details)'); // Target main message p
-                if(msgElement) {
-                    msgElement.textContent = message;
-                    msgElement.style.color = 'red'; // Indicate error
-                    msgElement.classList.add('error-message'); // Add class if not present
+                let msgElement = loadingOverlay.querySelector('p.error-message'); // Look for existing error message p
+                if (!msgElement) { // If no error p exists, use the default p
+                    msgElement = loadingOverlay.querySelector('p');
+                    if(msgElement) msgElement.classList.add('error-message'); // Add class for potential future styling/selection
                 }
 
+                if (msgElement) {
+                    msgElement.textContent = message;
+                    msgElement.style.color = 'red'; // Indicate error
+                }
 
-                // Add or update technical details
+                // Add technical details if provided and not already present
                 let errorDetailsElement = loadingOverlay.querySelector('p.error-details');
                  if (!errorDetailsElement && technicalError) { // Create if doesn't exist and error provided
                     errorDetailsElement = d.createElement('p');
@@ -461,27 +460,35 @@
         function getTeamFromChest(chestNo) {
             try {
                 if (!chestNo || typeof chestNo !== 'string') return null;
+                // Check essential data existence first
                 if (!dbTeams || !dbParticipants || !Array.isArray(TEAM_NAMES) || TEAM_NAMES.length === 0) {
+                     // console.warn("getTeamFromChest: Missing teams, participants, or TEAM_NAMES array.");
                      return null;
                 }
                 const upperChestNo = chestNo.toUpperCase();
+                // 1. Direct team name match (for group events where chestNo might be team name)
                 if (TEAM_NAMES.includes(upperChestNo)) return upperChestNo;
+                // 2. Check participants data using the exact chestNo
                 if (dbParticipants[chestNo] && dbParticipants[chestNo].team) return dbParticipants[chestNo].team;
+                // 3. Check chest number range
                 const chestNumberMatch = chestNo.match(/^\d+/);
                 if (chestNumberMatch) {
                     const chestNumber = parseInt(chestNumberMatch[0], 10);
-                     if (isNaN(chestNumber)) return null;
+                     if (isNaN(chestNumber)) return null; // Invalid number extracted
+                    // Iterate through team *names* from the global array
                     for (const teamName of TEAM_NAMES) {
-                         const team = dbTeams[teamName];
+                         const team = dbTeams[teamName]; // Get team object using the name
+                         // Validate team object and range properties
                          if (!team || !team.id_from || !team.id_to) continue;
                         const idFrom = parseInt(team.id_from, 10);
                         const idTo = parseInt(team.id_to, 10);
                         if (!isNaN(idFrom) && !isNaN(idTo) && chestNumber >= idFrom && chestNumber <= idTo) {
-                            return team.name;
+                            return team.name; // Return the canonical team name
                         }
                     }
                 }
-                return null;
+                // console.warn(`Team not found for chest: ${chestNo}`);
+                return null; // Not found after all checks
             } catch (e) {
                  console.error("Error in getTeamFromChest:", e, "Input:", chestNo);
                  return null;
@@ -491,32 +498,43 @@
 
         function initializeTeamData() {
             const data = {};
+            // Ensure dbTeams and dbCategories are valid before proceeding
             if (!dbTeams || typeof dbTeams !== 'object' || Object.keys(dbTeams).length === 0 ||
                 !dbCategories || !Array.isArray(dbCategories) || dbCategories.length === 0) {
-                 console.warn("initializeTeamData: dbTeams or dbCategories null/empty/invalid.");
-                 TEAM_NAMES = [];
-                 return data;
+                 console.warn("initializeTeamData: dbTeams or dbCategories null/empty/invalid. Cannot initialize point structure.");
+                 TEAM_NAMES = []; // Reset team names
+                 return data; // Return empty object
             }
+            // Use dbTeams keys as the source of truth for team names, sort them
             TEAM_NAMES = Object.keys(dbTeams).sort();
             console.log("Initialized TEAM_NAMES:", TEAM_NAMES);
 
             TEAM_NAMES.forEach(teamName => {
                 const teamData = dbTeams[teamName];
                 if (teamData) {
-                    data[teamName] = { name: teamName, total: 0 }; // Use key as canonical name
+                     // Use the key (teamName) as the canonical name in the processed data
+                    data[teamName] = { name: teamName, total: 0 };
+                    // Initialize points for each valid category
                     dbCategories.forEach(cat => {
-                         if (cat && cat.name) {
+                         if (cat && cat.name) { // Check if category object and name are valid
                             data[teamName][cat.name] = 0;
-                         } else { console.warn("Invalid category object:", cat); }
+                         } else {
+                              console.warn("Invalid category object found during team data initialization:", cat);
+                         }
                     });
+                     // Initialize points for group events
                     data[teamName]['group'] = 0;
-                } else { console.warn(`Team data missing for key: ${teamName}`); }
+                } else {
+                    // This case should ideally not happen if TEAM_NAMES comes from Object.keys(dbTeams)
+                    console.warn(`Team data missing for key: ${teamName} during initialization.`);
+                }
             });
 
+             // Sanity check
              if (Object.keys(data).length !== TEAM_NAMES.length) {
                  console.warn("Mismatch between TEAM_NAMES length and initialized data keys count.");
              }
-             console.log("Initialized processedTeamData structure:", JSON.stringify(data)); // Log structure
+             console.log("Initialized processedTeamData structure:", data);
             return data;
         }
 
@@ -525,16 +543,8 @@
             if (isProcessing) { console.log("Skip processAllData: Already processing."); return; }
             isProcessing = true;
             console.log("Starting processAllData...");
-            // Log current state of db variables
-            console.log("Data state before processing:", {
-                dbCategories: !!dbCategories, catLength: dbCategories?.length,
-                dbTeams: !!dbTeams, teamKeys: dbTeams ? Object.keys(dbTeams).length : 0,
-                dbHomepage: !!dbHomepage, dbParticipants: !!dbParticipants,
-                dbPrograms: !!dbPrograms, dbResults: !!dbResults
-            });
-
            try {
-                // Stricter check again
+                // Stricter check for essential data before proceeding
                 if (!dbCategories || dbCategories.length === 0 || !dbTeams || Object.keys(dbTeams).length === 0 || !dbHomepage || !dbParticipants || !dbPrograms || !dbResults) {
                      const missing = [
                          (!dbCategories || dbCategories.length === 0) && 'Categories',
@@ -542,21 +552,17 @@
                          !dbHomepage && 'Homepage', !dbParticipants && 'Participants',
                          !dbPrograms && 'Programs', !dbResults && 'Results'
                      ].filter(Boolean).join(', ');
-                     console.error(`processAllData HALTED: Essential data missing - ${missing}. Check Firestore paths, data, and security rules.`);
-                     // Display a more persistent error if critical data is missing
-                     if ((!dbCategories || dbCategories.length === 0) || (!dbTeams || Object.keys(dbTeams).length === 0)) {
-                        displayGlobalError(`Configuration Error: ${missing} missing.`, `Please ensure ${missing.toLowerCase()} exist in Firestore and security rules allow access.`);
-                     } else {
-                        updateLoadingMessage(`Waiting for ${missing.split(',')[0]}...`); // Less critical data
-                     }
+                     console.warn(`processAllData skipped: Essential data missing - ${missing}.`);
+                     updateLoadingMessage(`Waiting for ${missing.split(',')[0]}...`);
                      isProcessing = false;
                      return;
                 }
 
                 processedTeamData = initializeTeamData();
+                // Crucial check after initialization
                 if (TEAM_NAMES.length === 0 || Object.keys(processedTeamData).length === 0) {
-                     console.error("processAllData Error: Failed to initialize team data correctly AFTER checks passed. THIS IS UNEXPECTED.");
-                     displayGlobalError("Internal Error", "Could not process Team data. Please contact support.");
+                     console.error("processAllData Error: Failed to initialize team data correctly. Check Teams/Categories in Admin Panel.");
+                     displayGlobalError("Configuration Error", "Could not initialize Team data. Check Teams/Categories in Admin Panel.");
                      isProcessing = false;
                      return;
                 }
@@ -564,12 +570,14 @@
                 processedProgramData = [];
                 const talentPoints = {};
                 processedScoreboardData = { eventPoints: {}, categoryTotals: {}, categoryCounts: {} };
-                let currentResultsCount = 0;
+                let currentResultsCount = 0; // Use local count
 
+                // Filter out invalid categories before mapping names
                 const validCategories = dbCategories.filter(cat => cat && cat.name);
                 const categoryNames = validCategories.map(cat => cat.name);
-                categoryNames.push('group');
+                categoryNames.push('group'); // Keep 'group' for internal logic
 
+                // Initialize Scoreboard Totals/Counts using valid category names
                 categoryNames.forEach(catName => {
                     processedScoreboardData.categoryTotals[catName] = {};
                     TEAM_NAMES.forEach(team => { processedScoreboardData.categoryTotals[catName][team] = 0; });
@@ -577,55 +585,84 @@
                 });
 
                 // --- Main Processing Loop ---
-                console.log(`Processing ${Object.keys(dbResults).length} results...`);
                 for (const programId in dbResults) {
-                  try {
+                  try { // Inner try-catch for individual result processing
                         const program = dbPrograms[programId];
-                        if (!program || !program.name || !program.category) { console.warn(`Program data missing/invalid for result ID: ${programId}`); continue; }
+                        if (!program || !program.name || !program.category) { console.warn(`Program data missing or invalid for result ID: ${programId}`); continue; }
 
                         const eventName = program.name;
                         const categoryName = program.category;
                         const winners = dbResults[programId];
 
-                        if (!winners || !((winners.first && winners.first.length > 0) || (winners.second && winners.second.length > 0) || (winners.third && winners.third.length > 0))) { continue; }
+                        // Skip if no valid winner entries exist
+                        if (!winners || !((winners.first && winners.first.length > 0) || (winners.second && winners.second.length > 0) || (winners.third && winners.third.length > 0))) {
+                            continue;
+                        }
                         currentResultsCount++;
 
-                        const currentPoints = { first: parseInt(program.points_first || 5), second: parseInt(program.points_second || 3), third: parseInt(program.points_third || 1) };
+                        const currentPoints = {
+                            first: parseInt(program.points_first || 5, 10),
+                            second: parseInt(program.points_second || 3, 10),
+                            third: parseInt(program.points_third || 1, 10)
+                        };
+
                         const isGroupEvent = groupEvents.includes(eventName);
-                        if (isGroupEvent && currentPoints.first === 5 && currentPoints.second === 3 && currentPoints.third === 1) { currentPoints.first = 10; currentPoints.second = 8; currentPoints.third = 5; }
+                        // Adjust points for specific group events if default points match (5,3,1 -> 10,8,5)
+                        if (isGroupEvent && currentPoints.first === 5 && currentPoints.second === 3 && currentPoints.third === 1) {
+                            currentPoints.first = 10;
+                            currentPoints.second = 8;
+                            currentPoints.third = 5;
+                        }
 
-                        const filterCategory = isGroupEvent ? 'group' : categoryName;
-                        const eventScore = { category: categoryName, isGroup: isGroupEvent };
-                        TEAM_NAMES.forEach(team => { eventScore[team] = { points: 0, positions: [] }; });
+                        const filterCategory = isGroupEvent ? 'group' : categoryName; // Category used for filtering Results tab
+                        const eventScore = { category: categoryName, isGroup: isGroupEvent }; // Data for scoreboard card
+                        TEAM_NAMES.forEach(team => { eventScore[team] = { points: 0, positions: [] }; }); // Initialize scores for all teams for this event
 
+                        // Process winners for each position
                         for (const position of ['first', 'second', 'third']) {
-                            if (winners[position] && Array.isArray(winners[position])) {
+                            if (winners[position] && Array.isArray(winners[position])) { // Ensure it's an array
                                 winners[position].forEach(winner => {
-                                    if (!winner || !winner.chest || !winner.name) { console.warn(`Invalid winner data in ${eventName}, pos ${position}:`, winner); return; }
+                                    if (!winner || !winner.chest || !winner.name) { console.warn(`Invalid winner data in ${eventName}, pos ${position}:`, winner); return; } // Skip invalid winner
+
                                     const team = getTeamFromChest(winner.chest);
-                                    if (team && processedTeamData[team]) {
+
+                                    if (team && processedTeamData[team]) { // Ensure team is valid and exists
                                         const pointValue = currentPoints[position];
                                         processedTeamData[team].total += pointValue;
                                         const pointCategoryKey = isGroupEvent ? 'group' : categoryName;
+
                                         if (processedTeamData[team].hasOwnProperty(pointCategoryKey)) {
                                             processedTeamData[team][pointCategoryKey] += pointValue;
-                                        } else { console.warn(`Cat key '${pointCategoryKey}' missing for team '${team}' in ${eventName}. Initializing to ${pointValue}.`); processedTeamData[team][pointCategoryKey] = pointValue; } // Initialize if missing
-                                        if (!isGroupEvent) { const winnerId = `${winner.chest} ${winner.name}`; if (!talentPoints[winnerId]) talentPoints[winnerId] = { points: 0, category: categoryName }; talentPoints[winnerId].points += pointValue; }
-                                        if (eventScore[team]) { eventScore[team].points += pointValue; eventScore[team].positions.push(position === 'first' ? 1 : (position === 'second' ? 2 : 3)); }
+                                        } else { console.warn(`Cat key '${pointCategoryKey}' missing for team '${team}' in ${eventName}.`); }
+
+                                        if (!isGroupEvent) {
+                                            const winnerId = `${winner.chest} ${winner.name}`;
+                                            if (!talentPoints[winnerId]) talentPoints[winnerId] = { points: 0, category: categoryName };
+                                            talentPoints[winnerId].points += pointValue;
+                                        }
+                                        if (eventScore[team]) {
+                                            eventScore[team].points += pointValue;
+                                            eventScore[team].positions.push(position === 'first' ? 1 : (position === 'second' ? 2 : 3));
+                                        }
                                     } else if (team) { console.warn(`Team '${team}' (chest '${winner.chest}') !in processedTeamData for ${eventName}.`); }
-                                      else { /* console.warn(`No team for chest '${winner.chest}' in ${eventName}.`); */ } // Reduce noise
+                                      else { console.warn(`No team for chest '${winner.chest}' in ${eventName}.`); }
                                 });
                             }
                         }
-                        processedScoreboardData.eventPoints[eventName] = eventScore;
+                        processedScoreboardData.eventPoints[eventName] = eventScore; // Store event score details
 
+                        // Update scoreboard category totals and counts
                         const scoreboardCat = isGroupEvent ? 'group' : categoryName;
                         if (processedScoreboardData.categoryTotals[scoreboardCat]) {
-                            TEAM_NAMES.forEach(team => { if (eventScore[team]) { processedScoreboardData.categoryTotals[scoreboardCat][team] += eventScore[team].points; } });
+                            TEAM_NAMES.forEach(team => {
+                                if (eventScore[team]) {
+                                    processedScoreboardData.categoryTotals[scoreboardCat][team] += eventScore[team].points;
+                                }
+                            });
                             processedScoreboardData.categoryCounts[scoreboardCat]++;
                         } else { console.warn(`Scoreboard cat '${scoreboardCat}' !in totals for ${eventName}.`); }
 
-                        processedProgramData.push({ eventName, categoryName, filterCategory, winners, currentPoints });
+                        processedProgramData.push({ eventName, categoryName, filterCategory, winners, currentPoints }); // For Results tab
 
                     } catch (innerError) { console.error(`Error processing result for Program ID ${programId}:`, innerError); }
                 } // --- End Main Processing Loop ---
@@ -634,14 +671,17 @@
                 processedTalentData = {};
                 for (const studentKey in talentPoints) {
                     const { points, category } = talentPoints[studentKey];
-                     if (category) { if (!processedTalentData[category]) processedTalentData[category] = []; processedTalentData[category].push({ name: studentKey, points }); }
-                     else { console.warn(`Talent entry missing category: ${studentKey}`); }
+                     if (category) { // Ensure category exists
+                        if (!processedTalentData[category]) processedTalentData[category] = [];
+                        processedTalentData[category].push({ name: studentKey, points });
+                     } else { console.warn(`Talent entry missing category: ${studentKey}`); }
                 }
-                for (const category in processedTalentData) { processedTalentData[category].sort((a, b) => (b.points || 0) - (a.points || 0)); }
+                for (const category in processedTalentData) {
+                    processedTalentData[category].sort((a, b) => (b.points || 0) - (a.points || 0)); // Sort by points desc
+                }
 
-                publishedResultsCount = currentResultsCount;
+                publishedResultsCount = currentResultsCount; // Update global count
                 console.log("processAllData finished successfully. Published Results:", publishedResultsCount);
-                console.log("Final processedTeamData:", JSON.stringify(processedTeamData)); // Log final team data
 
                 renderAllComponents(); // Trigger rendering
 
@@ -650,32 +690,28 @@
                  displayGlobalError("Error processing event data.", error.message);
             }
             finally {
-                setTimeout(() => { isProcessing = false; }, 100);
+                setTimeout(() => { isProcessing = false; }, 100); // Release flag after a delay
             }
         }
 
 
-        // --- Rendering Functions (Keep existing content, ensure error handling) ---
+        // --- Rendering Functions ---
         function renderAllComponents() {
             // Essential Data Check - Repeat check here
-             if (!dbCategories || !Array.isArray(dbCategories) || dbCategories.length === 0 ||
-                 !dbTeams || typeof dbTeams !== 'object' || Object.keys(dbTeams).length === 0) {
-                const missing = (!dbTeams || Object.keys(dbTeams).length === 0) ? 'Teams' : 'Categories';
-                console.error(`Render ABORTED: Essential config missing - ${missing}.`);
-                 // Don't just update message, show persistent error if config missing after load attempts
-                 displayGlobalError(`Configuration Error: ${missing} missing.`, `Please add ${missing.toLowerCase()} in the Admin Panel and ensure Firestore rules allow access.`);
-                return; // Stop rendering
+            if (!dbCategories || dbCategories.length === 0 || !dbTeams || Object.keys(dbTeams).length === 0) {
+                const missing = !dbTeams || Object.keys(dbTeams).length === 0 ? 'Teams' : 'Categories';
+                console.log(`Render skipped: ${missing} not loaded or empty.`);
+                updateLoadingMessage(`Waiting for ${missing} configuration...`);
+                return;
             }
-             // Ensure TEAM_NAMES is populated (might run before processAllData finishes initialization if there's a race condition)
-            if (!Array.isArray(TEAM_NAMES) || TEAM_NAMES.length === 0) {
-                 initializeTeamData(); // Attempt to initialize again
+            if (TEAM_NAMES.length === 0) {
+                 initializeTeamData();
                  if (TEAM_NAMES.length === 0) {
-                    console.error("Render ABORTED: TEAM_NAMES could not be initialized from dbTeams.");
-                    displayGlobalError("Initialization Error", "Could not process Team names. Check Teams configuration.");
-                    return; // Stop if teams are loaded but names array isn't populated
+                    console.log("Render skipped: TEAM_NAMES could not be initialized.");
+                    updateLoadingMessage("Waiting for Team configuration...");
+                    return;
                  }
             }
-
 
             console.log("Rendering all components...");
 
@@ -685,16 +721,15 @@
             try { generateDetailedRankings(); } catch (e) { console.error("Error in generateDetailedRankings:", e); }
             try { renderProgramResults(); } catch (e) { console.error("Error in renderProgramResults:", e); }
             try { generateTalentList(); } catch (e) { console.error("Error in generateTalentList:", e); }
-            try { generateScoreboard(); } catch (e) { console.error("Error in generateScoreboard:", e); } // Includes filter call
+            try { generateScoreboard(); } catch (e) { console.error("Error in generateScoreboard:", e); }
             try { generateStaticContent(); } catch (e) { console.error("Error in generateStaticContent:", e); }
             try { updateResultCounts(); } catch (e) { console.error("Error in updateResultCounts:", e); }
 
             // --- Hide Loading Overlay ---
             const loadingOverlay = d.getElementById('loading-overlay');
             const mainContent = d.getElementById('main-content');
-            // Check if overlay is still displayed AND no error is shown
-            if (loadingOverlay && loadingOverlay.style.display !== 'none' && !loadingOverlay.querySelector('p.error-message')) {
-                clearTimeout(loadingTimeout); // Clear timeout only on successful render start
+            if (loadingOverlay && loadingOverlay.style.display !== 'none' && !loadingOverlay.innerHTML.includes('color: red')) {
+                clearTimeout(loadingTimeout);
                 loadingOverlay.style.opacity = '0';
                 setTimeout(() => {
                     if (loadingOverlay) loadingOverlay.style.display = 'none';
@@ -702,28 +737,21 @@
                     console.log("UI is now visible.");
                     hasRenderedOnce = true;
                 }, 500);
-            } else if (mainContent && mainContent.style.visibility !== 'visible' && loadingOverlay && !loadingOverlay.querySelector('p.error-message')) {
-                // If overlay somehow got hidden but content is still hidden, show content (unless error is displayed)
+            } else if (mainContent && mainContent.style.visibility !== 'visible') {
                 clearTimeout(loadingTimeout);
                 mainContent.style.visibility = 'visible';
-                console.log("Loading overlay was hidden/in error state (but no error msg shown), making content visible.");
+                console.log("Loading overlay was hidden/in error state, making content visible.");
                 hasRenderedOnce = true;
             } else if (hasRenderedOnce) {
                  console.log("RenderAllComponents called again, UI likely already visible.");
             } else if (!loadingOverlay) {
-                 // Fallback if loading overlay element doesn't exist
                  if (mainContent) mainContent.style.visibility = 'visible';
                  console.warn("Loading overlay element not found.");
                  hasRenderedOnce = true;
-                 clearTimeout(loadingTimeout); // Clear timeout anyway if overlay missing
-            } else if (loadingOverlay && loadingOverlay.querySelector('p.error-message')) {
-                 console.log("RenderAllComponents called, but an error is displayed. Keeping overlay.");
-                 // Do not hide overlay if an error is being shown
             }
         }
 
-        // Add try-catch wrappers to other rendering functions for safety
-        function generateFilterButtons() { try { /* Original code */
+        function generateFilterButtons() {
             const programFiltersEl = d.getElementById('program-filter-buttons');
             const scoreboardFiltersEl = d.getElementById('scoreboard-filter-buttons');
             if (!programFiltersEl || !scoreboardFiltersEl) {
@@ -756,9 +784,10 @@
                  scoreboardFiltersEl.querySelectorAll('.filter-btn.active').forEach(b => b.classList.remove('active'));
                 if (allBtn) allBtn.classList.add('active');
             }
-         } catch(e) { console.error("Error generating filter buttons:", e); }}
+        }
 
-        function generateTeamCards() { try { /* Original code */
+
+        function generateTeamCards() {
             const container = d.getElementById('team-cards-container');
             if (!container) { console.error("Team card container not found"); return; }
             container.innerHTML = '';
@@ -786,9 +815,9 @@
                         <p class="position">${positionTexts[i] || `#${i + 1} Position`}</p>
                     </div>`;
             });
-         } catch(e) { console.error("Error generating team cards:", e); }}
+        }
 
-        function generateDetailedRankings() { try { /* Original code */
+        function generateDetailedRankings() {
             const container = d.getElementById('detailed-rankings');
             if (!container) return;
 
@@ -858,9 +887,9 @@
                     </div>
                     ${tableRowsHTML}
                 </div>`;
-         } catch(e) { console.error("Error generating detailed rankings:", e); }}
+        }
 
-        function renderProgramResults() { try { /* Original code */
+        function renderProgramResults() {
              const grid = d.getElementById('program-results-grid');
             if (!grid) { console.error("program-results-grid not found"); return; }
             if (!processedProgramData || processedProgramData.length === 0) { grid.innerHTML = '<p class="text-gray-500 p-4 text-center">No results have been published yet.</p>'; return; }
@@ -907,9 +936,9 @@
             });
             const activeFilterButton = d.querySelector('#program-tab .filter-btn.active');
             filterResults(activeFilterButton ? activeFilterButton.dataset.filter : 'all');
-         } catch(e) { console.error("Error rendering program results:", e); }}
+         }
 
-        function generateTalentList() { try { /* Original code */
+        function generateTalentList() {
             const container = d.getElementById('talent-list-container');
             if (!container) { console.error("talent-list-container not found"); return; }
             const categories = Object.keys(processedTalentData || {}).sort();
@@ -957,9 +986,10 @@
                         ${listHtml}
                     </div>`;
             });
-         } catch(e) { console.error("Error generating talent list:", e); }}
+        }
 
-        function generateScoreboard() { try { /* Original code with fix */
+
+        function generateScoreboard() {
             const container = d.getElementById('scoreboard-container');
             if (!container) { console.error("Scoreboard container not found"); return; }
             container.innerHTML = ''; // Clear previous content
@@ -980,8 +1010,8 @@
                 sortedTeams.forEach(team => {
                     const teamData = eventData[team];
                     if (teamData && typeof teamData.points === 'number' && teamData.points > 0) {
-                        // Ensure getTrophyIconsHTML is called correctly (it's globally defined)
-                        eventRows += `<div class="scoreboard-team-row"><span>${team}</span><span>${getTrophyIconsHTML(teamData.positions)}${teamData.points}</span></div>`;
+                         // Ensure getTrophyIconsHTML is called correctly
+                        eventRows += `<div class="scoreboard-team-row"><span>${team}</span><span>${window.getTrophyIconsHTML(teamData.positions)}${teamData.points}</span></div>`;
                     }
                 });
                 if (eventRows) {
@@ -1018,15 +1048,20 @@
             container.innerHTML = eventCardsHTML + totalCardHTML + legendHTML;
 
              // Apply the default 'All' filter immediately after rendering all elements
-            if (typeof filterScoreboard === 'function') {
-                filterScoreboard('All'); // Apply filter to set initial visibility and totals
-            } else {
-                 console.error("filterScoreboard function not defined when applying default in generateScoreboard.");
-            }
-         } catch(e) { console.error("Error generating scoreboard:", e); }}
+             try {
+                 // Ensure filterScoreboard is globally accessible or called correctly
+                if (typeof filterScoreboard === 'function') {
+                    filterScoreboard('All'); // Apply filter to set initial visibility and totals
+                } else {
+                     console.error("filterScoreboard function not defined when applying default in generateScoreboard.");
+                }
+             } catch (e) {
+                 console.error("Error applying default filter within generateScoreboard:", e);
+             }
+        }
 
 
-        function generateStaticContent() { try { /* Original code */
+        function generateStaticContent() {
              const setText = (id, value, fallback = '') => { const el = d.getElementById(id); if (el) el.textContent = value || fallback; else console.warn(`Element not found: ${id}`); };
             const setSrc = (id, value, fallback) => { const el = d.getElementById(id); if (el) el.src = value || fallback; else console.warn(`Element not found: ${id}`); };
             const setHref = (selector, value) => { const el = d.querySelector(selector); if(el && value) { el.href = value; el.style.display='';} else if(el) el.style.display='none'; else console.warn(`Selector not found: ${selector}`); }
@@ -1037,8 +1072,9 @@
             const socialIconsContainer = d.getElementById('footer-social-icons');
 
 
-            if (!dbHomepage || Object.keys(dbHomepage).length === 0 ) {
+            if (!dbHomepage || Object.keys(dbHomepage).length === 0 ) { // Check if empty object too
                 console.warn("Static content render skipped: dbHomepage is null/empty.");
+                // Set minimal defaults
                 setText('dynamic-header-title', 'Results 2025'); setText('hero-main-title', 'Event Results'); setText('hero-subtitle', 'Live Updates'); setText('about-text', 'Details about the event will be updated soon.');
                 if(leadersSection) leadersSection.style.display = 'none'; if(gallerySection) gallerySection.style.display = 'none';
                 setText('footer-institution-name', 'Institution Name'); setText('footer-copyright', `© ${new Date().getFullYear()} Event Organizers`); if(socialIconsContainer) socialIconsContainer.style.display = 'none';
@@ -1050,8 +1086,9 @@
 
             const data = dbHomepage;
 
-            const hasLeaders = dbTeams && Object.keys(dbTeams).length > 0;
-             const hasGallery = data.gallery && Array.isArray(data.gallery) && data.gallery.length > 0;
+            // Ensure sections are visible only if relevant data exists
+             const hasLeaders = dbTeams && Object.keys(dbTeams).length > 0;
+             const hasGallery = data.gallery && Array.isArray(data.gallery) && data.gallery.length > 0; // Check if array and not empty
              if(leadersSection) leadersSection.style.display = hasLeaders ? 'block' : 'none';
              if(gallerySection) gallerySection.style.display = hasGallery ? 'block' : 'none';
 
@@ -1078,7 +1115,7 @@
            const leaderContainer = d.getElementById('leader-cards-container');
            const leaderPlaceholder = d.getElementById('leader-placeholder');
            if (leaderContainer) {
-               leaderContainer.innerHTML = '';
+               leaderContainer.innerHTML = ''; // Clear previous content
                if (hasLeaders) {
                    if(leaderPlaceholder) leaderPlaceholder.style.display = 'none';
                    const sortedTeams = Object.values(dbTeams).sort((a,b) => (a.name || '').localeCompare(b.name || ''));
@@ -1130,82 +1167,221 @@
             setText('footer-institution-name', data.institution_name, 'Institution Name');
             setText('footer-copyright', data.copyright_text, `© ${new Date().getFullYear()} Org Name. All rights reserved.`);
             if(socialIconsContainer){
+                 // Select links within the container
                  const igLink = socialIconsContainer.querySelector('a[aria-label="Instagram"]');
                  const ytLink = socialIconsContainer.querySelector('a[aria-label="YouTube"]');
                  const fbLink = socialIconsContainer.querySelector('a[aria-label="Facebook"]');
+
+                 // Update href and visibility based on data
                  setHref(igLink, data.social_instagram);
                  setHref(ytLink, data.social_youtube);
                  setHref(fbLink, data.social_facebook);
+
+                 // Show/hide the whole container
                  const hasSocials = !!(data.social_instagram || data.social_youtube || data.social_facebook);
                  socialIconsContainer.style.display = hasSocials ? 'flex' : 'none';
             }
-         } catch(e) { console.error("Error generating static content:", e); }}
+         }
+
 
         // --- UI Interaction Functions ---
-        // Add try-catch wrappers here for safety
-        window.openNav = function() { try {
-             const menuOverlay = d.getElementById("menu-overlay"); const mainContent = d.getElementById("main-content");
-             if (menuOverlay) menuOverlay.style.display = "flex"; if(mainContent) mainContent.style.filter = 'blur(4px)';
+        window.openNav = function() {
+             const menuOverlay = d.getElementById("menu-overlay");
+             const mainContent = d.getElementById("main-content");
+             if (menuOverlay) menuOverlay.style.display = "flex";
+             if(mainContent) mainContent.style.filter = 'blur(4px)';
              setTimeout(() => { if(menuOverlay) menuOverlay.style.opacity = '1'; }, 10);
-         } catch(e) { console.error("Error openNav:", e); }}
-        window.closeNav = function() { try {
-             const menuOverlay = d.getElementById("menu-overlay"); const mainContent = d.getElementById("main-content");
-             if(menuOverlay) menuOverlay.style.opacity = '0'; setTimeout(() => { if(menuOverlay) menuOverlay.style.display = "none"; }, 300);
+         }
+        window.closeNav = function() {
+             const menuOverlay = d.getElementById("menu-overlay");
+             const mainContent = d.getElementById("main-content");
+             if(menuOverlay) menuOverlay.style.opacity = '0';
+             setTimeout(() => { if(menuOverlay) menuOverlay.style.display = "none"; }, 300);
              if(mainContent) mainContent.style.filter = 'none';
-         } catch(e) { console.error("Error closeNav:", e); }}
-        window.showPage = function(pageId) { try {
-             const homePage = d.getElementById('home-page'); const scoreboardPage = d.getElementById('scoreboard-page');
+         }
+        window.showPage = function(pageId) {
+             const homePage = d.getElementById('home-page');
+             const scoreboardPage = d.getElementById('scoreboard-page');
              if(homePage) homePage.style.display = pageId === 'home-page' ? 'block' : 'none';
              if(scoreboardPage) scoreboardPage.style.display = pageId === 'scoreboard-page' ? 'block' : 'none';
              const scrollTopBtn = d.getElementById('scrollTopBtn');
-             if (scrollTopBtn) { if (pageId === 'home-page') { handleScroll(); } else { scrollTopBtn.classList.remove('show'); } }
+             if (scrollTopBtn) {
+                 if (pageId === 'home-page') { handleScroll(); } else { scrollTopBtn.classList.remove('show'); }
+             }
              updateMenuActiveState();
-         } catch(e) { console.error("Error showPage:", e); }}
-        window.showMainTab = function(tabId) { try {
+         }
+        window.showMainTab = function(tabId) {
              const currentActiveButton = d.querySelector('#scoreboard-page .main-tab-button.active');
              const clickedButton = d.querySelector(`.main-tab-button[onclick*="'${tabId}'"]`);
              if (clickedButton && currentActiveButton && clickedButton.isSameNode(currentActiveButton)) return;
+
              if (currentActiveButton) currentActiveButton.classList.remove('active');
              d.querySelectorAll('.main-tab-content').forEach(tab => tab.classList.remove('active'));
              const targetTab = d.getElementById(tabId);
              if(targetTab) targetTab.classList.add('active'); else console.warn(`Target tab content not found: ${tabId}`);
              if (clickedButton) clickedButton.classList.add('active'); else console.warn(`Clicked button not found for tab: ${tabId}`);
              updateMenuActiveState();
-         } catch(e) { console.error("Error showMainTab:", e); }}
-        window.filterResults = function(category = 'all') { try {
-             d.querySelectorAll('#program-tab .filter-btn').forEach(btn => btn.classList.remove('active'));
-             const activeBtn = d.querySelector(`#program-tab .filter-btn[data-filter="${category}"]`);
-             if(activeBtn) activeBtn.classList.add('active');
-             const searchInput = d.getElementById('search-input'); const searchTerm = searchInput ? searchInput.value.toLowerCase() : '';
-             d.querySelectorAll('#program-results-grid .event-result-card').forEach(card => {
-                 const categoryMatch = (category === 'all' || card.dataset.category === category);
-                 const searchMatch = card.dataset.searchText ? card.dataset.searchText.includes(searchTerm) : true;
-                 card.style.display = (categoryMatch && searchMatch) ? 'block' : 'none';
-             });
-         } catch(e) { console.error("Error filterResults:", e); }}
-        window.filterScoreboard = function(category) { try {
-             if (!category) { console.warn("filterScoreboard called with no category"); return; }
-             console.log("Filtering scoreboard by:", category);
-             d.querySelectorAll('#scoreboard-filter-buttons .filter-btn').forEach(btn => btn.classList.remove('active'));
-             const activeButton = d.querySelector(`#scoreboard-filter-buttons .filter-btn[data-filter="${category}"]`);
-             if (activeButton) { activeButton.classList.add('active'); }
-             else { console.warn(`Scoreboard filter btn not found for '${category}', defaulting to 'All'.`); const allBtn = d.querySelector('#scoreboard-filter-buttons .filter-btn[data-filter="All"]'); if (allBtn) allBtn.classList.add('active'); category = 'All'; }
-             const totalCard = d.getElementById('scoreboard-total-card'); const countElement = d.getElementById('scoreboard-category-count');
-             if (totalCard && TEAM_NAMES && TEAM_NAMES.length > 0) {
-                  const totalsToShow = category === 'All' ? processedTeamData : (processedScoreboardData.categoryTotals[category] || {});
-                  TEAM_NAMES.forEach(team => { const teamSpan = totalCard.querySelector(`span[data-team="${team}"]`); if (teamSpan) { const points = category === 'All' ? (processedTeamData[team]?.total || 0) : (totalsToShow[team] || 0); teamSpan.textContent = points; } else { console.warn(`Team span !found for ${team} in total card.`); } });
-              } else if (totalCard) { console.warn("TEAM_NAMES !ready for scoreboard filter."); }
-             if (countElement) { const count = category === 'All' ? publishedResultsCount : (processedScoreboardData.categoryCounts && processedScoreboardData.categoryCounts[category] || 0); countElement.textContent = `Results: ${count}`; }
-             d.querySelectorAll('#scoreboard-container .scoreboard-card:not(.total-card)').forEach(card => { const cardCat = card.dataset.category; card.style.display = (category === 'All' || category === cardCat) ? 'block' : 'none'; });
-         } catch (e) { console.error("Error in filterScoreboard:", e); }}
-        window.updateResultCounts = function() { try { const el = d.getElementById('team-results-count'); if (el) el.innerText = `Team point status after ${publishedResultsCount} results`; } catch(e) { console.error("Error updateResultCounts:", e); }}
-        window.getTrophyIconsHTML = function(positions) { try { if (!positions || !Array.isArray(positions) || positions.length === 0) return ''; const uP = [...new Set(positions)].sort((a,b)=>a-b); return uP.map(p=>{ if(p===1)return'<i class="fas fa-trophy trophy-icon gold"></i>'; if(p===2)return'<i class="fas fa-trophy trophy-icon silver"></i>'; if(p===3)return'<i class="fas fa-trophy trophy-icon bronze"></i>'; return'';}).join(''); } catch(e) { console.error("Error getTrophyIconsHTML:", e); return ''; }}
-        window.toggleTalentDropdown = function(listId, button) { try { const list = d.getElementById(listId); if(list) list.classList.toggle('open'); if(button) button.textContent = list && list.classList.contains('open') ? 'Show Less' : 'Show More'; } catch(e) { console.error("Error toggleTalentDropdown:", e); }}
-        window.updateMenuActiveState = function() { try { const homePage = d.getElementById('home-page'), hPV = homePage ? homePage.style.display !== 'none' : false; d.querySelectorAll('.menu-link').forEach(l=>l.classList.remove('active')); if(hPV){ const hL=d.querySelector('.menu-link[data-target="home-page"]'); if(hL)hL.classList.add('active'); } else { const aTB=d.querySelector('#scoreboard-page .main-tab-button.active'); if(aTB){ const oA=aTB.getAttribute('onclick'), tIM=oA?oA.match(/'([^']+)'/):null; if(tIM&&tIM[1]){ const tId=tIM[1], aML=d.querySelector(`.menu-link[data-target="${tId}"]`); if(aML)aML.classList.add('active'); } } else { const pL=d.querySelector('.menu-link[data-target="program-tab"]'); if(pL)pL.classList.add('active'); } } } catch(e) { console.error("Error updateMenuActiveState:", e); }}
-        async function shareImage(imageUrl) { try { if (navigator.share) { await navigator.share({ title: 'Sadaye Madeena 2k25 Gallery Image', text: 'Check out this image!', url: imageUrl }); } else { const ta=d.createElement("textarea"); ta.value=imageUrl; ta.style.position="fixed"; ta.style.left="-9999px"; d.body.appendChild(ta); ta.select(); if (navigator.clipboard&&navigator.clipboard.writeText){await navigator.clipboard.writeText(imageUrl); alert('Link copied!');} else {document.execCommand('copy'); alert('Link copied!');} d.body.removeChild(ta); } } catch(err){ alert('Could not share or copy.'); console.error('Share/Copy fail:',err); } }
-        const gallerySection = d.getElementById('gallery'); if (gallerySection) { gallerySection.addEventListener('click', (e)=>{ const btn=e.target.closest('.share-btn'); if (btn&&btn.dataset.url){ e.stopPropagation(); shareImage(btn.dataset.url); }}); } else { console.warn("Gallery section !found."); }
-        const scrollTopBtn = d.getElementById('scrollTopBtn'); function handleScroll(){ try { const hP=d.getElementById('home-page'), hPV=hP?hP.style.display!=='none':false; if(scrollTopBtn){scrollTopBtn.classList.toggle('show', hPV&&window.scrollY>300);} } catch(e) { console.error("Error handleScroll:", e); }}
-        window.scrollToTop = function() { try { window.scrollTo({top:0, behavior:'smooth'}); } catch(e) { console.error("Error scrollToTop:", e); }}; window.addEventListener('scroll', handleScroll);
+        }
+        window.filterResults = function(category = 'all') {
+             try {
+                d.querySelectorAll('#program-tab .filter-btn').forEach(btn => btn.classList.remove('active'));
+                const activeBtn = d.querySelector(`#program-tab .filter-btn[data-filter="${category}"]`);
+                if(activeBtn) activeBtn.classList.add('active');
+
+                const searchInput = d.getElementById('search-input');
+                const searchTerm = searchInput ? searchInput.value.toLowerCase() : '';
+
+                let resultsFound = false;
+                d.querySelectorAll('#program-results-grid .event-result-card').forEach(card => {
+                    const categoryMatch = (category === 'all' || card.dataset.category === category);
+                    const searchMatch = card.dataset.searchText ? card.dataset.searchText.includes(searchTerm) : true;
+                    const shouldShow = categoryMatch && searchMatch;
+                    card.style.display = shouldShow ? 'block' : 'none';
+                    if (shouldShow) resultsFound = true;
+                });
+             } catch(e) { console.error("Error in filterResults:", e); }
+        }
+        window.filterScoreboard = function(category) {
+             try {
+                if (!category) { console.warn("filterScoreboard called with no category"); return; }
+                console.log("Filtering scoreboard by:", category);
+
+                // Update active button state
+                d.querySelectorAll('#scoreboard-filter-buttons .filter-btn').forEach(btn => btn.classList.remove('active'));
+                const activeButton = d.querySelector(`#scoreboard-filter-buttons .filter-btn[data-filter="${category}"]`);
+                if (activeButton) { activeButton.classList.add('active'); }
+                else {
+                    console.warn(`Scoreboard filter button not found for '${category}', attempting to default to 'All'.`);
+                    const allButton = d.querySelector('#scoreboard-filter-buttons .filter-btn[data-filter="All"]');
+                    if (allButton) { allButton.classList.add('active'); category = 'All'; } // Explicitly fallback to 'All'
+                    else { console.error("Default 'All' filter button not found either!"); }
+                }
+
+
+                const totalCard = d.getElementById('scoreboard-total-card');
+                const countElement = d.getElementById('scoreboard-category-count');
+
+                // Update totals in the total card
+                if (totalCard && TEAM_NAMES && TEAM_NAMES.length > 0) {
+                     // Get the correct totals based on the selected category
+                     const totalsToShow = category === 'All' ? processedTeamData : (processedScoreboardData.categoryTotals[category] || {});
+                     TEAM_NAMES.forEach(team => {
+                         const teamSpan = totalCard.querySelector(`span[data-team="${team}"]`);
+                         if (teamSpan) {
+                              const points = category === 'All'
+                                   ? (processedTeamData[team]?.total || 0) // Overall total
+                                   : (totalsToShow[team] || 0);            // Category total
+                              teamSpan.textContent = points;
+                         } else {
+                              console.warn(`Team span not found for ${team} in total card.`);
+                         }
+                     });
+                 } else if (totalCard) {
+                     console.warn("TEAM_NAMES not ready for scoreboard filter update.");
+                 } else {
+                     // console.warn("Total card not found for scoreboard filter update (might be normal during initial render).");
+                 }
+
+
+                // Update result count display
+                if (countElement) {
+                    const count = category === 'All'
+                         ? publishedResultsCount                     // Overall published count
+                         : (processedScoreboardData.categoryCounts && processedScoreboardData.categoryCounts[category] || 0); // Category specific count, check categoryCounts exists
+                    countElement.textContent = `Results: ${count}`;
+                } else {
+                     // console.warn("Scoreboard category count element not found.");
+                }
+
+
+                // Show/hide individual event cards based on category
+                let cardsShown = 0;
+                d.querySelectorAll('#scoreboard-container .scoreboard-card:not(.total-card)').forEach(card => {
+                    const cardCategory = card.dataset.category; // This is 'group' or the specific category name
+                    const shouldShow = (category === 'All' || category === cardCategory);
+                    card.style.display = shouldShow ? 'block' : 'none';
+                    if(shouldShow) cardsShown++;
+                });
+                console.log(`Cards shown for category '${category}': ${cardsShown}`);
+
+             } catch (e) { console.error("Error in filterScoreboard:", e); }
+        }
+        window.updateResultCounts = function() {
+             const el = d.getElementById('team-results-count');
+             if (el) el.innerText = `Team point status after ${publishedResultsCount} results`;
+        }
+        window.getTrophyIconsHTML = function(positions) {
+             if (!positions || !Array.isArray(positions) || positions.length === 0) return '';
+             const uniquePositions = [...new Set(positions)].sort((a,b) => a-b); // Sort numerically
+             return uniquePositions.map(pos => {
+                 if (pos === 1) return '<i class="fas fa-trophy trophy-icon gold"></i>';
+                 if (pos === 2) return '<i class="fas fa-trophy trophy-icon silver"></i>';
+                 if (pos === 3) return '<i class="fas fa-trophy trophy-icon bronze"></i>';
+                 return '';
+             }).join(''); // Join icons without space if multiple positions
+        }
+
+        window.toggleTalentDropdown = function(listId, button) {
+             const list = d.getElementById(listId);
+             if(list) list.classList.toggle('open');
+             if(button) button.textContent = list && list.classList.contains('open') ? 'Show Less' : 'Show More';
+         }
+        window.updateMenuActiveState = function() {
+             const homePage = d.getElementById('home-page');
+             const homePageVisible = homePage ? homePage.style.display !== 'none' : false;
+             d.querySelectorAll('.menu-link').forEach(link => link.classList.remove('active'));
+             if (homePageVisible) {
+                 const homeLink = d.querySelector('.menu-link[data-target="home-page"]');
+                 if (homeLink) homeLink.classList.add('active');
+             } else {
+                 const activeTabButton = d.querySelector('#scoreboard-page .main-tab-button.active');
+                 if (activeTabButton) {
+                     const onclickAttr = activeTabButton.getAttribute('onclick');
+                     const tabIdMatch = onclickAttr ? onclickAttr.match(/'([^']+)'/) : null;
+                     if (tabIdMatch && tabIdMatch[1]) {
+                         const tabId = tabIdMatch[1];
+                         const activeMenuLink = d.querySelector(`.menu-link[data-target="${tabId}"]`);
+                         if (activeMenuLink) activeMenuLink.classList.add('active');
+                     }
+                 } else { // Fallback if no active tab button found
+                     const programLink = d.querySelector('.menu-link[data-target="program-tab"]');
+                     if (programLink) programLink.classList.add('active');
+                 }
+             }
+         }
+        async function shareImage(imageUrl) {
+             if (navigator.share) {
+                 try { await navigator.share({ title: 'Sadaye Madeena 2k25 Gallery Image', text: 'Check out this image from the fest!', url: imageUrl }); console.log('Image shared successfully'); }
+                 catch (err) { console.error('Error sharing image:', err); alert('Sharing failed.'); }
+             } else {
+                 try {
+                     const textArea = d.createElement("textarea"); textArea.value = imageUrl; textArea.style.position = "fixed"; textArea.style.left = "-9999px"; d.body.appendChild(textArea); textArea.select();
+                     if (navigator.clipboard && navigator.clipboard.writeText) { await navigator.clipboard.writeText(imageUrl); alert('Sharing not supported, link copied!'); }
+                     else { document.execCommand('copy'); alert('Sharing not supported, link copied!'); }
+                     d.body.removeChild(textArea);
+                 } catch (err) { alert('Copying link failed.'); console.error('Fallback copy failed:', err); }
+             }
+         }
+        // Add event listener safely
+        const gallerySection = d.getElementById('gallery');
+        if (gallerySection) {
+            gallerySection.addEventListener('click', function(event) {
+                const shareButton = event.target.closest('.share-btn');
+                if (shareButton && shareButton.dataset.url) {
+                    event.stopPropagation();
+                    shareImage(shareButton.dataset.url);
+                }
+            });
+        } else { console.warn("Gallery section not found for adding share listener."); }
+
+        const scrollTopBtn = d.getElementById('scrollTopBtn');
+        function handleScroll() {
+             const homePage = d.getElementById('home-page');
+             const homePageVisible = homePage ? homePage.style.display !== 'none' : false;
+             if (scrollTopBtn) { scrollTopBtn.classList.toggle('show', homePageVisible && window.scrollY > 300); }
+         }
+        window.scrollToTop = function() { window.scrollTo({ top: 0, behavior: 'smooth' }); }
+        window.addEventListener('scroll', handleScroll);
 
 
         // --- App Initialization ---
@@ -1232,7 +1408,7 @@
                           } else { // Essential config missing
                               const missing = !teamsReady ? 'Teams' : 'Categories';
                               console.error(`Config Error: ${missing} not found or empty.`);
-                              displayGlobalError(`Configuration Incomplete: ${missing} missing.`, `Please add ${missing.toLowerCase()} in the Admin Panel and ensure Firestore rules allow access.`);
+                              displayGlobalError(`Configuration Incomplete: ${missing} missing.`, `Please add ${missing.toLowerCase()} in the Admin Panel.`);
                               clearTimeout(loadingTimeout); // Stop timeout as it's a config error
                           }
                      } else { // Still waiting for data
@@ -1259,44 +1435,29 @@
                     case 'teams': dbTeams = {}; TEAM_NAMES = []; break; case 'homepage': dbHomepage = {}; break;
                     case 'categories': dbCategories = []; break; case 'participants': dbParticipants = {}; break;
                 }
-                loadStatus[sourceName] = true; // Mark as loaded (with error)
-                 // Display persistent error for critical config failures
-                 if (['teams', 'categories'].includes(sourceName)) {
-                     displayGlobalError(`Error Loading ${sourceName}`, `Could not load ${sourceName.toLowerCase()}. Check Firestore rules/data. Details: ${error.message}`);
+                loadStatus[sourceName] = true;
+                 if (['teams', 'categories'].includes(sourceName)) { // Critical config errors
+                     displayGlobalError(`Error loading ${sourceName}.`, `App may not function correctly. Details: ${error.message}`);
                  }
-                 try { checkAllDataLoaded(`error in ${sourceName}`); } // Trigger check to potentially show config error msg
+                 try { checkAllDataLoaded(`error in ${sourceName}`); }
                  catch (checkError) { console.error(`Error calling checkAllDataLoaded after ${sourceName} error:`, checkError); }
             };
-
             // Define listeners with safer data processing in callbacks
-             const resultsPath = `artifacts/${appId}/public/data/results`; console.log("Listening to:", resultsPath);
-             onSnapshot(query(collection(db, resultsPath)), (snapshot) => { console.log(`Listener: results (${snapshot.size})`); try { const data={}; snapshot.docs.forEach(doc=>{data[doc.id]=doc.data();}); dbResults=data; loadStatus.results=true; checkAllDataLoaded('results'); } catch(e){ createErrorHandler('results')(e);}}, createErrorHandler('results'));
-
-             const programsPath = `artifacts/${appId}/public/data/programs`; console.log("Listening to:", programsPath);
-             onSnapshot(query(collection(db, programsPath)), (snapshot) => { console.log(`Listener: programs (${snapshot.size})`); try { const data={}; snapshot.docs.forEach(doc=>{data[doc.id]=doc.data();}); dbPrograms=data; loadStatus.programs=true; checkAllDataLoaded('programs'); } catch(e){ createErrorHandler('programs')(e);}}, createErrorHandler('programs'));
-
-             const teamsPath = `artifacts/${appId}/public/data/teams`; console.log("Listening to:", teamsPath);
-             onSnapshot(query(collection(db, teamsPath)), (snapshot) => { console.log(`Listener: teams (${snapshot.size})`); try { const data={}; snapshot.docs.forEach(doc=>{data[doc.id]={name:doc.id, ...doc.data()};}); dbTeams=data; loadStatus.teams=true; checkAllDataLoaded('teams'); } catch(e){ createErrorHandler('teams')(e);}}, createErrorHandler('teams'));
-
-             const homepagePath = `artifacts/${appId}/public/data/config/homepage`; console.log("Listening to:", homepagePath);
-             onSnapshot(doc(db, homepagePath), (docSnap) => { console.log(`Listener: homepage (${docSnap.exists()})`); try { dbHomepage=docSnap.exists()?docSnap.data():{}; loadStatus.homepage=true; checkAllDataLoaded('homepage'); } catch(e){ createErrorHandler('homepage')(e);}}, createErrorHandler('homepage'));
-
-             const categoriesPath = `artifacts/${appId}/public/data/categories`; console.log("Listening to:", categoriesPath);
-             onSnapshot(query(collection(db, categoriesPath)), (snapshot) => { console.log(`Listener: categories (${snapshot.size})`); try { dbCategories=snapshot.docs.map(doc=>({id:doc.id, ...doc.data()})).sort((a,b)=>(a.name||'').localeCompare(b.name||'')); loadStatus.categories=true; checkAllDataLoaded('categories'); } catch(e){ createErrorHandler('categories')(e);}}, createErrorHandler('categories'));
-
-             const participantsPath = `artifacts/${appId}/public/data/participants`; console.log("Listening to:", participantsPath);
-             onSnapshot(query(collection(db, participantsPath)), (snapshot) => { console.log(`Listener: participants (${snapshot.size})`); try { const data={}; snapshot.docs.forEach(doc=>{data[doc.id]=doc.data();}); dbParticipants=data; loadStatus.participants=true; checkAllDataLoaded('participants'); } catch(e){ createErrorHandler('participants')(e);}}, createErrorHandler('participants'));
-
+            onSnapshot(query(collection(db, `artifacts/${appId}/public/data/results`)), (snapshot) => { console.log(`Listener: results snapshot received (empty: ${snapshot.empty})`); try { const data = {}; snapshot.docs.forEach(doc => { data[doc.id] = doc.data(); }); dbResults = data; loadStatus.results = true; checkAllDataLoaded('results'); } catch (e) { createErrorHandler('results')(e); } }, createErrorHandler('results'));
+            onSnapshot(query(collection(db, `artifacts/${appId}/public/data/programs`)), (snapshot) => { console.log(`Listener: programs snapshot received (empty: ${snapshot.empty})`); try { const data = {}; snapshot.docs.forEach(doc => { data[doc.id] = doc.data(); }); dbPrograms = data; loadStatus.programs = true; checkAllDataLoaded('programs'); } catch (e) { createErrorHandler('programs')(e); } }, createErrorHandler('programs'));
+            onSnapshot(query(collection(db, `artifacts/${appId}/public/data/teams`)), (snapshot) => { console.log(`Listener: teams snapshot received (empty: ${snapshot.empty})`); try { const data = {}; snapshot.docs.forEach(doc => { data[doc.id] = {name: doc.id, ...doc.data()}; }); dbTeams = data; loadStatus.teams = true; checkAllDataLoaded('teams'); } catch (e) { createErrorHandler('teams')(e); } }, createErrorHandler('teams'));
+            onSnapshot(doc(db, `artifacts/${appId}/public/data/config`, 'homepage'), (docSnap) => { console.log(`Listener: homepage snapshot received (exists: ${docSnap.exists()})`); try { dbHomepage = docSnap.exists() ? docSnap.data() : {}; loadStatus.homepage = true; checkAllDataLoaded('homepage'); } catch (e) { createErrorHandler('homepage')(e); } }, createErrorHandler('homepage'));
+            onSnapshot(query(collection(db, `artifacts/${appId}/public/data/categories`)), (snapshot) => { console.log(`Listener: categories snapshot received (empty: ${snapshot.empty})`); try { dbCategories = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })).sort((a, b) => (a.name||'').localeCompare(b.name||'')); loadStatus.categories = true; checkAllDataLoaded('categories'); } catch (e) { createErrorHandler('categories')(e); } }, createErrorHandler('categories'));
+            onSnapshot(query(collection(db, `artifacts/${appId}/public/data/participants`)), (snapshot) => { console.log(`Listener: participants snapshot received (empty: ${snapshot.empty})`); try { const data = {}; snapshot.docs.forEach(doc => { data[doc.id] = doc.data(); }); dbParticipants = data; loadStatus.participants = true; checkAllDataLoaded('participants'); } catch (e) { createErrorHandler('participants')(e); } }, createErrorHandler('participants'));
              console.log("Firestore listeners attached.");
         }
-
 
         // Start loading timeout
         loadingTimeout = setTimeout(() => {
             if (!allDataLoaded) { // Only trigger if data hasn't loaded successfully
                  console.error("Loading timeout reached (30 seconds).");
                  const pending = Object.keys(loadStatus).filter(k => !loadStatus[k]).join(', ') || 'initial checks';
-                  displayGlobalError( "Loading Timeout", `Could not load: ${pending}. Check connection & ensure Teams/Categories exist in Firestore & Security Rules allow access.` ); // Added rules hint
+                  displayGlobalError( "Loading Timeout", `Could not load: ${pending}. Check connection & ensure Teams/Categories exist in Firestore.` );
             }
         }, 30000); // 30 seconds timeout
 
