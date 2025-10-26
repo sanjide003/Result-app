@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- Version 2.2 - Final Working Version -->
+<!-- Version 2.5 - Loading Debug -->
 <html lang="ml">
 <head>
     <meta charset="UTF-8">
@@ -178,19 +178,23 @@
         .show-more-btn:hover { background-color: #e6ecf1; }
 
         #scoreboard-tab .filter-controls { margin-bottom: 25px; }
+        /* Scoreboard container holds event cards, total card, and legend */
         #scoreboard-container { max-width: 800px; margin: 0 auto; gap: 20px; display: flex; flex-direction: column; padding-top: 0; }
+        /* Event card styles */
         .scoreboard-card { background-color: var(--card-background); border-radius: 16px; padding: 20px; box-shadow: 0 6px 15px var(--shadow-color); border: 1px solid var(--border-color); margin-bottom: 0; }
         .scoreboard-event-header { font-size: 1.2em; font-weight: bold; color: var(--heading-color); padding-bottom: 15px; margin-bottom: 15px; border-bottom: 1px solid var(--border-color); text-align: center; display: block; }
         .scoreboard-team-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #f3f4f6; }
         .scoreboard-team-row:last-child { border-bottom: none; }
         .scoreboard-team-row span:first-child { color: var(--text-color); font-weight: 500; }
         .scoreboard-team-row span:last-child { font-weight: bold; font-size: 1.1em; color: var(--heading-color); display: flex; align-items: center; gap: 10px; }
-        .total-card { background: #f9fafb; border: 1px solid var(--border-color); margin-top: 10px; }
+        /* Total card specific styles */
+        .total-card { background: #f9fafb; border: 1px solid var(--border-color); margin-top: 10px; /* Adjust margin if needed */ }
         .total-card h3 { font-family: 'Saira', sans-serif; font-size: 1.8em; color: var(--heading-color); text-align: center; margin-top: 0; margin-bottom: 10px; }
         .total-card .category-count-text { text-align: center; color: var(--subtle-text); margin-top: -5px; margin-bottom: 20px; font-size: 0.9em; }
         .total-card .scoreboard-team-row span:first-child { font-weight: bold; color: var(--heading-color); font-size: 1.1em; }
         .total-card .scoreboard-team-row span:last-child { font-size: 1.6em; color: var(--primary-color); }
-        .scoreboard-legend { display: flex; justify-content: center; gap: 20px; margin-top: 30px; padding: 15px; background-color: var(--card-background); border-radius: 12px; box-shadow: 0 4px 12px var(--shadow-color); color: var(--subtle-text); font-size: 0.9em; max-width: fit-content; margin-left: auto; margin-right: auto; }
+        /* Legend styles */
+        .scoreboard-legend { display: flex; justify-content: center; gap: 20px; margin-top: 10px; /* Reduced top margin */ padding: 15px; background-color: var(--card-background); border-radius: 12px; box-shadow: 0 4px 12px var(--shadow-color); color: var(--subtle-text); font-size: 0.9em; max-width: fit-content; margin-left: auto; margin-right: auto; }
         .scoreboard-legend span { display: flex; align-items: center; gap: 8px; }
         .trophy-icon { font-size: 1.1em; }
         .gold { color: var(--champion-gold); } .silver { color: var(--runner-up-silver); } .bronze { color: var(--second-runner-up-bronze); }
@@ -305,7 +309,11 @@
                     <div class="filter-controls">
                          <div class="filter-buttons" id="scoreboard-filter-buttons"><p class="text-gray-500">Loading filters...</p></div>
                     </div>
-                    <div id="scoreboard-container"><p id="scoreboard-placeholder" class="text-gray-500 text-center py-10">Loading scoreboard...</p></div>
+                     <!-- Container for event cards, total card, and legend -->
+                    <div id="scoreboard-container">
+                        <p id="scoreboard-placeholder" class="text-gray-500 text-center py-10">Loading scoreboard...</p>
+                        <!-- Event cards, Total card, and Legend will be inserted here by generateScoreboard() -->
+                    </div>
                 </div>
                 <div id="talent-tab" class="main-tab-content">
                     <div id="talent-list-container"><p class="text-gray-500 p-4 text-center">Loading talent list...</p></div>
@@ -317,7 +325,10 @@
     <footer>
         <div class="footer-content">
             <div class="social-icons" id="footer-social-icons">
-                <a href="#" target="_blank"><i class="fab fa-instagram"></i></a> <a href="#" target="_blank"><i class="fab fa-youtube"></i></a> <a href="#" target="_blank"><i class="fab fa-facebook-f"></i></a>
+                 <!-- Social links will be populated by generateStaticContent -->
+                 <a href="#" target="_blank" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                 <a href="#" target="_blank" aria-label="YouTube"><i class="fab fa-youtube"></i></a>
+                 <a href="#" target="_blank" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
             </div>
             <p class="institution-name" id="footer-institution-name">Institution Name</p>
             <p class="copyright" id="footer-copyright">© Year Org Name.</p>
@@ -327,181 +338,344 @@
     <button id="scrollTopBtn" title="Go to top" onclick="scrollToTop()"><i class="fas fa-arrow-up"></i></button>
 
     <script type="module">
-        // Firebase Config & Init
+        // --- Global Variables & Config ---
+        let loadingTimeout = null; // Timeout handle
+        const d = document; // Alias for document
         const firebaseConfig = { apiKey: "AIzaSyDBfnce5gtJhW9u1xwU2FVPQGx2KvG1vw8", authDomain: "result25.firebaseapp.com", projectId: "result25", storageBucket: "result25.firebasestorage.app", messagingSenderId: "1099340945335", appId: "1:1099340945335:web:4fdc63db6bf6b40a30ba32", measurementId: "G-S4BJW3N642" };
         const appId = typeof __app_id !== 'undefined' ? __app_id : firebaseConfig.projectId;
         const finalFirebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : firebaseConfig;
         finalFirebaseConfig.projectId = appId;
+        console.log("Using Firebase Project ID:", finalFirebaseConfig.projectId);
+
+        // --- Firebase Imports & Init ---
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js";
         import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-auth.js";
-        import { getFirestore, doc, onSnapshot, collection, query } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-firestore.js";
-        const app = initializeApp(finalFirebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
-        try { await signInAnonymously(auth); } catch(error) { console.error("Anonymous sign-in failed: ", error); }
+        import { getFirestore, doc, onSnapshot, collection, query, enableNetwork } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-firestore.js"; // Added enableNetwork
+        let app, auth, db;
+        try {
+            app = initializeApp(finalFirebaseConfig);
+            auth = getAuth(app);
+            db = getFirestore(app);
+            // Explicitly enable network - might help if it was accidentally disabled
+            // enableNetwork(db).then(() => console.log("Firestore network enabled.")).catch(err => console.error("Error enabling network:", err));
+            console.log("Firebase Initialized.");
+            signInAnonymously(auth).then(() => console.log("Signed in anonymously."))
+                .catch(error => {
+                    console.error("Anonymous sign-in failed: ", error);
+                    displayGlobalError("Could not connect. Check connection.", error.message);
+                });
+        } catch (initError) {
+             console.error("Firebase initialization failed:", initError);
+             displayGlobalError("Application setup failed.", "Could not initialize Firebase.");
+        }
 
-        // ===================================
-        // ഡാറ്റാ കോൺഫിഗറേഷൻ
-        // ===================================
+
+        // --- Data Variables ---
         let TEAM_NAMES = [];
-        const groupEvents = [ "മദ്ഹുന്നബി സംഘഗാനം", "മുനാഖശ", "മാഷപ്പ്", "സംഘഗാനം (അറബി)", "സംഘഗാനം (മലയാളം)","മൗലിദ് പാരായണം", "ബുർദ ആലാപനം", "മാലപ്പാട്ട്", "ഇസ്ലാമിക് സമൂഹഗാനം (മലയാളം)", "പത്ര നിർമ്മാണം", "മാഗസിൻ നിർമ്മാണം", "ഡിജിറ്റൽ ക്വിസ്" ];
+        const groupEvents = [ "മദ്ഹുന്നബി സംഘഗാനം", "മുനാഖശ", "മാഷപ്പ്", "സംഘഗാനം (അറബി)", "സംഘഗാനം (മലയാളം)","മൗലിദ് പാരായണം", "ബുർദ ആലാപനം", "മാലപ്പാട്ട്", "ഇസ്ലാമിക് സമൂഹഗാനം (മലയാളം)", "പത്ര നിർമ്മാണം", "മാഗസിൻ നിർമ്മാണം", "ഡിജിital ക്വിസ്" ]; // Typo fixed
         let processedTeamData = {}, processedProgramData = [], processedTalentData = {}, processedScoreboardData = {};
         let publishedResultsCount = 0;
-        let dbPrograms = null, dbTeams = null, dbCategories = null, dbHomepage = null, dbParticipants = null;
-        let dbResults = null;
-        const d = document;
+        let dbPrograms = null, dbTeams = null, dbCategories = null, dbHomepage = null, dbParticipants = null, dbResults = null;
 
-        // ===================================
-        // ഡാറ്റാ പ്രോസസ്സിംഗ് (UPDATED for custom points)
-        // ===================================
-        function getTeamFromChest(chestNo) {
-            if (!chestNo || typeof chestNo !== 'string') return null;
-            if (dbTeams == null || dbParticipants == null) return null;
+        // --- State Variables ---
+        let isProcessing = false;
+        let dataProcessingTimeout = null;
+        let hasRenderedOnce = false;
+        let allDataLoaded = false;
+        let loadStatus = { results: false, programs: false, teams: false, homepage: false, categories: false, participants: false };
+        let loadCheckTimeout = null;
 
-            for (const teamName of TEAM_NAMES) { if (chestNo.toUpperCase() === teamName) return teamName; }
-            if (dbParticipants[chestNo] && dbParticipants[chestNo].team) { return dbParticipants[chestNo].team; }
-            const chestNumberMatch = chestNo.match(/^\d+/);
-            if (chestNumberMatch) {
-                const chestNumber = parseInt(chestNumberMatch[0], 10);
-                for (const team of Object.values(dbTeams)) {
-                    const idFrom = parseInt(team.id_from, 10);
-                    const idTo = parseInt(team.id_to, 10);
-                    if (!isNaN(idFrom) && !isNaN(idTo) && chestNumber >= idFrom && chestNumber <= idTo) {
-                        return team.name;
-                    }
+        // --- Helper Functions ---
+        const setText = (id, value, fallback = '') => { const el = d.getElementById(id); if (el) el.textContent = value || fallback; else console.warn(`Element not found: ${id}`); };
+        const setSrc = (id, value, fallback) => { const el = d.getElementById(id); if (el) el.src = value || fallback; else console.warn(`Element not found: ${id}`); };
+        const setHref = (selector, value) => {
+             const el = d.querySelector(selector);
+             if(el && value) {
+                el.href = value;
+                el.style.display=''; // Reset display property if URL exists
+                const parentContainer = d.getElementById('footer-social-icons');
+                if (parentContainer) parentContainer.style.display = 'flex'; // Ensure container is visible
+             } else if (el) {
+                 el.style.display='none'; // Hide the specific link if no URL
+                 // Check if all siblings are hidden, then hide parent
+                 const parentContainer = d.getElementById('footer-social-icons');
+                 if (parentContainer && Array.from(parentContainer.children).every(child => child.style.display === 'none')) {
+                     parentContainer.style.display = 'none';
+                 }
+             } else {
+                 // console.warn(`Selector not found: ${selector}`); // Reduce console noise for default icons
+             }
+         }
+
+
+        function updateLoadingMessage(message) {
+            const loadingOverlay = d.getElementById('loading-overlay');
+            if (loadingOverlay && loadingOverlay.style.display !== 'none') {
+                const msgElement = loadingOverlay.querySelector('p:not(.error-details)'); // Target main message p
+                if (msgElement && !msgElement.style.color.includes('red')) { // Don't overwrite error messages
+                     msgElement.textContent = message;
                 }
             }
-            return null;
         }
+
+        function displayGlobalError(message, technicalError = "") {
+            clearTimeout(loadingTimeout); // Stop timeout timer
+            const loadingOverlay = d.getElementById('loading-overlay');
+            if (loadingOverlay) {
+                const spinner = loadingOverlay.querySelector('.spinner');
+                if (spinner) spinner.style.display = 'none'; // Hide spinner
+                let msgElement = loadingOverlay.querySelector('p:not(.error-details)'); // Target main message p
+                if(msgElement) {
+                    msgElement.textContent = message;
+                    msgElement.style.color = 'red'; // Indicate error
+                    msgElement.classList.add('error-message'); // Add class if not present
+                }
+
+
+                // Add or update technical details
+                let errorDetailsElement = loadingOverlay.querySelector('p.error-details');
+                 if (!errorDetailsElement && technicalError) { // Create if doesn't exist and error provided
+                    errorDetailsElement = d.createElement('p');
+                    errorDetailsElement.classList.add('error-details');
+                    errorDetailsElement.style.color = 'red';
+                    errorDetailsElement.style.fontSize = '0.8em';
+                    errorDetailsElement.style.padding = '0 20px';
+                    errorDetailsElement.style.marginTop = '10px';
+                    loadingOverlay.appendChild(errorDetailsElement);
+                }
+                 if(errorDetailsElement) { // Update text if element exists
+                      errorDetailsElement.textContent = technicalError ? `Details: ${technicalError}` : '';
+                 }
+
+                // Ensure overlay is visible
+                loadingOverlay.style.opacity = '1';
+                loadingOverlay.style.display = 'flex';
+                console.error("Global Error Displayed:", message, technicalError);
+            } else {
+                 console.error("CRITICAL: Loading overlay not found to display error:", message, technicalError);
+            }
+        }
+
+
+        // --- Data Processing ---
+        function getTeamFromChest(chestNo) {
+            try {
+                if (!chestNo || typeof chestNo !== 'string') return null;
+                if (!dbTeams || !dbParticipants || !Array.isArray(TEAM_NAMES) || TEAM_NAMES.length === 0) {
+                     return null;
+                }
+                const upperChestNo = chestNo.toUpperCase();
+                if (TEAM_NAMES.includes(upperChestNo)) return upperChestNo;
+                if (dbParticipants[chestNo] && dbParticipants[chestNo].team) return dbParticipants[chestNo].team;
+                const chestNumberMatch = chestNo.match(/^\d+/);
+                if (chestNumberMatch) {
+                    const chestNumber = parseInt(chestNumberMatch[0], 10);
+                     if (isNaN(chestNumber)) return null;
+                    for (const teamName of TEAM_NAMES) {
+                         const team = dbTeams[teamName];
+                         if (!team || !team.id_from || !team.id_to) continue;
+                        const idFrom = parseInt(team.id_from, 10);
+                        const idTo = parseInt(team.id_to, 10);
+                        if (!isNaN(idFrom) && !isNaN(idTo) && chestNumber >= idFrom && chestNumber <= idTo) {
+                            return team.name;
+                        }
+                    }
+                }
+                return null;
+            } catch (e) {
+                 console.error("Error in getTeamFromChest:", e, "Input:", chestNo);
+                 return null;
+            }
+        }
+
+
         function initializeTeamData() {
             const data = {};
-            if (dbTeams == null || dbCategories == null) return data;
-            TEAM_NAMES = Object.keys(dbTeams);
-            TEAM_NAMES.forEach(team => {
-                data[team] = { name: team, total: 0 };
-                dbCategories.forEach(cat => { data[team][cat.name] = 0; });
-                data[team]['group'] = 0;
+            if (!dbTeams || typeof dbTeams !== 'object' || Object.keys(dbTeams).length === 0 ||
+                !dbCategories || !Array.isArray(dbCategories) || dbCategories.length === 0) {
+                 console.warn("initializeTeamData: dbTeams or dbCategories null/empty/invalid.");
+                 TEAM_NAMES = [];
+                 return data;
+            }
+            TEAM_NAMES = Object.keys(dbTeams).sort();
+            console.log("Initialized TEAM_NAMES:", TEAM_NAMES);
+
+            TEAM_NAMES.forEach(teamName => {
+                const teamData = dbTeams[teamName];
+                if (teamData) {
+                    data[teamName] = { name: teamName, total: 0 }; // Use key as canonical name
+                    dbCategories.forEach(cat => {
+                         if (cat && cat.name) {
+                            data[teamName][cat.name] = 0;
+                         } else { console.warn("Invalid category object:", cat); }
+                    });
+                    data[teamName]['group'] = 0;
+                } else { console.warn(`Team data missing for key: ${teamName}`); }
             });
+
+             if (Object.keys(data).length !== TEAM_NAMES.length) {
+                 console.warn("Mismatch between TEAM_NAMES length and initialized data keys count.");
+             }
+             console.log("Initialized processedTeamData structure:", JSON.stringify(data)); // Log structure
             return data;
         }
 
+
         function processAllData() {
-            if (dbCategories == null || dbTeams == null || dbHomepage == null || dbParticipants == null || dbPrograms == null || dbResults == null) {
-                console.warn("processAllData called, but essential data is null. Waiting...");
-                return;
-            }
+            if (isProcessing) { console.log("Skip processAllData: Already processing."); return; }
+            isProcessing = true;
+            console.log("Starting processAllData...");
+            // Log current state of db variables
+            console.log("Data state before processing:", {
+                dbCategories: !!dbCategories, catLength: dbCategories?.length,
+                dbTeams: !!dbTeams, teamKeys: dbTeams ? Object.keys(dbTeams).length : 0,
+                dbHomepage: !!dbHomepage, dbParticipants: !!dbParticipants,
+                dbPrograms: !!dbPrograms, dbResults: !!dbResults
+            });
 
-            const currentResults = dbResults;
-            processedTeamData = initializeTeamData();
-            processedProgramData = [];
-            const talentPoints = {};
-            processedScoreboardData = { eventPoints: {}, categoryTotals: {}, categoryCounts: {} };
-            let resultsCount = 0;
-            const categoryNames = dbCategories.map(cat => cat.name);
-            categoryNames.push('group'); // Keep 'group' for internal logic
-            categoryNames.forEach(catName => { processedScoreboardData.categoryTotals[catName] = {}; TEAM_NAMES.forEach(team => { processedScoreboardData.categoryTotals[catName][team] = 0; }); processedScoreboardData.categoryCounts[catName] = 0; });
-
-            for (const programId in currentResults) {
-                const program = dbPrograms[programId];
-                if (!program) continue;
-                const eventName = program.name, categoryName = program.category, winners = currentResults[programId];
-                if (!((winners.first && winners.first.length > 0) || (winners.second && winners.second.length > 0) || (winners.third && winners.third.length > 0))) continue;
-                resultsCount++;
-
-                const currentPoints = {
-                    first: parseInt(program.points_first || 5, 10),
-                    second: parseInt(program.points_second || 3, 10),
-                    third: parseInt(program.points_third || 1, 10)
-                };
-
-                const isGroupEvent = groupEvents.includes(eventName);
-                // Adjust points for specific group events if default points match
-                if (isGroupEvent && program.points_first === 5 && program.points_second === 3 && program.points_third === 1) {
-                    currentPoints.first = 10;
-                    currentPoints.second = 8;
-                    currentPoints.third = 5;
+           try {
+                // Stricter check again
+                if (!dbCategories || dbCategories.length === 0 || !dbTeams || Object.keys(dbTeams).length === 0 || !dbHomepage || !dbParticipants || !dbPrograms || !dbResults) {
+                     const missing = [
+                         (!dbCategories || dbCategories.length === 0) && 'Categories',
+                         (!dbTeams || Object.keys(dbTeams).length === 0) && 'Teams',
+                         !dbHomepage && 'Homepage', !dbParticipants && 'Participants',
+                         !dbPrograms && 'Programs', !dbResults && 'Results'
+                     ].filter(Boolean).join(', ');
+                     console.error(`processAllData HALTED: Essential data missing - ${missing}. Check Firestore paths, data, and security rules.`);
+                     // Display a more persistent error if critical data is missing
+                     if ((!dbCategories || dbCategories.length === 0) || (!dbTeams || Object.keys(dbTeams).length === 0)) {
+                        displayGlobalError(`Configuration Error: ${missing} missing.`, `Please ensure ${missing.toLowerCase()} exist in Firestore and security rules allow access.`);
+                     } else {
+                        updateLoadingMessage(`Waiting for ${missing.split(',')[0]}...`); // Less critical data
+                     }
+                     isProcessing = false;
+                     return;
                 }
 
-                const filterCategory = isGroupEvent ? 'group' : categoryName;
-                const eventScore = { category: categoryName, isGroup: isGroupEvent }; // Added isGroup flag
-                TEAM_NAMES.forEach(team => { eventScore[team] = { points: 0, positions: [] }; });
+                processedTeamData = initializeTeamData();
+                if (TEAM_NAMES.length === 0 || Object.keys(processedTeamData).length === 0) {
+                     console.error("processAllData Error: Failed to initialize team data correctly AFTER checks passed. THIS IS UNEXPECTED.");
+                     displayGlobalError("Internal Error", "Could not process Team data. Please contact support.");
+                     isProcessing = false;
+                     return;
+                }
 
-                for (const position of ['first', 'second', 'third']) {
-                    if (winners[position] && winners[position].length > 0) {
-                        winners[position].forEach(winner => {
-                            const team = getTeamFromChest(winner.chest);
-                            if (team && processedTeamData[team]) { // Check if team exists in processed data
-                                const pointValue = currentPoints[position];
-                                processedTeamData[team].total += pointValue;
-                                const pointCategoryKey = isGroupEvent ? 'group' : categoryName;
-                                if (processedTeamData[team][pointCategoryKey] !== undefined) {
-                                   processedTeamData[team][pointCategoryKey] += pointValue;
-                                }
-                                if (!isGroupEvent) {
-                                    const winnerIdentifier = `${winner.chest} ${winner.name}`;
-                                    if (!talentPoints[winnerIdentifier]) talentPoints[winnerIdentifier] = { points: 0, category: categoryName };
-                                    talentPoints[winnerIdentifier].points += pointValue;
-                                }
-                                if (eventScore[team]) { // Check if team exists in event score
-                                    eventScore[team].points += pointValue;
-                                    eventScore[team].positions.push(position === 'first' ? 1 : (position === 'second' ? 2 : 3));
-                                } else {
-                                     console.warn(`Team ${team} not found in eventScore for ${eventName}`);
-                                }
-                            } else if (team) {
-                                console.warn(`Team ${team} from chest ${winner.chest} not found in processedTeamData.`);
+                processedProgramData = [];
+                const talentPoints = {};
+                processedScoreboardData = { eventPoints: {}, categoryTotals: {}, categoryCounts: {} };
+                let currentResultsCount = 0;
+
+                const validCategories = dbCategories.filter(cat => cat && cat.name);
+                const categoryNames = validCategories.map(cat => cat.name);
+                categoryNames.push('group');
+
+                categoryNames.forEach(catName => {
+                    processedScoreboardData.categoryTotals[catName] = {};
+                    TEAM_NAMES.forEach(team => { processedScoreboardData.categoryTotals[catName][team] = 0; });
+                    processedScoreboardData.categoryCounts[catName] = 0;
+                });
+
+                // --- Main Processing Loop ---
+                console.log(`Processing ${Object.keys(dbResults).length} results...`);
+                for (const programId in dbResults) {
+                  try {
+                        const program = dbPrograms[programId];
+                        if (!program || !program.name || !program.category) { console.warn(`Program data missing/invalid for result ID: ${programId}`); continue; }
+
+                        const eventName = program.name;
+                        const categoryName = program.category;
+                        const winners = dbResults[programId];
+
+                        if (!winners || !((winners.first && winners.first.length > 0) || (winners.second && winners.second.length > 0) || (winners.third && winners.third.length > 0))) { continue; }
+                        currentResultsCount++;
+
+                        const currentPoints = { first: parseInt(program.points_first || 5), second: parseInt(program.points_second || 3), third: parseInt(program.points_third || 1) };
+                        const isGroupEvent = groupEvents.includes(eventName);
+                        if (isGroupEvent && currentPoints.first === 5 && currentPoints.second === 3 && currentPoints.third === 1) { currentPoints.first = 10; currentPoints.second = 8; currentPoints.third = 5; }
+
+                        const filterCategory = isGroupEvent ? 'group' : categoryName;
+                        const eventScore = { category: categoryName, isGroup: isGroupEvent };
+                        TEAM_NAMES.forEach(team => { eventScore[team] = { points: 0, positions: [] }; });
+
+                        for (const position of ['first', 'second', 'third']) {
+                            if (winners[position] && Array.isArray(winners[position])) {
+                                winners[position].forEach(winner => {
+                                    if (!winner || !winner.chest || !winner.name) { console.warn(`Invalid winner data in ${eventName}, pos ${position}:`, winner); return; }
+                                    const team = getTeamFromChest(winner.chest);
+                                    if (team && processedTeamData[team]) {
+                                        const pointValue = currentPoints[position];
+                                        processedTeamData[team].total += pointValue;
+                                        const pointCategoryKey = isGroupEvent ? 'group' : categoryName;
+                                        if (processedTeamData[team].hasOwnProperty(pointCategoryKey)) {
+                                            processedTeamData[team][pointCategoryKey] += pointValue;
+                                        } else { console.warn(`Cat key '${pointCategoryKey}' missing for team '${team}' in ${eventName}. Initializing to ${pointValue}.`); processedTeamData[team][pointCategoryKey] = pointValue; } // Initialize if missing
+                                        if (!isGroupEvent) { const winnerId = `${winner.chest} ${winner.name}`; if (!talentPoints[winnerId]) talentPoints[winnerId] = { points: 0, category: categoryName }; talentPoints[winnerId].points += pointValue; }
+                                        if (eventScore[team]) { eventScore[team].points += pointValue; eventScore[team].positions.push(position === 'first' ? 1 : (position === 'second' ? 2 : 3)); }
+                                    } else if (team) { console.warn(`Team '${team}' (chest '${winner.chest}') !in processedTeamData for ${eventName}.`); }
+                                      else { /* console.warn(`No team for chest '${winner.chest}' in ${eventName}.`); */ } // Reduce noise
+                                });
                             }
-                        });
-                    }
-                }
-                processedScoreboardData.eventPoints[eventName] = eventScore;
-                const scoreboardCat = isGroupEvent ? 'group' : categoryName;
-                if (processedScoreboardData.categoryTotals[scoreboardCat]) {
-                    TEAM_NAMES.forEach(team => {
-                         if (eventScore[team]) { // Check again before adding
-                            processedScoreboardData.categoryTotals[scoreboardCat][team] += eventScore[team].points;
-                         }
-                    });
-                    processedScoreboardData.categoryCounts[scoreboardCat]++;
-                } else {
-                     console.warn(`Category ${scoreboardCat} not found in scoreboard totals.`);
-                }
-                processedProgramData.push({ eventName, categoryName, filterCategory, winners, currentPoints });
-            }
+                        }
+                        processedScoreboardData.eventPoints[eventName] = eventScore;
 
-            processedTalentData = {};
-            for (const studentKey in talentPoints) {
-                const { points, category } = talentPoints[studentKey];
-                if (!processedTalentData[category]) processedTalentData[category] = [];
-                processedTalentData[category].push({ name: studentKey, points });
-            }
-            for (const category in processedTalentData) { processedTalentData[category].sort((a, b) => b.points - a.points); }
+                        const scoreboardCat = isGroupEvent ? 'group' : categoryName;
+                        if (processedScoreboardData.categoryTotals[scoreboardCat]) {
+                            TEAM_NAMES.forEach(team => { if (eventScore[team]) { processedScoreboardData.categoryTotals[scoreboardCat][team] += eventScore[team].points; } });
+                            processedScoreboardData.categoryCounts[scoreboardCat]++;
+                        } else { console.warn(`Scoreboard cat '${scoreboardCat}' !in totals for ${eventName}.`); }
 
-            publishedResultsCount = resultsCount;
-            renderAllComponents();
+                        processedProgramData.push({ eventName, categoryName, filterCategory, winners, currentPoints });
+
+                    } catch (innerError) { console.error(`Error processing result for Program ID ${programId}:`, innerError); }
+                } // --- End Main Processing Loop ---
+
+                // Process Talent Data
+                processedTalentData = {};
+                for (const studentKey in talentPoints) {
+                    const { points, category } = talentPoints[studentKey];
+                     if (category) { if (!processedTalentData[category]) processedTalentData[category] = []; processedTalentData[category].push({ name: studentKey, points }); }
+                     else { console.warn(`Talent entry missing category: ${studentKey}`); }
+                }
+                for (const category in processedTalentData) { processedTalentData[category].sort((a, b) => (b.points || 0) - (a.points || 0)); }
+
+                publishedResultsCount = currentResultsCount;
+                console.log("processAllData finished successfully. Published Results:", publishedResultsCount);
+                console.log("Final processedTeamData:", JSON.stringify(processedTeamData)); // Log final team data
+
+                renderAllComponents(); // Trigger rendering
+
+            } catch (error) {
+                 console.error("Critical Error in processAllData:", error);
+                 displayGlobalError("Error processing event data.", error.message);
+            }
+            finally {
+                setTimeout(() => { isProcessing = false; }, 100);
+            }
         }
 
-        // ===================================
-        // റെൻഡറിംഗ് ഫംഗ്ഷനുകൾ (UPDATED)
-        // ===================================
 
+        // --- Rendering Functions (Keep existing content, ensure error handling) ---
         function renderAllComponents() {
-             // Essential Data Check
-            if (!dbCategories || dbCategories.length === 0 || !dbTeams || Object.keys(dbTeams).length === 0) {
-                const missing = !dbTeams || Object.keys(dbTeams).length === 0 ? 'Teams' : 'Categories';
-                console.log(`Render skipped: ${missing} not loaded or empty.`);
-                updateLoadingMessage(`Waiting for ${missing} configuration...`); // Keep showing loading
-                return; // Stop rendering if essential config is missing
+            // Essential Data Check - Repeat check here
+             if (!dbCategories || !Array.isArray(dbCategories) || dbCategories.length === 0 ||
+                 !dbTeams || typeof dbTeams !== 'object' || Object.keys(dbTeams).length === 0) {
+                const missing = (!dbTeams || Object.keys(dbTeams).length === 0) ? 'Teams' : 'Categories';
+                console.error(`Render ABORTED: Essential config missing - ${missing}.`);
+                 // Don't just update message, show persistent error if config missing after load attempts
+                 displayGlobalError(`Configuration Error: ${missing} missing.`, `Please add ${missing.toLowerCase()} in the Admin Panel and ensure Firestore rules allow access.`);
+                return; // Stop rendering
             }
-             // Ensure TEAM_NAMES is populated
-            if (TEAM_NAMES.length === 0) {
-                 initializeTeamData(); // Attempt to initialize from dbTeams
+             // Ensure TEAM_NAMES is populated (might run before processAllData finishes initialization if there's a race condition)
+            if (!Array.isArray(TEAM_NAMES) || TEAM_NAMES.length === 0) {
+                 initializeTeamData(); // Attempt to initialize again
                  if (TEAM_NAMES.length === 0) {
-                    console.log("Render skipped: TEAM_NAMES could not be initialized.");
-                    updateLoadingMessage("Waiting for Team configuration...");
+                    console.error("Render ABORTED: TEAM_NAMES could not be initialized from dbTeams.");
+                    displayGlobalError("Initialization Error", "Could not process Team names. Check Teams configuration.");
                     return; // Stop if teams are loaded but names array isn't populated
                  }
             }
+
 
             console.log("Rendering all components...");
 
@@ -511,86 +685,86 @@
             try { generateDetailedRankings(); } catch (e) { console.error("Error in generateDetailedRankings:", e); }
             try { renderProgramResults(); } catch (e) { console.error("Error in renderProgramResults:", e); }
             try { generateTalentList(); } catch (e) { console.error("Error in generateTalentList:", e); }
-            try { generateScoreboard(); } catch (e) { console.error("Error in generateScoreboard:", e); }
+            try { generateScoreboard(); } catch (e) { console.error("Error in generateScoreboard:", e); } // Includes filter call
             try { generateStaticContent(); } catch (e) { console.error("Error in generateStaticContent:", e); }
             try { updateResultCounts(); } catch (e) { console.error("Error in updateResultCounts:", e); }
 
-            // Default filter for scoreboard - Use 'All'
-            const defaultScoreboardFilter = 'All';
-            try {
-                if (typeof filterScoreboard === 'function') {
-                    filterScoreboard(defaultScoreboardFilter);
-                } else {
-                     console.error("filterScoreboard function is not defined when setting default.");
-                }
-            } catch (e) { console.error("Error applying default scoreboard filter:", e); }
-
-            // Hide loading overlay and show content
+            // --- Hide Loading Overlay ---
             const loadingOverlay = d.getElementById('loading-overlay');
             const mainContent = d.getElementById('main-content');
-            if (loadingOverlay && loadingOverlay.style.display !== 'none') { // Check if overlay is visible
-                clearTimeout(loadingTimeout); // Clear timeout once rendering starts
+            // Check if overlay is still displayed AND no error is shown
+            if (loadingOverlay && loadingOverlay.style.display !== 'none' && !loadingOverlay.querySelector('p.error-message')) {
+                clearTimeout(loadingTimeout); // Clear timeout only on successful render start
                 loadingOverlay.style.opacity = '0';
                 setTimeout(() => {
-                    if(loadingOverlay) loadingOverlay.style.display = 'none';
-                    if(mainContent) mainContent.style.visibility = 'visible';
+                    if (loadingOverlay) loadingOverlay.style.display = 'none';
+                    if (mainContent) mainContent.style.visibility = 'visible';
                     console.log("UI is now visible.");
-                    hasRenderedOnce = true; // Mark that rendering has happened once
-                }, 500); // Wait for fade out
-            } else if(mainContent && mainContent.style.visibility !== 'visible') {
-                 // If overlay is already hidden but content isn't visible
-                 clearTimeout(loadingTimeout);
-                 mainContent.style.visibility = 'visible';
-                 console.log("Loading overlay was hidden, making content visible.");
+                    hasRenderedOnce = true;
+                }, 500);
+            } else if (mainContent && mainContent.style.visibility !== 'visible' && loadingOverlay && !loadingOverlay.querySelector('p.error-message')) {
+                // If overlay somehow got hidden but content is still hidden, show content (unless error is displayed)
+                clearTimeout(loadingTimeout);
+                mainContent.style.visibility = 'visible';
+                console.log("Loading overlay was hidden/in error state (but no error msg shown), making content visible.");
+                hasRenderedOnce = true;
+            } else if (hasRenderedOnce) {
+                 console.log("RenderAllComponents called again, UI likely already visible.");
+            } else if (!loadingOverlay) {
+                 // Fallback if loading overlay element doesn't exist
+                 if (mainContent) mainContent.style.visibility = 'visible';
+                 console.warn("Loading overlay element not found.");
                  hasRenderedOnce = true;
-            } else {
-                 console.log("RenderAllComponents called, but UI might already be visible.");
+                 clearTimeout(loadingTimeout); // Clear timeout anyway if overlay missing
+            } else if (loadingOverlay && loadingOverlay.querySelector('p.error-message')) {
+                 console.log("RenderAllComponents called, but an error is displayed. Keeping overlay.");
+                 // Do not hide overlay if an error is being shown
             }
         }
 
-
-        function generateFilterButtons() {
+        // Add try-catch wrappers to other rendering functions for safety
+        function generateFilterButtons() { try { /* Original code */
             const programFiltersEl = d.getElementById('program-filter-buttons');
             const scoreboardFiltersEl = d.getElementById('scoreboard-filter-buttons');
-            if (!programFiltersEl || !scoreboardFiltersEl) return;
+            if (!programFiltersEl || !scoreboardFiltersEl) {
+                 console.warn("Filter button containers not found."); return;
+            }
 
             let progHTML = `<button class="filter-btn active" data-filter="all" onclick="filterResults('all')">All</button>`;
-            let scoreHTML = `<button class="filter-btn active" data-filter="All" onclick="filterScoreboard('All')">All</button>`; // 'All' is default active
+            let scoreHTML = `<button class="filter-btn active" data-filter="All" onclick="filterScoreboard('All')">All</button>`;
 
-            // Check if there are group points before adding Group button
-            const hasGroupPoints = processedTeamData && Object.values(processedTeamData).some(team => team.group > 0);
+            const hasGroupPoints = processedTeamData && Object.values(processedTeamData).some(team => team && typeof team.group === 'number' && team.group > 0);
             if (hasGroupPoints) {
                 progHTML += `<button class="filter-btn" data-filter="group" onclick="filterResults('group')">Group</button>`;
                 scoreHTML += `<button class="filter-btn" data-filter="group" onclick="filterScoreboard('group')">Group</button>`;
             }
 
             (dbCategories || []).forEach(cat => {
-                progHTML += `<button class="filter-btn" data-filter="${cat.name}" onclick="filterResults('${cat.name}')">${cat.name}</button>`;
-                scoreHTML += `<button class="filter-btn" data-filter="${cat.name}" onclick="filterScoreboard('${cat.name}')">${cat.name}</button>`;
+                 if (cat && cat.name) {
+                    progHTML += `<button class="filter-btn" data-filter="${cat.name}" onclick="filterResults('${cat.name}')">${cat.name}</button>`;
+                    scoreHTML += `<button class="filter-btn" data-filter="${cat.name}" onclick="filterScoreboard('${cat.name}')">${cat.name}</button>`;
+                 }
             });
 
             programFiltersEl.innerHTML = progHTML;
 
-            // Check if only the 'All' button exists for scoreboard
             if (!hasGroupPoints && (!dbCategories || dbCategories.length === 0)) {
                 scoreboardFiltersEl.innerHTML = "<p class='text-gray-500'>No categories or group results yet.</p>";
             } else {
                 scoreboardFiltersEl.innerHTML = scoreHTML;
-                // Ensure 'All' is active initially
                 const allBtn = scoreboardFiltersEl.querySelector('[data-filter="All"]');
-                 scoreboardFiltersEl.querySelectorAll('.filter-btn.active').forEach(b => b.classList.remove('active')); // Remove active from others
-                if (allBtn) allBtn.classList.add('active'); // Set 'All' as active
+                 scoreboardFiltersEl.querySelectorAll('.filter-btn.active').forEach(b => b.classList.remove('active'));
+                if (allBtn) allBtn.classList.add('active');
             }
-        }
+         } catch(e) { console.error("Error generating filter buttons:", e); }}
 
-
-        function generateTeamCards() {
-            const dataToRank = processedTeamData || {};
-            const rankedTeams = Object.values(dataToRank).sort((a, b) => b.total - a.total);
-
+        function generateTeamCards() { try { /* Original code */
             const container = d.getElementById('team-cards-container');
             if (!container) { console.error("Team card container not found"); return; }
-            container.innerHTML = ''; // Clear previous content
+            container.innerHTML = '';
+
+            const dataToRank = processedTeamData || {};
+            const rankedTeams = Object.values(dataToRank).sort((a, b) => (b.total || 0) - (a.total || 0));
 
             const cardClasses = ['champion', 'first-runner-up', 'second-runner-up'];
             const positionTexts = ['Champions', '1st Runners-up', '2nd Runners-up'];
@@ -602,36 +776,35 @@
             }
 
             rankedTeams.slice(0, 3).forEach((team, i) => {
-                 // Ensure team.name exists
                  const teamName = team.name || 'Unknown Team';
+                 const totalPoints = team.total || 0;
                 container.innerHTML += `
                     <div class="team-card ${cardClasses[i] || ''}">
                         <div class="icon"><i class="${iconClasses[i] || 'fas fa-award'}"></i></div>
                         <div class="team-name">${teamName}</div>
-                        <p class="points"><b>${team.total}</b></p>
+                        <p class="points"><b>${totalPoints}</b></p>
                         <p class="position">${positionTexts[i] || `#${i + 1} Position`}</p>
                     </div>`;
             });
-        }
+         } catch(e) { console.error("Error generating team cards:", e); }}
 
-        function generateDetailedRankings() {
+        function generateDetailedRankings() { try { /* Original code */
             const container = d.getElementById('detailed-rankings');
             if (!container) return;
 
             const dataToRank = processedTeamData || {};
-            const rankedTeams = Object.values(dataToRank).sort((a, b) => b.total - a.total);
+            const rankedTeams = Object.values(dataToRank).sort((a, b) => (b.total || 0) - (a.total || 0));
 
              if (rankedTeams.length === 0) {
                 container.innerHTML = `<h2>Detailed Rankings</h2><p class="text-gray-500 p-4">No team data to display.</p>`;
                 return;
             }
 
-            const maxScore = rankedTeams.length > 0 ? (rankedTeams[0].total || 1) : 1; // Avoid division by zero
+            const maxScore = rankedTeams.length > 0 ? (rankedTeams[0].total || 1) : 1;
             let headerColsHTML = '', gridTemplateStyle = '40px 1.5fr';
-            let colCount = 2; // Rank + Team Name
+            let colCount = 2;
 
-             // Check if group points exist before adding column
-            const hasGroupPoints = Object.values(dataToRank).some(team => team.group > 0);
+            const hasGroupPoints = Object.values(dataToRank).some(team => team && typeof team.group === 'number' && team.group > 0);
             if (hasGroupPoints) {
                 headerColsHTML += `<div>Group</div>`;
                 gridTemplateStyle += ' 0.8fr';
@@ -639,28 +812,31 @@
             }
 
             (dbCategories || []).forEach(cat => {
-                headerColsHTML += `<div>${cat.name}</div>`;
-                gridTemplateStyle += ' 0.8fr';
-                colCount++;
+                 if (cat && cat.name) {
+                    headerColsHTML += `<div>${cat.name}</div>`;
+                    gridTemplateStyle += ' 0.8fr';
+                    colCount++;
+                 }
             });
 
-            gridTemplateStyle += ' 1fr 1fr'; // Add for Total and Progress
+            gridTemplateStyle += ' 1fr 1fr';
             colCount += 2;
 
-            // Adjust min-width based on actual columns added
-            const minTableWidth = 40 + 150 + (colCount - 2) * 80 + 100 + 100; // Approx widths
+            const minTableWidth = 40 + 150 + (colCount - 4) * 80 + 100 + 100;
 
             let tableRowsHTML = '';
             rankedTeams.forEach((team, index) => {
                 const rank = index + 1;
-                // Calculate progress safely, ensure it's between 0 and 100
-                const progress = maxScore > 0 ? Math.max(0, Math.min(100, (team.total / maxScore) * 100)) : 0;
+                const teamTotal = team.total || 0;
+                const progress = maxScore > 0 ? Math.max(0, Math.min(100, (teamTotal / maxScore) * 100)) : 0;
                 let pointsColsHTML = '';
                 if (hasGroupPoints) {
                     pointsColsHTML += `<div><span class="points-pill group">${team['group'] || 0}</span></div>`;
                 }
                 (dbCategories || []).forEach((cat, i) => {
-                    pointsColsHTML += `<div><span class="points-pill default-pill-${(i % 6) + 1}">${team[cat.name] || 0}</span></div>`;
+                     if (cat && cat.name) {
+                        pointsColsHTML += `<div><span class="points-pill default-pill-${(i % 6) + 1}">${team[cat.name] || 0}</span></div>`;
+                     }
                 });
 
                 tableRowsHTML += `
@@ -668,7 +844,7 @@
                         <div><span class="rank-cell ${rank === 1 ? 'rank-1' : (rank === 2 ? 'rank-2' : (rank === 3 ? 'rank-3' : ''))}">${rank}</span></div>
                         <div class="team-name-cell">${team.name || 'Unknown Team'}</div>
                         ${pointsColsHTML}
-                        <div class="total-points-cell">${team.total}</div>
+                        <div class="total-points-cell">${teamTotal}</div>
                         <td><div class="progress-circle-container"><div class="progress-circle" style="--p:${progress};"><span class="progress-circle-text">${Math.round(progress)}%</span></div></div></td>
                     </div>`;
             });
@@ -682,13 +858,13 @@
                     </div>
                     ${tableRowsHTML}
                 </div>`;
-        }
+         } catch(e) { console.error("Error generating detailed rankings:", e); }}
 
-        function renderProgramResults() {
+        function renderProgramResults() { try { /* Original code */
              const grid = d.getElementById('program-results-grid');
             if (!grid) { console.error("program-results-grid not found"); return; }
             if (!processedProgramData || processedProgramData.length === 0) { grid.innerHTML = '<p class="text-gray-500 p-4 text-center">No results have been published yet.</p>'; return; }
-            grid.innerHTML = ''; // Clear placeholder/previous
+            grid.innerHTML = '';
             const sortedPrograms = processedProgramData.sort((a, b) => a.eventName.localeCompare(b.eventName));
             sortedPrograms.forEach(program => {
                 let winnersHtml = '';
@@ -699,14 +875,16 @@
                 positions.forEach(position => {
                     if (program.winners[position] && program.winners[position].length > 0) {
                         program.winners[position].forEach(winner => {
-                            const teamName = getTeamFromChest(winner.chest) || 'N/A';
-                            searchText += `${winner.name} ${winner.chest} ${teamName} `.toLowerCase();
+                             const winnerName = winner.name || 'Unknown';
+                             const winnerChest = winner.chest || '?';
+                             const teamName = getTeamFromChest(winnerChest) || 'N/A';
+                             searchText += `${winnerName} ${winnerChest} ${teamName} `.toLowerCase();
                             winnersHtml += `
                                 <div class="winner-entry ${positionClasses[position]}">
                                     ${positionIcons[position]}
                                     <div class="winner-details">
-                                        <div class="name">${winner.name || 'Unknown Name'}</div>
-                                        <div class="id-team"><span>${winner.chest || '?'}</span>${teamName}</div>
+                                        <div class="name">${winnerName}</div>
+                                        <div class="id-team"><span>${winnerChest}</span>${teamName}</div>
                                     </div>
                                     <div class="winner-points">
                                         <div class="points-value">${program.currentPoints[position]}</div>
@@ -727,27 +905,27 @@
                         </div>
                     </div>`;
             });
-            // Re-apply filter after rendering
             const activeFilterButton = d.querySelector('#program-tab .filter-btn.active');
             filterResults(activeFilterButton ? activeFilterButton.dataset.filter : 'all');
-         }
+         } catch(e) { console.error("Error rendering program results:", e); }}
 
-        function generateTalentList() {
+        function generateTalentList() { try { /* Original code */
             const container = d.getElementById('talent-list-container');
             if (!container) { console.error("talent-list-container not found"); return; }
             const categories = Object.keys(processedTalentData || {}).sort();
             if (!processedTalentData || categories.length === 0) { container.innerHTML = '<p class="text-gray-500 p-4 text-center">Individual talent points will appear here once results are published.</p>'; return; }
-            container.innerHTML = ''; // Clear placeholder/previous
+            container.innerHTML = '';
             categories.forEach(category => {
                 const students = processedTalentData[category];
-                const listId = `talent-list-${category.replace(/\s+/g, '-').toLowerCase()}`;
+                const listId = `talent-list-${category.replace(/[^a-zA-Z0-9]/g, '-')}`;
                 let listHtml = '<div class="talent-list">';
                 let dropdownHtml = '';
                 const positionIcons = { 0: '<i class="medal-icon fas fa-trophy"></i>', 1: '<i class="medal-icon fas fa-medal silver"></i>', 2: '<i class="medal-icon fas fa-medal bronze"></i>' };
                 const positionClasses = { 0: 'first-place', 1: 'second-place', 2: 'third-place' };
                 students.forEach((student, index) => {
-                    const nameParts = student.name.split(' ');
-                    const chest = nameParts.length > 1 ? nameParts[0] : student.name;
+                     const studentNameStr = student.name || '';
+                    const nameParts = studentNameStr.split(' ');
+                    const chest = nameParts.length > 1 ? nameParts[0] : studentNameStr;
                     const name = nameParts.length > 1 ? nameParts.slice(1).join(' ') : 'Unknown Name';
                     const teamName = getTeamFromChest(chest) || 'N/A';
                     const entryHtml = `
@@ -758,20 +936,20 @@
                                 <div class="id-team"><span>${chest}</span>${teamName}</div>
                             </div>
                             <div class="winner-points">
-                                <div class="points-value">${student.points}</div>
+                                <div class="points-value">${student.points || 0}</div>
                                 <div class="points-label">Points</div>
                             </div>
                         </div>`;
-                    if (index < 5 || students.length <= 8) { // Show first 5 or all if 8 or less
+                    if (index < 5 || students.length <= 8) {
                         listHtml += entryHtml;
                     } else {
                         dropdownHtml += entryHtml;
                     }
                 });
                 listHtml += '</div>';
-                if (dropdownHtml) { // Add dropdown and button only if there are hidden items
+                if (dropdownHtml) {
                     listHtml += `<div id="${listId}" class="talent-dropdown-list">${dropdownHtml}</div>`;
-                    listHtml += `<button class="show-more-btn" onclick="toggleTalentDropdown('${listId}', this)">Show More</button>`;
+                    listHtml += `<button class="show-more-btn" onclick="toggleTalentDropdown('${listId.replace(/'/g, "\\'")}', this)">Show More</button>`;
                 }
                 container.innerHTML += `
                     <div class="talent-category-card">
@@ -779,20 +957,44 @@
                         ${listHtml}
                     </div>`;
             });
-        }
+         } catch(e) { console.error("Error generating talent list:", e); }}
 
-        function generateScoreboard() {
+        function generateScoreboard() { try { /* Original code with fix */
             const container = d.getElementById('scoreboard-container');
-            if (!container ) { console.error("Scoreboard container not found"); return; }
-            container.innerHTML = ''; // Clear everything
+            if (!container) { console.error("Scoreboard container not found"); return; }
+            container.innerHTML = ''; // Clear previous content
 
-             // Check if data is ready
-            if (!processedScoreboardData || !processedScoreboardData.eventPoints || Object.keys(processedScoreboardData.eventPoints).length === 0 || TEAM_NAMES.length === 0) {
+            if (!processedScoreboardData || !processedScoreboardData.eventPoints || Object.keys(processedScoreboardData.eventPoints).length === 0 || !TEAM_NAMES || TEAM_NAMES.length === 0) {
                 container.innerHTML = '<p id="scoreboard-placeholder" class="text-gray-500 text-center py-10">No scoreboard data available yet.</p>';
                 return;
             }
 
-            const sortedTeams = [...TEAM_NAMES].sort(); // Create a sorted copy
+            const sortedTeams = [...TEAM_NAMES].sort();
+            let eventCardsHTML = '';
+            const sortedEvents = Object.keys(processedScoreboardData.eventPoints).sort();
+
+            // Generate HTML for individual event cards
+            sortedEvents.forEach(eventName => {
+                const eventData = processedScoreboardData.eventPoints[eventName];
+                let eventRows = '';
+                sortedTeams.forEach(team => {
+                    const teamData = eventData[team];
+                    if (teamData && typeof teamData.points === 'number' && teamData.points > 0) {
+                        // Ensure getTrophyIconsHTML is called correctly (it's globally defined)
+                        eventRows += `<div class="scoreboard-team-row"><span>${team}</span><span>${getTrophyIconsHTML(teamData.positions)}${teamData.points}</span></div>`;
+                    }
+                });
+                if (eventRows) {
+                    const cardCategory = eventData.isGroup ? 'group' : eventData.category;
+                    eventCardsHTML += `
+                        <div class="scoreboard-card" data-event-name="${eventName}" data-category="${cardCategory}" style="display: none;"> <!-- Start hidden -->
+                            <div class="scoreboard-event-header"><span>${eventName}</span></div>
+                            ${eventRows}
+                        </div>`;
+                }
+            });
+
+            // Generate HTML for the total card
             let totalRows = '';
             sortedTeams.forEach(team => {
                 totalRows += `<div class="scoreboard-team-row"><span>${team}</span><span data-team="${team}">0</span></div>`;
@@ -803,67 +1005,56 @@
                     <p id="scoreboard-category-count" class="category-count-text">Results: 0</p>
                     ${totalRows}
                 </div>`;
-            container.insertAdjacentHTML('beforeend', totalCardHTML); // Add total card first
 
-            const sortedEvents = Object.keys(processedScoreboardData.eventPoints).sort();
-            let eventCardsHTML = '';
-            sortedEvents.forEach(eventName => {
-                const eventData = processedScoreboardData.eventPoints[eventName];
-                let eventRows = '';
-                sortedTeams.forEach(team => { // Iterate using sorted teams
-                    const teamData = eventData[team];
-                    if (teamData && teamData.points > 0) {
-                        eventRows += `<div class="scoreboard-team-row"><span>${team}</span><span>${getTrophyIconsHTML(teamData.positions)}${teamData.points}</span></div>`;
-                    }
-                });
-                if (eventRows) { // Only add card if there are rows to show
-                    const cardCategory = eventData.isGroup ? 'group' : eventData.category;
-                    eventCardsHTML += `
-                        <div class="scoreboard-card" data-event-name="${eventName}" data-category="${cardCategory}" style="display: none;">
-                            <div class="scoreboard-event-header"><span>${eventName}</span></div>
-                            ${eventRows}
-                        </div>`;
-                }
-            });
-            container.insertAdjacentHTML('beforeend', eventCardsHTML); // Add event cards after total card
-
-            // Add legend at the very end
-            container.innerHTML += `
+            // Generate HTML for the legend
+            const legendHTML = `
                 <div class="scoreboard-legend">
                     <span><i class="fas fa-trophy trophy-icon gold"></i> Gold</span>
                     <span><i class="fas fa-trophy trophy-icon silver"></i> Silver</span>
                     <span><i class="fas fa-trophy trophy-icon bronze"></i> Bronze</span>
                 </div>`;
-             // Apply default filter after rendering scoreboard elements
-             filterScoreboard('All'); // Ensure 'All' filter is applied
-        }
 
-        function generateStaticContent() {
-             const setText = (id, value, fallback = '') => { const el = d.getElementById(id); if (el) el.textContent = value || fallback; };
-            const setSrc = (id, value, fallback) => { const el = d.getElementById(id); if (el) el.src = value || fallback; };
+            // Assemble the scoreboard container: Event Cards -> Total Card -> Legend
+            container.innerHTML = eventCardsHTML + totalCardHTML + legendHTML;
+
+             // Apply the default 'All' filter immediately after rendering all elements
+            if (typeof filterScoreboard === 'function') {
+                filterScoreboard('All'); // Apply filter to set initial visibility and totals
+            } else {
+                 console.error("filterScoreboard function not defined when applying default in generateScoreboard.");
+            }
+         } catch(e) { console.error("Error generating scoreboard:", e); }}
+
+
+        function generateStaticContent() { try { /* Original code */
+             const setText = (id, value, fallback = '') => { const el = d.getElementById(id); if (el) el.textContent = value || fallback; else console.warn(`Element not found: ${id}`); };
+            const setSrc = (id, value, fallback) => { const el = d.getElementById(id); if (el) el.src = value || fallback; else console.warn(`Element not found: ${id}`); };
+            const setHref = (selector, value) => { const el = d.querySelector(selector); if(el && value) { el.href = value; el.style.display='';} else if(el) el.style.display='none'; else console.warn(`Selector not found: ${selector}`); }
+
+
             const leadersSection = d.getElementById('leaders');
             const gallerySection = d.getElementById('gallery');
+            const socialIconsContainer = d.getElementById('footer-social-icons');
 
-            if (!dbHomepage) {
-                console.warn("Static content render skipped: dbHomepage is null.");
-                // Set minimal defaults if homepage data is missing
-                setText('dynamic-header-title', 'Results 2025');
-                setText('hero-main-title', 'Event Results');
-                setText('hero-subtitle', 'Live Updates');
-                setText('about-text', 'Details about the event will be updated soon.');
-                if(leadersSection) leadersSection.style.display = 'none'; // Hide sections if no data
-                if(gallerySection) gallerySection.style.display = 'none';
-                setText('footer-institution-name', 'Institution Name');
-                setText('footer-copyright', `© ${new Date().getFullYear()} Event Organizers`);
-                const socialIcons = d.getElementById('footer-social-icons'); if(socialIcons) socialIcons.style.display = 'none';
+
+            if (!dbHomepage || Object.keys(dbHomepage).length === 0 ) {
+                console.warn("Static content render skipped: dbHomepage is null/empty.");
+                setText('dynamic-header-title', 'Results 2025'); setText('hero-main-title', 'Event Results'); setText('hero-subtitle', 'Live Updates'); setText('about-text', 'Details about the event will be updated soon.');
+                if(leadersSection) leadersSection.style.display = 'none'; if(gallerySection) gallerySection.style.display = 'none';
+                setText('footer-institution-name', 'Institution Name'); setText('footer-copyright', `© ${new Date().getFullYear()} Event Organizers`); if(socialIconsContainer) socialIconsContainer.style.display = 'none';
+                setText('stats-programs-public', '-'); setText('stats-participants-public', '-'); setText('stats-categories-public', '-'); setText('stats-teams-public', '-');
+                const leaderPlaceholder = d.getElementById('leader-placeholder'); if(leaderPlaceholder) leaderPlaceholder.textContent = "Leader info unavailable.";
+                const galleryPlaceholder = d.getElementById('gallery-placeholder'); if(galleryPlaceholder) galleryPlaceholder.textContent = "Gallery unavailable.";
                 return;
             }
 
-            // Ensure sections are visible if data exists
-            if(leadersSection) leadersSection.style.display = 'block';
-            if(gallerySection) gallerySection.style.display = 'block';
-
             const data = dbHomepage;
+
+            const hasLeaders = dbTeams && Object.keys(dbTeams).length > 0;
+             const hasGallery = data.gallery && Array.isArray(data.gallery) && data.gallery.length > 0;
+             if(leadersSection) leadersSection.style.display = hasLeaders ? 'block' : 'none';
+             if(gallerySection) gallerySection.style.display = hasGallery ? 'block' : 'none';
+
 
             // Header & Hero
             setText('dynamic-header-title', data.header_title, 'Sadaye Madeena 2k25');
@@ -887,10 +1078,9 @@
            const leaderContainer = d.getElementById('leader-cards-container');
            const leaderPlaceholder = d.getElementById('leader-placeholder');
            if (leaderContainer) {
-               leaderContainer.innerHTML = ''; // Clear previous content
-               if (dbTeams && Object.keys(dbTeams).length > 0) {
+               leaderContainer.innerHTML = '';
+               if (hasLeaders) {
                    if(leaderPlaceholder) leaderPlaceholder.style.display = 'none';
-                   // Sort teams by name before displaying
                    const sortedTeams = Object.values(dbTeams).sort((a,b) => (a.name || '').localeCompare(b.name || ''));
                    sortedTeams.forEach(team => {
                        leaderContainer.innerHTML += `
@@ -904,7 +1094,7 @@
                            </div>`;
                    });
                } else if (leaderPlaceholder) {
-                   leaderPlaceholder.textContent = dbTeams === null ? 'Loading leaders...' : 'No teams found. Please add teams in the admin panel.';
+                   leaderPlaceholder.textContent = dbTeams === null ? 'Loading leaders...' : 'No teams configured.';
                    leaderPlaceholder.style.display = 'block';
                }
            }
@@ -912,23 +1102,24 @@
             // Gallery Section
             const galleryContainer = d.getElementById('gallery-rows-container');
             const galleryPlaceholder = d.getElementById('gallery-placeholder');
-            const galleryUrls = data.gallery || []; // Assumes gallery is an array of URLs
+            const galleryUrls = data.gallery || [];
             const rowElements = [d.getElementById('gallery-row-0'), d.getElementById('gallery-row-1'), d.getElementById('gallery-row-2')];
 
-            // Clear existing gallery content
             rowElements.forEach(row => { if(row) row.innerHTML = ''; });
 
             if (galleryUrls.length > 0) {
                 if(galleryPlaceholder) galleryPlaceholder.style.display = 'none';
                 galleryUrls.forEach((url, index) => {
-                    const rowIndex = index % 3; // Distribute images across 3 rows
-                    if(rowElements[rowIndex]){
-                        rowElements[rowIndex].innerHTML += `
-                            <div class="gallery-item-wrapper">
-                                <img src="${url}" alt="Gallery Image ${index + 1}" loading="lazy" onerror="this.onerror=null;this.src='https://placehold.co/200x280/EFEFEF/CCC?text=Error';">
-                                <button class="share-btn" data-url="${url}"><i class="fas fa-share-alt"></i></button>
-                            </div>`;
-                    }
+                     if (url && typeof url === 'string') {
+                        const rowIndex = index % 3;
+                        if(rowElements[rowIndex]){
+                            rowElements[rowIndex].innerHTML += `
+                                <div class="gallery-item-wrapper">
+                                    <img src="${url}" alt="Gallery Image ${index + 1}" loading="lazy" onerror="this.onerror=null;this.src='https://placehold.co/200x280/EFEFEF/CCC?text=Error';">
+                                    <button class="share-btn" data-url="${url}"><i class="fas fa-share-alt"></i></button>
+                                </div>`;
+                        }
+                     } else { console.warn(`Invalid URL in gallery at index ${index}:`, url); }
                 });
             } else if (galleryPlaceholder) {
                 galleryPlaceholder.textContent = 'No gallery images added yet.';
@@ -938,400 +1129,164 @@
             // Footer
             setText('footer-institution-name', data.institution_name, 'Institution Name');
             setText('footer-copyright', data.copyright_text, `© ${new Date().getFullYear()} Org Name. All rights reserved.`);
-            const socialIconsContainer = d.getElementById('footer-social-icons');
             if(socialIconsContainer){
-                socialIconsContainer.innerHTML = ''; // Clear previous icons
-                let hasSocials = false;
-                if (data.social_instagram) {
-                    socialIconsContainer.innerHTML += `<a href="${data.social_instagram}" target="_blank" aria-label="Instagram"><i class="fab fa-instagram"></i></a>`;
-                    hasSocials = true;
-                }
-                if (data.social_youtube) {
-                    socialIconsContainer.innerHTML += `<a href="${data.social_youtube}" target="_blank" aria-label="YouTube"><i class="fab fa-youtube"></i></a>`;
-                    hasSocials = true;
-                }
-                if (data.social_facebook) {
-                    socialIconsContainer.innerHTML += `<a href="${data.social_facebook}" target="_blank" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>`;
-                    hasSocials = true;
-                }
-                // Hide container if no links
-                socialIconsContainer.style.display = hasSocials ? 'block' : 'none';
+                 const igLink = socialIconsContainer.querySelector('a[aria-label="Instagram"]');
+                 const ytLink = socialIconsContainer.querySelector('a[aria-label="YouTube"]');
+                 const fbLink = socialIconsContainer.querySelector('a[aria-label="Facebook"]');
+                 setHref(igLink, data.social_instagram);
+                 setHref(ytLink, data.social_youtube);
+                 setHref(fbLink, data.social_facebook);
+                 const hasSocials = !!(data.social_instagram || data.social_youtube || data.social_facebook);
+                 socialIconsContainer.style.display = hasSocials ? 'flex' : 'none';
             }
-         }
+         } catch(e) { console.error("Error generating static content:", e); }}
 
-        // ===================================
-        // UI പ്രവർത്തനങ്ങൾ
-        // ===================================
-        window.openNav = function() {
-             const menuOverlay = d.getElementById("menu-overlay");
-             const mainContent = d.getElementById("main-content");
-             if (menuOverlay) menuOverlay.style.display = "flex";
-             if(mainContent) mainContent.style.filter = 'blur(4px)';
+        // --- UI Interaction Functions ---
+        // Add try-catch wrappers here for safety
+        window.openNav = function() { try {
+             const menuOverlay = d.getElementById("menu-overlay"); const mainContent = d.getElementById("main-content");
+             if (menuOverlay) menuOverlay.style.display = "flex"; if(mainContent) mainContent.style.filter = 'blur(4px)';
              setTimeout(() => { if(menuOverlay) menuOverlay.style.opacity = '1'; }, 10);
-         }
-        window.closeNav = function() {
-             const menuOverlay = d.getElementById("menu-overlay");
-             const mainContent = d.getElementById("main-content");
-             if(menuOverlay) menuOverlay.style.opacity = '0';
-             setTimeout(() => { if(menuOverlay) menuOverlay.style.display = "none"; }, 300);
+         } catch(e) { console.error("Error openNav:", e); }}
+        window.closeNav = function() { try {
+             const menuOverlay = d.getElementById("menu-overlay"); const mainContent = d.getElementById("main-content");
+             if(menuOverlay) menuOverlay.style.opacity = '0'; setTimeout(() => { if(menuOverlay) menuOverlay.style.display = "none"; }, 300);
              if(mainContent) mainContent.style.filter = 'none';
-         }
-        window.showPage = function(pageId) {
-             const homePage = d.getElementById('home-page');
-             const scoreboardPage = d.getElementById('scoreboard-page');
+         } catch(e) { console.error("Error closeNav:", e); }}
+        window.showPage = function(pageId) { try {
+             const homePage = d.getElementById('home-page'); const scoreboardPage = d.getElementById('scoreboard-page');
              if(homePage) homePage.style.display = pageId === 'home-page' ? 'block' : 'none';
              if(scoreboardPage) scoreboardPage.style.display = pageId === 'scoreboard-page' ? 'block' : 'none';
              const scrollTopBtn = d.getElementById('scrollTopBtn');
-             if (scrollTopBtn) {
-                 if (pageId === 'home-page') { handleScroll(); } else { scrollTopBtn.classList.remove('show'); }
-             }
+             if (scrollTopBtn) { if (pageId === 'home-page') { handleScroll(); } else { scrollTopBtn.classList.remove('show'); } }
              updateMenuActiveState();
-         }
-        window.showMainTab = function(tabId) {
+         } catch(e) { console.error("Error showPage:", e); }}
+        window.showMainTab = function(tabId) { try {
              const currentActiveButton = d.querySelector('#scoreboard-page .main-tab-button.active');
              const clickedButton = d.querySelector(`.main-tab-button[onclick*="'${tabId}'"]`);
-             // If clicking the already active button, do nothing
              if (clickedButton && currentActiveButton && clickedButton.isSameNode(currentActiveButton)) return;
-
              if (currentActiveButton) currentActiveButton.classList.remove('active');
              d.querySelectorAll('.main-tab-content').forEach(tab => tab.classList.remove('active'));
              const targetTab = d.getElementById(tabId);
-             if(targetTab) targetTab.classList.add('active');
-             if (clickedButton) clickedButton.classList.add('active');
+             if(targetTab) targetTab.classList.add('active'); else console.warn(`Target tab content not found: ${tabId}`);
+             if (clickedButton) clickedButton.classList.add('active'); else console.warn(`Clicked button not found for tab: ${tabId}`);
              updateMenuActiveState();
-        }
-        window.filterResults = function(category = 'all') {
+         } catch(e) { console.error("Error showMainTab:", e); }}
+        window.filterResults = function(category = 'all') { try {
              d.querySelectorAll('#program-tab .filter-btn').forEach(btn => btn.classList.remove('active'));
              const activeBtn = d.querySelector(`#program-tab .filter-btn[data-filter="${category}"]`);
              if(activeBtn) activeBtn.classList.add('active');
-
-             const searchInput = d.getElementById('search-input');
-             const searchTerm = searchInput ? searchInput.value.toLowerCase() : '';
-
+             const searchInput = d.getElementById('search-input'); const searchTerm = searchInput ? searchInput.value.toLowerCase() : '';
              d.querySelectorAll('#program-results-grid .event-result-card').forEach(card => {
                  const categoryMatch = (category === 'all' || card.dataset.category === category);
-                 // Ensure card.dataset.searchText exists before calling includes
                  const searchMatch = card.dataset.searchText ? card.dataset.searchText.includes(searchTerm) : true;
                  card.style.display = (categoryMatch && searchMatch) ? 'block' : 'none';
              });
-        }
-        window.filterScoreboard = function(category) {
-            if (!category) { console.warn("filterScoreboard called with no category"); return; }
-            d.querySelectorAll('#scoreboard-filter-buttons .filter-btn').forEach(btn => btn.classList.remove('active'));
-            const activeButton = d.querySelector(`#scoreboard-filter-buttons .filter-btn[data-filter="${category}"]`);
-            if (activeButton) { activeButton.classList.add('active'); }
-             else { console.warn(`Scoreboard filter button not found for '${category}', defaulting to 'All'`);
-                const allButton = d.querySelector('#scoreboard-filter-buttons .filter-btn[data-filter="All"]');
-                if (allButton) allButton.classList.add('active');
-                category = 'All'; // Fallback to 'All'
-            }
-
-            const totalCard = d.getElementById('scoreboard-total-card');
-            const countElement = d.getElementById('scoreboard-category-count');
-
-            // Update totals in the total card
-            if (totalCard && TEAM_NAMES && TEAM_NAMES.length > 0) {
-                 const totalsToShow = category === 'All' ? processedTeamData : (processedScoreboardData.categoryTotals[category] || {});
-                 TEAM_NAMES.forEach(team => {
-                     const teamSpan = totalCard.querySelector(`span[data-team="${team}"]`);
-                     if (teamSpan) {
-                          // For 'All', show overall total, otherwise category total
-                          teamSpan.textContent = category === 'All' ? (processedTeamData[team]?.total || 0) : (totalsToShow[team] || 0);
-                     }
-                 });
-             }
-
-            // Update result count
-            if (countElement) {
-                const count = category === 'All' ? publishedResultsCount : (processedScoreboardData.categoryCounts[category] || 0);
-                countElement.textContent = `Results: ${count}`;
-            }
-
-            // Show/hide individual event cards
-            d.querySelectorAll('#scoreboard-container .scoreboard-card:not(.total-card)').forEach(card => {
-                const cardCategory = card.dataset.category; // This should be 'group' or the specific category name
-                card.style.display = (category === 'All' || category === cardCategory) ? 'block' : 'none';
-            });
-        }
-        window.updateResultCounts = function() {
-             const el = d.getElementById('team-results-count');
-             if (el) el.innerText = `Team point status after ${publishedResultsCount} results`;
-        }
-        window.getTrophyIconsHTML = function(positions) {
-             if (!positions || positions.length === 0) return '';
-             // Use Set to get unique positions, then sort
-             const uniquePositions = [...new Set(positions)].sort();
-             return uniquePositions.map(pos => {
-                 if (pos === 1) return '<i class="fas fa-trophy trophy-icon gold"></i>';
-                 if (pos === 2) return '<i class="fas fa-trophy trophy-icon silver"></i>'; // Changed to trophy
-                 if (pos === 3) return '<i class="fas fa-trophy trophy-icon bronze"></i>'; // Changed to trophy
-                 return '';
-             }).join('');
-        }
-        window.toggleTalentDropdown = function(listId, button) {
-             const list = d.getElementById(listId);
-             if(list) list.classList.toggle('open');
-             if(button) button.textContent = list && list.classList.contains('open') ? 'Show Less' : 'Show More';
-         }
-        window.updateMenuActiveState = function() {
-             const homePage = d.getElementById('home-page');
-             const homePageVisible = homePage ? homePage.style.display !== 'none' : false;
-             d.querySelectorAll('.menu-link').forEach(link => link.classList.remove('active'));
-             if (homePageVisible) {
-                 const homeLink = d.querySelector('.menu-link[data-target="home-page"]');
-                 if (homeLink) homeLink.classList.add('active');
-             } else {
-                 const activeTabButton = d.querySelector('#scoreboard-page .main-tab-button.active');
-                 if (activeTabButton) {
-                     // Extract tabId from onclick attribute
-                     const onclickAttr = activeTabButton.getAttribute('onclick');
-                     const tabIdMatch = onclickAttr ? onclickAttr.match(/'([^']+)'/) : null;
-                     if (tabIdMatch && tabIdMatch[1]) {
-                         const tabId = tabIdMatch[1];
-                         const activeMenuLink = d.querySelector(`.menu-link[data-target="${tabId}"]`);
-                         if (activeMenuLink) activeMenuLink.classList.add('active');
-                     }
-                 } else {
-                     // Fallback if no active tab button is found (e.g., initial load direct to scoreboard page)
-                     const programLink = d.querySelector('.menu-link[data-target="program-tab"]');
-                     if (programLink) programLink.classList.add('active');
-                 }
-             }
-         }
-        async function shareImage(imageUrl) {
-             if (navigator.share) {
-                 try {
-                     await navigator.share({ title: 'Sadaye Madeena 2k25 Gallery Image', text: 'Check out this image from the fest!', url: imageUrl });
-                     console.log('Image shared successfully');
-                 } catch (err) {
-                     console.error('Error sharing image:', err);
-                     alert('Sharing failed.'); // Use a more user-friendly message or UI element
-                 }
-             } else {
-                 // Fallback for browsers that don't support navigator.share
-                 try {
-                     const textArea = d.createElement("textarea");
-                     textArea.value = imageUrl;
-                     textArea.style.position = "fixed"; // Prevent scrolling issues
-                     textArea.style.left = "-9999px"; // Move off-screen
-                     d.body.appendChild(textArea);
-                     textArea.focus();
-                     textArea.select();
-                     // Use Clipboard API if available, fallback to execCommand
-                     if (navigator.clipboard && navigator.clipboard.writeText) {
-                         await navigator.clipboard.writeText(imageUrl);
-                         alert('Sharing not supported, but image link copied to clipboard!');
-                     } else {
-                         document.execCommand('copy'); // Use deprecated execCommand as fallback
-                         alert('Sharing not supported, but image link copied to clipboard!');
-                     }
-                     d.body.removeChild(textArea);
-                 } catch (err) {
-                     alert('Sharing is not supported on this browser. Please copy the link manually.');
-                     console.error('Fallback copy failed:', err);
-                 }
-             }
-         }
-        // Add event listener safely
-        const gallerySection = d.getElementById('gallery');
-        if (gallerySection) {
-            gallerySection.addEventListener('click', function(event) {
-                const shareButton = event.target.closest('.share-btn');
-                if (shareButton) {
-                    const imageUrl = shareButton.dataset.url;
-                    if (imageUrl) {
-                        event.stopPropagation(); // Prevent triggering other clicks if needed
-                        shareImage(imageUrl);
-                    }
-                }
-            });
-        } else {
-            console.warn("Gallery section not found for adding share listener.");
-        }
-
-        const scrollTopBtn = d.getElementById('scrollTopBtn');
-        function handleScroll() {
-             const homePage = d.getElementById('home-page');
-             // Check if homePage exists before accessing style
-             const homePageVisible = homePage ? homePage.style.display !== 'none' : false;
-             if (scrollTopBtn) { // Check if button exists
-                 if (homePageVisible && window.scrollY > 300) {
-                     scrollTopBtn.classList.add('show');
-                 } else {
-                     scrollTopBtn.classList.remove('show');
-                 }
-             }
-         }
-        window.scrollToTop = function() { window.scrollTo({ top: 0, behavior: 'smooth' }); }
-        window.addEventListener('scroll', handleScroll);
-
-        // ===================================
-        // ആപ്ലിക്കേഷൻ ആരംഭിക്കുമ്പോൾ
-        // ===================================
-        let allDataLoaded = false;
-        let loadStatus = { results: false, programs: false, teams: false, homepage: false, categories: false, participants: false };
-        let loadCheckTimeout = null; // To debounce checks
-        let dataProcessingTimeout = null; // To debounce processing on updates
-        let hasRenderedOnce = false; // Flag to prevent unnecessary full re-renders
-        let isProcessing = false; // Flag to prevent concurrent processing
-        let loadingTimeout = null; // Timeout handle
-
-         function updateLoadingMessage(message) {
-            const loadingOverlay = d.getElementById('loading-overlay');
-            if (loadingOverlay && loadingOverlay.style.display !== 'none') {
-                const msgElement = loadingOverlay.querySelector('p');
-                // Avoid overwriting error messages
-                if (msgElement && !msgElement.style.color.includes('red')) {
-                     msgElement.textContent = message;
-                }
-            }
-         }
-
-        function displayGlobalError(message, technicalError = "") {
-            clearTimeout(loadingTimeout); // Stop timeout timer
-            const loadingOverlay = d.getElementById('loading-overlay');
-            if (loadingOverlay) {
-                const spinner = loadingOverlay.querySelector('.spinner');
-                if (spinner) spinner.style.display = 'none'; // Hide spinner
-                const msgElement = loadingOverlay.querySelector('p');
-                if (msgElement) {
-                    msgElement.textContent = message;
-                    msgElement.style.color = 'red'; // Indicate error
-                }
-                 // Add technical details if provided and not already present
-                if (technicalError && !loadingOverlay.innerHTML.includes(technicalError.substring(0,50))) { // Check substring to avoid duplicates
-                    const errorDetails = d.createElement('p');
-                    errorDetails.style.color = 'red';
-                    errorDetails.style.fontSize = '0.8em';
-                    errorDetails.style.padding = '0 20px';
-                    errorDetails.style.marginTop = '10px';
-                    errorDetails.textContent = `Details: ${technicalError}`;
-                    loadingOverlay.appendChild(errorDetails);
-                }
-                // Ensure overlay is visible
-                loadingOverlay.style.opacity = '1';
-                loadingOverlay.style.display = 'flex';
-                console.error("Global Error Displayed:", message, technicalError);
-            } else {
-                 console.error("CRITICAL: Loading overlay not found to display error:", message, technicalError);
-            }
-        }
+         } catch(e) { console.error("Error filterResults:", e); }}
+        window.filterScoreboard = function(category) { try {
+             if (!category) { console.warn("filterScoreboard called with no category"); return; }
+             console.log("Filtering scoreboard by:", category);
+             d.querySelectorAll('#scoreboard-filter-buttons .filter-btn').forEach(btn => btn.classList.remove('active'));
+             const activeButton = d.querySelector(`#scoreboard-filter-buttons .filter-btn[data-filter="${category}"]`);
+             if (activeButton) { activeButton.classList.add('active'); }
+             else { console.warn(`Scoreboard filter btn not found for '${category}', defaulting to 'All'.`); const allBtn = d.querySelector('#scoreboard-filter-buttons .filter-btn[data-filter="All"]'); if (allBtn) allBtn.classList.add('active'); category = 'All'; }
+             const totalCard = d.getElementById('scoreboard-total-card'); const countElement = d.getElementById('scoreboard-category-count');
+             if (totalCard && TEAM_NAMES && TEAM_NAMES.length > 0) {
+                  const totalsToShow = category === 'All' ? processedTeamData : (processedScoreboardData.categoryTotals[category] || {});
+                  TEAM_NAMES.forEach(team => { const teamSpan = totalCard.querySelector(`span[data-team="${team}"]`); if (teamSpan) { const points = category === 'All' ? (processedTeamData[team]?.total || 0) : (totalsToShow[team] || 0); teamSpan.textContent = points; } else { console.warn(`Team span !found for ${team} in total card.`); } });
+              } else if (totalCard) { console.warn("TEAM_NAMES !ready for scoreboard filter."); }
+             if (countElement) { const count = category === 'All' ? publishedResultsCount : (processedScoreboardData.categoryCounts && processedScoreboardData.categoryCounts[category] || 0); countElement.textContent = `Results: ${count}`; }
+             d.querySelectorAll('#scoreboard-container .scoreboard-card:not(.total-card)').forEach(card => { const cardCat = card.dataset.category; card.style.display = (category === 'All' || category === cardCat) ? 'block' : 'none'; });
+         } catch (e) { console.error("Error in filterScoreboard:", e); }}
+        window.updateResultCounts = function() { try { const el = d.getElementById('team-results-count'); if (el) el.innerText = `Team point status after ${publishedResultsCount} results`; } catch(e) { console.error("Error updateResultCounts:", e); }}
+        window.getTrophyIconsHTML = function(positions) { try { if (!positions || !Array.isArray(positions) || positions.length === 0) return ''; const uP = [...new Set(positions)].sort((a,b)=>a-b); return uP.map(p=>{ if(p===1)return'<i class="fas fa-trophy trophy-icon gold"></i>'; if(p===2)return'<i class="fas fa-trophy trophy-icon silver"></i>'; if(p===3)return'<i class="fas fa-trophy trophy-icon bronze"></i>'; return'';}).join(''); } catch(e) { console.error("Error getTrophyIconsHTML:", e); return ''; }}
+        window.toggleTalentDropdown = function(listId, button) { try { const list = d.getElementById(listId); if(list) list.classList.toggle('open'); if(button) button.textContent = list && list.classList.contains('open') ? 'Show Less' : 'Show More'; } catch(e) { console.error("Error toggleTalentDropdown:", e); }}
+        window.updateMenuActiveState = function() { try { const homePage = d.getElementById('home-page'), hPV = homePage ? homePage.style.display !== 'none' : false; d.querySelectorAll('.menu-link').forEach(l=>l.classList.remove('active')); if(hPV){ const hL=d.querySelector('.menu-link[data-target="home-page"]'); if(hL)hL.classList.add('active'); } else { const aTB=d.querySelector('#scoreboard-page .main-tab-button.active'); if(aTB){ const oA=aTB.getAttribute('onclick'), tIM=oA?oA.match(/'([^']+)'/):null; if(tIM&&tIM[1]){ const tId=tIM[1], aML=d.querySelector(`.menu-link[data-target="${tId}"]`); if(aML)aML.classList.add('active'); } } else { const pL=d.querySelector('.menu-link[data-target="program-tab"]'); if(pL)pL.classList.add('active'); } } } catch(e) { console.error("Error updateMenuActiveState:", e); }}
+        async function shareImage(imageUrl) { try { if (navigator.share) { await navigator.share({ title: 'Sadaye Madeena 2k25 Gallery Image', text: 'Check out this image!', url: imageUrl }); } else { const ta=d.createElement("textarea"); ta.value=imageUrl; ta.style.position="fixed"; ta.style.left="-9999px"; d.body.appendChild(ta); ta.select(); if (navigator.clipboard&&navigator.clipboard.writeText){await navigator.clipboard.writeText(imageUrl); alert('Link copied!');} else {document.execCommand('copy'); alert('Link copied!');} d.body.removeChild(ta); } } catch(err){ alert('Could not share or copy.'); console.error('Share/Copy fail:',err); } }
+        const gallerySection = d.getElementById('gallery'); if (gallerySection) { gallerySection.addEventListener('click', (e)=>{ const btn=e.target.closest('.share-btn'); if (btn&&btn.dataset.url){ e.stopPropagation(); shareImage(btn.dataset.url); }}); } else { console.warn("Gallery section !found."); }
+        const scrollTopBtn = d.getElementById('scrollTopBtn'); function handleScroll(){ try { const hP=d.getElementById('home-page'), hPV=hP?hP.style.display!=='none':false; if(scrollTopBtn){scrollTopBtn.classList.toggle('show', hPV&&window.scrollY>300);} } catch(e) { console.error("Error handleScroll:", e); }}
+        window.scrollToTop = function() { try { window.scrollTo({top:0, behavior:'smooth'}); } catch(e) { console.error("Error scrollToTop:", e); }}; window.addEventListener('scroll', handleScroll);
 
 
+        // --- App Initialization ---
         function checkAllDataLoaded(source = "unknown") {
-             clearTimeout(loadCheckTimeout); // Clear previous check timeout
-             loadCheckTimeout = setTimeout(() => { // Debounce the check slightly
+             clearTimeout(loadCheckTimeout);
+             loadCheckTimeout = setTimeout(() => {
                  console.log(`Checking data load status (triggered by: ${source})`);
                  try {
-                     // Check if all individual load statuses are true
                      const allFlagsTrue = Object.values(loadStatus).every(status => status === true);
-
                      if (allFlagsTrue) {
-                          // Additional check: Ensure essential data like teams and categories are not empty
                           const teamsReady = dbTeams && Object.keys(dbTeams).length > 0;
                           const categoriesReady = dbCategories && Array.isArray(dbCategories) && dbCategories.length > 0;
-
                           if (teamsReady && categoriesReady) {
                               if (!allDataLoaded) {
-                                  allDataLoaded = true; // Mark that initial load is complete
+                                  allDataLoaded = true;
                                   console.log("All necessary data loaded. Processing for the first time...");
-                                  clearTimeout(loadingTimeout); // Clear loading timeout
+                                  clearTimeout(loadingTimeout);
                                   processAllData(); // Process data and render
-                              } else {
-                                  // Data updated after initial load, re-process if not already processing
-                                  if (!isProcessing) {
-                                       console.log("Data updated. Re-processing...");
-                                       clearTimeout(dataProcessingTimeout); // Debounce re-processing
-                                       dataProcessingTimeout = setTimeout(processAllData, 200); // Process after a short delay
-                                  } else {
-                                       console.log("Skipping re-process: Already processing.");
-                                  }
-                              }
-                          } else {
-                              // Data flags are true, but essential data is missing (e.g., empty collection)
+                              } else if (!isProcessing) { // Check if not already processing an update
+                                   console.log("Data updated. Re-processing...");
+                                   clearTimeout(dataProcessingTimeout);
+                                   dataProcessingTimeout = setTimeout(processAllData, 250); // Slightly longer debounce for updates
+                              } else { console.log("Skipping re-process: Already processing an update."); }
+                          } else { // Essential config missing
                               const missing = !teamsReady ? 'Teams' : 'Categories';
-                              console.warn(`All flags true, but ${missing} are empty. Check Firestore data in Admin Panel.`);
-                              // Display error permanently on loading screen
-                              displayGlobalError(`Configuration Incomplete: ${missing} not found.`, `Please add ${missing.toLowerCase()} in the Admin Panel.`);
+                              console.error(`Config Error: ${missing} not found or empty.`);
+                              displayGlobalError(`Configuration Incomplete: ${missing} missing.`, `Please add ${missing.toLowerCase()} in the Admin Panel and ensure Firestore rules allow access.`);
+                              clearTimeout(loadingTimeout); // Stop timeout as it's a config error
                           }
-                     } else {
-                         // Not all data has loaded yet
+                     } else { // Still waiting for data
                          const pending = Object.keys(loadStatus).filter(k => !loadStatus[k]).join(', ') || 'initial checks';
                          console.log(`Still waiting for: ${pending}`);
-                         // Update loading message with the first pending item
                          updateLoadingMessage(`Loading ${pending.split(',')[0]}...`);
                      }
                  } catch (e) {
                       console.error("Error within checkAllDataLoaded:", e);
                       displayGlobalError("Error checking data status.", e.message);
-                      clearTimeout(loadingTimeout); // Stop timeout on error
+                      clearTimeout(loadingTimeout);
                  }
-             }, 150); // Small debounce delay
+             }, 150);
         }
 
-        // --- Setup Firestore Listeners ---
         function setupFirestoreListeners() {
-            if (setupFirestoreListeners.called) {
-                console.log("Listeners already set up.");
-                return; // Prevent setting up listeners multiple times
-            }
-            setupFirestoreListeners.called = true; // Mark as called
+            if (setupFirestoreListeners.called) return;
+            setupFirestoreListeners.called = true;
             console.log("Setting up Firestore listeners...");
-
             const createErrorHandler = (sourceName) => (error) => {
                 console.error(`Error loading ${sourceName}: `, error);
-                // Set default empty values on error
-                switch (sourceName) {
-                    case 'results': dbResults = {}; break;
-                    case 'programs': dbPrograms = {}; break;
-                    case 'teams': dbTeams = {}; TEAM_NAMES = []; break; // Reset TEAM_NAMES too
-                    case 'homepage': dbHomepage = {}; break; // Use empty object as fallback
-                    case 'categories': dbCategories = []; break;
-                    case 'participants': dbParticipants = {}; break;
+                switch (sourceName) { /* Set defaults */
+                    case 'results': dbResults = {}; break; case 'programs': dbPrograms = {}; break;
+                    case 'teams': dbTeams = {}; TEAM_NAMES = []; break; case 'homepage': dbHomepage = {}; break;
+                    case 'categories': dbCategories = []; break; case 'participants': dbParticipants = {}; break;
                 }
-                loadStatus[sourceName] = true; // Mark as 'loaded' (even with error)
-                 // Display specific errors for critical data immediately
-                 if (['teams', 'categories', 'programs'].includes(sourceName)) {
-                     displayGlobalError(`Error loading ${sourceName}.`, `Check connection or config. Details: ${error.message}`);
+                loadStatus[sourceName] = true; // Mark as loaded (with error)
+                 // Display persistent error for critical config failures
+                 if (['teams', 'categories'].includes(sourceName)) {
+                     displayGlobalError(`Error Loading ${sourceName}`, `Could not load ${sourceName.toLowerCase()}. Check Firestore rules/data. Details: ${error.message}`);
                  }
-                 // Try checking load status again after error
-                 try { checkAllDataLoaded(`error in ${sourceName}`); }
+                 try { checkAllDataLoaded(`error in ${sourceName}`); } // Trigger check to potentially show config error msg
                  catch (checkError) { console.error(`Error calling checkAllDataLoaded after ${sourceName} error:`, checkError); }
             };
 
-            // Define listeners with error handling
-            onSnapshot(query(collection(db, `artifacts/${appId}/public/data/results`)),
-                (snapshot) => { try { dbResults = {}; snapshot.docs.forEach(doc => { dbResults[doc.id] = doc.data(); }); loadStatus.results = true; checkAllDataLoaded('results'); } catch (e) { console.error("Error processing results snapshot:", e); createErrorHandler('results')(e); } }, // Call error handler on catch
-                createErrorHandler('results')
-            );
-            onSnapshot(query(collection(db, `artifacts/${appId}/public/data/programs`)),
-                (snapshot) => { try { dbPrograms = {}; snapshot.docs.forEach(doc => { dbPrograms[doc.id] = doc.data(); }); loadStatus.programs = true; checkAllDataLoaded('programs'); } catch (e) { console.error("Error processing programs snapshot:", e); createErrorHandler('programs')(e); } },
-                createErrorHandler('programs')
-            );
-             onSnapshot(query(collection(db, `artifacts/${appId}/public/data/teams`)),
-                (snapshot) => {
-                    try {
-                        const teamsTemp = {};
-                        snapshot.docs.forEach(doc => { teamsTemp[doc.id] = {name: doc.id, ...doc.data()}; }); // Ensure name property is set using doc.id
-                        dbTeams = teamsTemp; // Assign after successful processing
-                        loadStatus.teams = true;
-                        checkAllDataLoaded('teams');
-                     } catch (e) { console.error("Error processing teams snapshot:", e); createErrorHandler('teams')(e); }
-                },
-                createErrorHandler('teams')
-            );
-            onSnapshot(doc(db, `artifacts/${appId}/public/data/config`, 'homepage'),
-                (docSnap) => { try { dbHomepage = docSnap.exists() ? docSnap.data() : {}; loadStatus.homepage = true; checkAllDataLoaded('homepage'); } catch (e) { console.error("Error processing homepage snapshot:", e); createErrorHandler('homepage')(e); } }, // Use empty object fallback
-                createErrorHandler('homepage')
-            );
-            onSnapshot(query(collection(db, `artifacts/${appId}/public/data/categories`)),
-                (snapshot) => { try { dbCategories = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })).sort((a, b) => a.name.localeCompare(b.name)); loadStatus.categories = true; checkAllDataLoaded('categories'); } catch (e) { console.error("Error processing categories snapshot:", e); createErrorHandler('categories')(e); } },
-                createErrorHandler('categories')
-            );
-            onSnapshot(query(collection(db, `artifacts/${appId}/public/data/participants`)),
-                (snapshot) => { try { dbParticipants = {}; snapshot.docs.forEach(doc => { dbParticipants[doc.id] = doc.data(); }); loadStatus.participants = true; checkAllDataLoaded('participants'); } catch (e) { console.error("Error processing participants snapshot:", e); createErrorHandler('participants')(e); } },
-                createErrorHandler('participants')
-            );
+            // Define listeners with safer data processing in callbacks
+             const resultsPath = `artifacts/${appId}/public/data/results`; console.log("Listening to:", resultsPath);
+             onSnapshot(query(collection(db, resultsPath)), (snapshot) => { console.log(`Listener: results (${snapshot.size})`); try { const data={}; snapshot.docs.forEach(doc=>{data[doc.id]=doc.data();}); dbResults=data; loadStatus.results=true; checkAllDataLoaded('results'); } catch(e){ createErrorHandler('results')(e);}}, createErrorHandler('results'));
+
+             const programsPath = `artifacts/${appId}/public/data/programs`; console.log("Listening to:", programsPath);
+             onSnapshot(query(collection(db, programsPath)), (snapshot) => { console.log(`Listener: programs (${snapshot.size})`); try { const data={}; snapshot.docs.forEach(doc=>{data[doc.id]=doc.data();}); dbPrograms=data; loadStatus.programs=true; checkAllDataLoaded('programs'); } catch(e){ createErrorHandler('programs')(e);}}, createErrorHandler('programs'));
+
+             const teamsPath = `artifacts/${appId}/public/data/teams`; console.log("Listening to:", teamsPath);
+             onSnapshot(query(collection(db, teamsPath)), (snapshot) => { console.log(`Listener: teams (${snapshot.size})`); try { const data={}; snapshot.docs.forEach(doc=>{data[doc.id]={name:doc.id, ...doc.data()};}); dbTeams=data; loadStatus.teams=true; checkAllDataLoaded('teams'); } catch(e){ createErrorHandler('teams')(e);}}, createErrorHandler('teams'));
+
+             const homepagePath = `artifacts/${appId}/public/data/config/homepage`; console.log("Listening to:", homepagePath);
+             onSnapshot(doc(db, homepagePath), (docSnap) => { console.log(`Listener: homepage (${docSnap.exists()})`); try { dbHomepage=docSnap.exists()?docSnap.data():{}; loadStatus.homepage=true; checkAllDataLoaded('homepage'); } catch(e){ createErrorHandler('homepage')(e);}}, createErrorHandler('homepage'));
+
+             const categoriesPath = `artifacts/${appId}/public/data/categories`; console.log("Listening to:", categoriesPath);
+             onSnapshot(query(collection(db, categoriesPath)), (snapshot) => { console.log(`Listener: categories (${snapshot.size})`); try { dbCategories=snapshot.docs.map(doc=>({id:doc.id, ...doc.data()})).sort((a,b)=>(a.name||'').localeCompare(b.name||'')); loadStatus.categories=true; checkAllDataLoaded('categories'); } catch(e){ createErrorHandler('categories')(e);}}, createErrorHandler('categories'));
+
+             const participantsPath = `artifacts/${appId}/public/data/participants`; console.log("Listening to:", participantsPath);
+             onSnapshot(query(collection(db, participantsPath)), (snapshot) => { console.log(`Listener: participants (${snapshot.size})`); try { const data={}; snapshot.docs.forEach(doc=>{data[doc.id]=doc.data();}); dbParticipants=data; loadStatus.participants=true; checkAllDataLoaded('participants'); } catch(e){ createErrorHandler('participants')(e);}}, createErrorHandler('participants'));
+
              console.log("Firestore listeners attached.");
         }
 
@@ -1339,25 +1294,33 @@
         // Start loading timeout
         loadingTimeout = setTimeout(() => {
             if (!allDataLoaded) { // Only trigger if data hasn't loaded successfully
-                 console.error("Loading timeout reached (20 seconds).");
+                 console.error("Loading timeout reached (30 seconds).");
                  const pending = Object.keys(loadStatus).filter(k => !loadStatus[k]).join(', ') || 'initial checks';
-                 displayGlobalError(
-                     "Loading is taking too long.",
-                     `Could not load: ${pending}. Please check your internet connection and ensure Teams/Categories are configured in the Admin Panel.`
-                 );
+                  displayGlobalError( "Loading Timeout", `Could not load: ${pending}. Check connection & ensure Teams/Categories exist in Firestore & Security Rules allow access.` ); // Added rules hint
             }
-        }, 20000); // 20 seconds timeout
+        }, 30000); // 30 seconds timeout
 
-        // Setup listeners after Firebase init
-        setupFirestoreListeners();
-
+        // --- Initialize App ---
+        if (db) { // Ensure db is initialized before setting listeners
+           setupFirestoreListeners();
+        } else {
+           console.error("Firestore DB object not initialized. Cannot set listeners.");
+           displayGlobalError("Initialization Failed", "Could not connect to database.");
+        }
 
         window.onload = function() {
            try {
                 console.log("Window onload event triggered.");
                 showPage('home-page'); // Show home page initially
                 updateMenuActiveState(); // Set active menu link
-                showMainTab('team-tab'); // Set team tab active by default within scoreboard page (even if hidden initially)
+                // Set team tab active by default within scoreboard page
+                const teamTabButton = d.querySelector('.main-tab-button[onclick*="\'team-tab\'"]');
+                const teamTabContent = d.getElementById('team-tab');
+                d.querySelectorAll('.main-tab-button.active').forEach(b => b.classList.remove('active'));
+                d.querySelectorAll('.main-tab-content.active').forEach(c => c.classList.remove('active'));
+                if(teamTabButton) teamTabButton.classList.add('active');
+                if(teamTabContent) teamTabContent.classList.add('active');
+
                 console.log("Initial page and tab set successfully.");
             } catch(e) {
                  console.error("Error during window.onload:", e);
