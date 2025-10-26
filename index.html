@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- Version 2.6 - Final Combined Fixes -->
+<!-- Version 2.7 - Firestore Loading Debug -->
 <html lang="ml">
 <head>
     <meta charset="UTF-8">
@@ -350,13 +350,14 @@
         // --- Firebase Imports & Init ---
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js";
         import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-auth.js";
-        import { getFirestore, doc, onSnapshot, collection, query, enableNetwork } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-firestore.js"; // Added enableNetwork
+        import { getFirestore, doc, onSnapshot, collection, query, enableNetwork, setLogLevel } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-firestore.js"; // Added enableNetwork, setLogLevel
         let app, auth, db;
         try {
             app = initializeApp(finalFirebaseConfig);
             auth = getAuth(app);
             db = getFirestore(app);
-            // Explicitly enable network - might help if it was accidentally disabled
+            setLogLevel('debug'); // Enable debug logging for Firestore
+            console.log("Firestore db object:", db); // Log db object
             // enableNetwork(db).then(() => console.log("Firestore network enabled.")).catch(err => console.error("Error enabling network:", err));
             console.log("Firebase Initialized.");
             signInAnonymously(auth).then(() => console.log("Signed in anonymously."))
@@ -461,7 +462,9 @@
         function getTeamFromChest(chestNo) {
             try {
                 if (!chestNo || typeof chestNo !== 'string') return null;
+                // Ensure TEAM_NAMES is an array before using .length or .includes
                 if (!dbTeams || !dbParticipants || !Array.isArray(TEAM_NAMES) || TEAM_NAMES.length === 0) {
+                     console.warn("getTeamFromChest returning null due to uninitialized data (dbTeams, dbParticipants, or TEAM_NAMES)");
                      return null;
                 }
                 const upperChestNo = chestNo.toUpperCase();
@@ -473,11 +476,13 @@
                      if (isNaN(chestNumber)) return null;
                     for (const teamName of TEAM_NAMES) {
                          const team = dbTeams[teamName];
-                         if (!team || !team.id_from || !team.id_to) continue;
+                         // Add checks for team and its properties
+                         if (!team || typeof team.id_from === 'undefined' || typeof team.id_to === 'undefined') continue;
                         const idFrom = parseInt(team.id_from, 10);
                         const idTo = parseInt(team.id_to, 10);
                         if (!isNaN(idFrom) && !isNaN(idTo) && chestNumber >= idFrom && chestNumber <= idTo) {
-                            return team.name;
+                            // Ensure team.name exists, fallback to teamName (key)
+                            return team.name || teamName;
                         }
                     }
                 }
@@ -491,32 +496,43 @@
 
         function initializeTeamData() {
             const data = {};
+            // Ensure dbTeams and dbCategories are valid and have data
             if (!dbTeams || typeof dbTeams !== 'object' || Object.keys(dbTeams).length === 0 ||
                 !dbCategories || !Array.isArray(dbCategories) || dbCategories.length === 0) {
-                 console.warn("initializeTeamData: dbTeams or dbCategories null/empty/invalid.");
-                 TEAM_NAMES = [];
-                 return data;
+                 console.error("initializeTeamData FAILED: dbTeams or dbCategories null/empty/invalid.", {dbTeams, dbCategories});
+                 TEAM_NAMES = []; // Ensure reset
+                 return data; // Return empty data
             }
-            TEAM_NAMES = Object.keys(dbTeams).sort();
+
+            TEAM_NAMES = Object.keys(dbTeams).sort(); // Get keys from the loaded dbTeams object
             console.log("Initialized TEAM_NAMES:", TEAM_NAMES);
 
+            if (TEAM_NAMES.length === 0) {
+                 console.error("initializeTeamData FAILED: No team names found in dbTeams keys.");
+                 return data; // Return empty if no keys
+            }
+
             TEAM_NAMES.forEach(teamName => {
-                const teamData = dbTeams[teamName];
+                const teamData = dbTeams[teamName]; // teamData should exist if teamName is a key
                 if (teamData) {
                     data[teamName] = { name: teamName, total: 0 }; // Use key as canonical name
                     dbCategories.forEach(cat => {
                          if (cat && cat.name) {
                             data[teamName][cat.name] = 0;
-                         } else { console.warn("Invalid category object:", cat); }
+                         } else { console.warn("Invalid category object during team init:", cat); }
                     });
                     data[teamName]['group'] = 0;
-                } else { console.warn(`Team data missing for key: ${teamName}`); }
+                } else {
+                    // This case should ideally not happen if TEAM_NAMES comes from Object.keys(dbTeams)
+                    console.warn(`Team data missing for key: ${teamName} during init, even though it was a key.`);
+                }
             });
 
+             // Final check for consistency
              if (Object.keys(data).length !== TEAM_NAMES.length) {
-                 console.warn("Mismatch between TEAM_NAMES length and initialized data keys count.");
+                 console.warn(`Mismatch after init: TEAM_NAMES length (${TEAM_NAMES.length}) vs initialized data keys (${Object.keys(data).length}).`);
              }
-             console.log("Initialized processedTeamData structure:", JSON.stringify(data)); // Log structure
+             console.log("Successfully Initialized processedTeamData structure:", JSON.stringify(data));
             return data;
         }
 
@@ -525,40 +541,40 @@
             if (isProcessing) { console.log("Skip processAllData: Already processing."); return; }
             isProcessing = true;
             console.log("Starting processAllData...");
-            // Log current state of db variables
-            console.log("Data state before processing:", {
-                dbCategories: !!dbCategories, catLength: dbCategories?.length,
-                dbTeams: !!dbTeams, teamKeys: dbTeams ? Object.keys(dbTeams).length : 0,
-                dbHomepage: !!dbHomepage, dbParticipants: !!dbParticipants,
-                dbPrograms: !!dbPrograms, dbResults: !!dbResults
+            console.log("Data state AT START of processing:", {
+                categories: dbCategories ? `Array(${dbCategories.length})` : null,
+                teams: dbTeams ? `Object(${Object.keys(dbTeams).length} keys)` : null,
+                homepage: !!dbHomepage, participants: !!dbParticipants, programs: !!dbPrograms, results: !!dbResults
             });
 
            try {
-                // Stricter check again
-                if (!dbCategories || dbCategories.length === 0 || !dbTeams || Object.keys(dbTeams).length === 0 || !dbHomepage || !dbParticipants || !dbPrograms || !dbResults) {
+                // Stricter check again with detailed logging
+                if (!dbCategories || !Array.isArray(dbCategories) || dbCategories.length === 0 ||
+                    !dbTeams || typeof dbTeams !== 'object' || Object.keys(dbTeams).length === 0 ||
+                    !dbHomepage || !dbParticipants || !dbPrograms || !dbResults)
+                {
                      const missing = [
-                         (!dbCategories || dbCategories.length === 0) && 'Categories',
-                         (!dbTeams || Object.keys(dbTeams).length === 0) && 'Teams',
+                         (!dbCategories || !Array.isArray(dbCategories) || dbCategories.length === 0) && 'Categories',
+                         (!dbTeams || typeof dbTeams !== 'object' || Object.keys(dbTeams).length === 0) && 'Teams',
                          !dbHomepage && 'Homepage', !dbParticipants && 'Participants',
                          !dbPrograms && 'Programs', !dbResults && 'Results'
                      ].filter(Boolean).join(', ');
-                     console.error(`processAllData HALTED: Essential data missing - ${missing}. Check Firestore paths, data, and security rules.`);
-                     // Display a more persistent error if critical data is missing
+                     console.error(`processAllData HALTED: Essential data missing or invalid - ${missing}.`, {
+                        dbCategories, dbTeams, dbHomepage, dbParticipants, dbPrograms, dbResults
+                     });
                      if ((!dbCategories || dbCategories.length === 0) || (!dbTeams || Object.keys(dbTeams).length === 0)) {
-                        displayGlobalError(`Configuration Error: ${missing} missing.`, `Please ensure ${missing.toLowerCase()} exist in Firestore and security rules allow access.`);
-                     } else {
-                        updateLoadingMessage(`Waiting for ${missing.split(',')[0]}...`); // Less critical data
-                     }
-                     isProcessing = false;
-                     return;
+                        displayGlobalError(`Configuration Error: ${missing} missing.`, `Please add ${missing.toLowerCase()} in Admin Panel & check Firestore Rules.`);
+                     } else { updateLoadingMessage(`Waiting for ${missing.split(',')[0]}...`); }
+                     isProcessing = false; return;
                 }
 
+                // --- Initialization ---
                 processedTeamData = initializeTeamData();
+                 // If initialization failed (e.g., dbTeams was present but processing failed), stop.
                 if (TEAM_NAMES.length === 0 || Object.keys(processedTeamData).length === 0) {
-                     console.error("processAllData Error: Failed to initialize team data correctly AFTER checks passed. THIS IS UNEXPECTED.");
-                     displayGlobalError("Internal Error", "Could not process Team data. Please contact support.");
-                     isProcessing = false;
-                     return;
+                     console.error("processAllData Error: Team data initialization failed critically.");
+                     displayGlobalError("Initialization Error", "Could not process Team/Category data. Check Admin config.");
+                     isProcessing = false; return;
                 }
 
                 processedProgramData = [];
@@ -575,6 +591,8 @@
                     TEAM_NAMES.forEach(team => { processedScoreboardData.categoryTotals[catName][team] = 0; });
                     processedScoreboardData.categoryCounts[catName] = 0;
                 });
+                // --- End Initialization ---
+
 
                 // --- Main Processing Loop ---
                 console.log(`Processing ${Object.keys(dbResults).length} results...`);
@@ -603,17 +621,18 @@
                                 winners[position].forEach(winner => {
                                     if (!winner || !winner.chest || !winner.name) { console.warn(`Invalid winner data in ${eventName}, pos ${position}:`, winner); return; }
                                     const team = getTeamFromChest(winner.chest);
-                                    if (team && processedTeamData[team]) {
+                                    if (team && processedTeamData[team]) { // Check team exists in our initialized structure
                                         const pointValue = currentPoints[position];
-                                        processedTeamData[team].total += pointValue;
+                                        processedTeamData[team].total = (processedTeamData[team].total || 0) + pointValue; // Safely add
                                         const pointCategoryKey = isGroupEvent ? 'group' : categoryName;
                                         if (processedTeamData[team].hasOwnProperty(pointCategoryKey)) {
-                                            processedTeamData[team][pointCategoryKey] += pointValue;
-                                        } else { console.warn(`Cat key '${pointCategoryKey}' missing for team '${team}' in ${eventName}. Initializing to ${pointValue}.`); processedTeamData[team][pointCategoryKey] = pointValue; } // Initialize if missing
-                                        if (!isGroupEvent) { const winnerId = `${winner.chest} ${winner.name}`; if (!talentPoints[winnerId]) talentPoints[winnerId] = { points: 0, category: categoryName }; talentPoints[winnerId].points += pointValue; }
-                                        if (eventScore[team]) { eventScore[team].points += pointValue; eventScore[team].positions.push(position === 'first' ? 1 : (position === 'second' ? 2 : 3)); }
-                                    } else if (team) { console.warn(`Team '${team}' (chest '${winner.chest}') !in processedTeamData for ${eventName}.`); }
-                                      else { /* console.warn(`No team for chest '${winner.chest}' in ${eventName}.`); */ } // Reduce noise
+                                            processedTeamData[team][pointCategoryKey] = (processedTeamData[team][pointCategoryKey] || 0) + pointValue; // Safely add
+                                        } else { console.warn(`Cat key '${pointCategoryKey}' missing for team '${team}' in ${eventName}. Initializing to ${pointValue}.`); processedTeamData[team][pointCategoryKey] = pointValue; }
+                                        if (!isGroupEvent) { const winnerId = `${winner.chest} ${winner.name}`; if (!talentPoints[winnerId]) talentPoints[winnerId] = { points: 0, category: categoryName }; talentPoints[winnerId].points = (talentPoints[winnerId].points || 0) + pointValue; } // Safely add
+                                        if (eventScore[team]) { eventScore[team].points = (eventScore[team].points || 0) + pointValue; eventScore[team].positions.push(position === 'first' ? 1 : (position === 'second' ? 2 : 3)); }
+                                    } else {
+                                         // Reduce noise: console.warn(`Could not map chest '${winner.chest}' to a valid team in ${eventName}.`);
+                                    }
                                 });
                             }
                         }
@@ -641,7 +660,7 @@
 
                 publishedResultsCount = currentResultsCount;
                 console.log("processAllData finished successfully. Published Results:", publishedResultsCount);
-                console.log("Final processedTeamData:", JSON.stringify(processedTeamData)); // Log final team data
+                // console.log("Final processedTeamData:", JSON.stringify(processedTeamData)); // Log final team data - potentially large
 
                 renderAllComponents(); // Trigger rendering
 
@@ -650,7 +669,7 @@
                  displayGlobalError("Error processing event data.", error.message);
             }
             finally {
-                setTimeout(() => { isProcessing = false; }, 100);
+                setTimeout(() => { isProcessing = false; console.log("isProcessing set to false."); }, 100);
             }
         }
 
@@ -662,20 +681,18 @@
                  !dbTeams || typeof dbTeams !== 'object' || Object.keys(dbTeams).length === 0) {
                 const missing = (!dbTeams || Object.keys(dbTeams).length === 0) ? 'Teams' : 'Categories';
                 console.error(`Render ABORTED: Essential config missing - ${missing}.`);
-                 // Don't just update message, show persistent error if config missing after load attempts
                  displayGlobalError(`Configuration Error: ${missing} missing.`, `Please add ${missing.toLowerCase()} in the Admin Panel and ensure Firestore rules allow access.`);
                 return; // Stop rendering
             }
-             // Ensure TEAM_NAMES is populated (might run before processAllData finishes initialization if there's a race condition)
+             // Ensure TEAM_NAMES is populated
             if (!Array.isArray(TEAM_NAMES) || TEAM_NAMES.length === 0) {
                  initializeTeamData(); // Attempt to initialize again
                  if (TEAM_NAMES.length === 0) {
                     console.error("Render ABORTED: TEAM_NAMES could not be initialized from dbTeams.");
                     displayGlobalError("Initialization Error", "Could not process Team names. Check Teams configuration.");
-                    return; // Stop if teams are loaded but names array isn't populated
+                    return;
                  }
             }
-
 
             console.log("Rendering all components...");
 
@@ -692,9 +709,8 @@
             // --- Hide Loading Overlay ---
             const loadingOverlay = d.getElementById('loading-overlay');
             const mainContent = d.getElementById('main-content');
-            // Check if overlay is still displayed AND no error is shown
-            if (loadingOverlay && loadingOverlay.style.display !== 'none' && !loadingOverlay.querySelector('p.error-message')) {
-                clearTimeout(loadingTimeout); // Clear timeout only on successful render start
+            if (loadingOverlay && loadingOverlay.style.display !== 'none' && !loadingOverlay.querySelector('.error-message')) { // Check specifically for error class
+                clearTimeout(loadingTimeout);
                 loadingOverlay.style.opacity = '0';
                 setTimeout(() => {
                     if (loadingOverlay) loadingOverlay.style.display = 'none';
@@ -702,8 +718,7 @@
                     console.log("UI is now visible.");
                     hasRenderedOnce = true;
                 }, 500);
-            } else if (mainContent && mainContent.style.visibility !== 'visible' && loadingOverlay && !loadingOverlay.querySelector('p.error-message')) {
-                // If overlay somehow got hidden but content is still hidden, show content (unless error is displayed)
+            } else if (mainContent && mainContent.style.visibility !== 'visible' && loadingOverlay && !loadingOverlay.querySelector('.error-message')) {
                 clearTimeout(loadingTimeout);
                 mainContent.style.visibility = 'visible';
                 console.log("Loading overlay was hidden/in error state (but no error msg shown), making content visible.");
@@ -711,19 +726,19 @@
             } else if (hasRenderedOnce) {
                  console.log("RenderAllComponents called again, UI likely already visible.");
             } else if (!loadingOverlay) {
-                 // Fallback if loading overlay element doesn't exist
                  if (mainContent) mainContent.style.visibility = 'visible';
                  console.warn("Loading overlay element not found.");
                  hasRenderedOnce = true;
-                 clearTimeout(loadingTimeout); // Clear timeout anyway if overlay missing
-            } else if (loadingOverlay && loadingOverlay.querySelector('p.error-message')) {
+                 clearTimeout(loadingTimeout);
+            } else if (loadingOverlay && loadingOverlay.querySelector('.error-message')) {
                  console.log("RenderAllComponents called, but an error is displayed. Keeping overlay.");
                  // Do not hide overlay if an error is being shown
             }
         }
 
+
         // Add try-catch wrappers to other rendering functions for safety
-        function generateFilterButtons() { try { /* Original code */
+        function generateFilterButtons() { try {
             const programFiltersEl = d.getElementById('program-filter-buttons');
             const scoreboardFiltersEl = d.getElementById('scoreboard-filter-buttons');
             if (!programFiltersEl || !scoreboardFiltersEl) {
@@ -758,7 +773,7 @@
             }
          } catch(e) { console.error("Error generating filter buttons:", e); }}
 
-        function generateTeamCards() { try { /* Original code */
+        function generateTeamCards() { try {
             const container = d.getElementById('team-cards-container');
             if (!container) { console.error("Team card container not found"); return; }
             container.innerHTML = '';
@@ -788,7 +803,7 @@
             });
          } catch(e) { console.error("Error generating team cards:", e); }}
 
-        function generateDetailedRankings() { try { /* Original code */
+        function generateDetailedRankings() { try {
             const container = d.getElementById('detailed-rankings');
             if (!container) return;
 
@@ -822,7 +837,7 @@
             gridTemplateStyle += ' 1fr 1fr';
             colCount += 2;
 
-            const minTableWidth = 40 + 150 + (colCount - 4) * 80 + 100 + 100;
+            const minTableWidth = 40 + 150 + (colCount - 4) * 80 + 100 + 100; // Recalculate based on actual cols
 
             let tableRowsHTML = '';
             rankedTeams.forEach((team, index) => {
@@ -860,12 +875,12 @@
                 </div>`;
          } catch(e) { console.error("Error generating detailed rankings:", e); }}
 
-        function renderProgramResults() { try { /* Original code */
+        function renderProgramResults() { try {
              const grid = d.getElementById('program-results-grid');
             if (!grid) { console.error("program-results-grid not found"); return; }
             if (!processedProgramData || processedProgramData.length === 0) { grid.innerHTML = '<p class="text-gray-500 p-4 text-center">No results have been published yet.</p>'; return; }
             grid.innerHTML = '';
-            const sortedPrograms = processedProgramData.sort((a, b) => a.eventName.localeCompare(b.eventName));
+            const sortedPrograms = processedProgramData.sort((a, b) => (a.eventName||'').localeCompare(b.eventName||''));
             sortedPrograms.forEach(program => {
                 let winnersHtml = '';
                 let searchText = `${program.eventName} ${program.categoryName} `.toLowerCase();
@@ -909,7 +924,7 @@
             filterResults(activeFilterButton ? activeFilterButton.dataset.filter : 'all');
          } catch(e) { console.error("Error rendering program results:", e); }}
 
-        function generateTalentList() { try { /* Original code */
+        function generateTalentList() { try {
             const container = d.getElementById('talent-list-container');
             if (!container) { console.error("talent-list-container not found"); return; }
             const categories = Object.keys(processedTalentData || {}).sort();
@@ -959,7 +974,7 @@
             });
          } catch(e) { console.error("Error generating talent list:", e); }}
 
-        function generateScoreboard() { try { /* Original code with fix */
+        function generateScoreboard() { try {
             const container = d.getElementById('scoreboard-container');
             if (!container) { console.error("Scoreboard container not found"); return; }
             container.innerHTML = ''; // Clear previous content
@@ -973,28 +988,25 @@
             let eventCardsHTML = '';
             const sortedEvents = Object.keys(processedScoreboardData.eventPoints).sort();
 
-            // Generate HTML for individual event cards
             sortedEvents.forEach(eventName => {
                 const eventData = processedScoreboardData.eventPoints[eventName];
                 let eventRows = '';
                 sortedTeams.forEach(team => {
                     const teamData = eventData[team];
                     if (teamData && typeof teamData.points === 'number' && teamData.points > 0) {
-                        // Ensure getTrophyIconsHTML is called correctly (it's globally defined)
                         eventRows += `<div class="scoreboard-team-row"><span>${team}</span><span>${getTrophyIconsHTML(teamData.positions)}${teamData.points}</span></div>`;
                     }
                 });
                 if (eventRows) {
                     const cardCategory = eventData.isGroup ? 'group' : eventData.category;
                     eventCardsHTML += `
-                        <div class="scoreboard-card" data-event-name="${eventName}" data-category="${cardCategory}" style="display: none;"> <!-- Start hidden -->
+                        <div class="scoreboard-card" data-event-name="${eventName}" data-category="${cardCategory}" style="display: none;">
                             <div class="scoreboard-event-header"><span>${eventName}</span></div>
                             ${eventRows}
                         </div>`;
                 }
             });
 
-            // Generate HTML for the total card
             let totalRows = '';
             sortedTeams.forEach(team => {
                 totalRows += `<div class="scoreboard-team-row"><span>${team}</span><span data-team="${team}">0</span></div>`;
@@ -1006,7 +1018,6 @@
                     ${totalRows}
                 </div>`;
 
-            // Generate HTML for the legend
             const legendHTML = `
                 <div class="scoreboard-legend">
                     <span><i class="fas fa-trophy trophy-icon gold"></i> Gold</span>
@@ -1014,22 +1025,18 @@
                     <span><i class="fas fa-trophy trophy-icon bronze"></i> Bronze</span>
                 </div>`;
 
-            // Assemble the scoreboard container: Event Cards -> Total Card -> Legend
+            // Assemble: Event Cards -> Total Card -> Legend
             container.innerHTML = eventCardsHTML + totalCardHTML + legendHTML;
 
-             // Apply the default 'All' filter immediately after rendering all elements
-            if (typeof filterScoreboard === 'function') {
-                filterScoreboard('All'); // Apply filter to set initial visibility and totals
-            } else {
-                 console.error("filterScoreboard function not defined when applying default in generateScoreboard.");
-            }
+             if (typeof filterScoreboard === 'function') { filterScoreboard('All'); }
+             else { console.error("filterScoreboard func undefined in generateScoreboard."); }
          } catch(e) { console.error("Error generating scoreboard:", e); }}
 
 
-        function generateStaticContent() { try { /* Original code */
+        function generateStaticContent() { try {
              const setText = (id, value, fallback = '') => { const el = d.getElementById(id); if (el) el.textContent = value || fallback; else console.warn(`Element not found: ${id}`); };
             const setSrc = (id, value, fallback) => { const el = d.getElementById(id); if (el) el.src = value || fallback; else console.warn(`Element not found: ${id}`); };
-            const setHref = (selector, value) => { const el = d.querySelector(selector); if(el && value) { el.href = value; el.style.display='';} else if(el) el.style.display='none'; /* else console.warn(`Selector not found: ${selector}`); */ } // Reduced console noise
+            const setHref = (selector, value) => { const el = d.querySelector(selector); if(el && value) { el.href = value; el.style.display='';} else if(el) el.style.display='none'; /* else console.warn(`Selector not found: ${selector}`); */ }
 
 
             const leadersSection = d.getElementById('leaders');
@@ -1039,9 +1046,9 @@
 
             if (!dbHomepage || Object.keys(dbHomepage).length === 0 ) {
                 console.warn("Static content render skipped: dbHomepage is null/empty.");
-                setText('dynamic-header-title', 'Results 2025'); setText('hero-main-title', 'Event Results'); setText('hero-subtitle', 'Live Updates'); setText('about-text', 'Details about the event will be updated soon.');
+                setText('dynamic-header-title', 'Results 2025'); setText('hero-main-title', 'Event Results'); setText('hero-subtitle', 'Live Updates'); setText('about-text', 'Details will be updated soon.');
                 if(leadersSection) leadersSection.style.display = 'none'; if(gallerySection) gallerySection.style.display = 'none';
-                setText('footer-institution-name', 'Institution Name'); setText('footer-copyright', `© ${new Date().getFullYear()} Event Organizers`); if(socialIconsContainer) socialIconsContainer.style.display = 'none';
+                setText('footer-institution-name', 'Institution Name'); setText('footer-copyright', `© ${new Date().getFullYear()} Org`); if(socialIconsContainer) socialIconsContainer.style.display = 'none';
                 setText('stats-programs-public', '-'); setText('stats-participants-public', '-'); setText('stats-categories-public', '-'); setText('stats-teams-public', '-');
                 const leaderPlaceholder = d.getElementById('leader-placeholder'); if(leaderPlaceholder) leaderPlaceholder.textContent = "Leader info unavailable.";
                 const galleryPlaceholder = d.getElementById('gallery-placeholder'); if(galleryPlaceholder) galleryPlaceholder.textContent = "Gallery unavailable.";
@@ -1055,26 +1062,16 @@
              if(leadersSection) leadersSection.style.display = hasLeaders ? 'block' : 'none';
              if(gallerySection) gallerySection.style.display = hasGallery ? 'block' : 'none';
 
-
-            // Header & Hero
             setText('dynamic-header-title', data.header_title, 'Sadaye Madeena 2k25');
             setSrc('hero-logo', data.logo_url, 'https://placehold.co/150x150/FFFFFF/EFEFEF?text=Logo');
             setText('hero-main-title', data.main_title, 'Sadaye Madeena 2k25');
             setText('hero-subtitle', data.subtitle, 'Inter-Madrasa Art Fest');
-
-            // About Section
             setText('about-section-title', data.about_title, 'About The Fest');
             setText('about-section-subtitle', data.about_subtitle, 'Thirunoor\'25');
             setText('about-text', data.about, 'Welcome...');
             setSrc('about-image', data.about_image_url, 'https://placehold.co/800x400/EFEFEF/CCCCCC?text=Event+Image');
+            setText('stats-programs-public', data.total_programs, '-'); setText('stats-participants-public', data.total_participants, '-'); setText('stats-categories-public', data.total_categories, '-'); setText('stats-teams-public', data.total_teams, '-');
 
-            // Stats
-            setText('stats-programs-public', data.total_programs, '-');
-            setText('stats-participants-public', data.total_participants, '-');
-            setText('stats-categories-public', data.total_categories, '-');
-            setText('stats-teams-public', data.total_teams, '-');
-
-           // Leaders Section
            const leaderContainer = d.getElementById('leader-cards-container');
            const leaderPlaceholder = d.getElementById('leader-placeholder');
            if (leaderContainer) {
@@ -1099,14 +1096,11 @@
                }
            }
 
-            // Gallery Section
             const galleryContainer = d.getElementById('gallery-rows-container');
             const galleryPlaceholder = d.getElementById('gallery-placeholder');
             const galleryUrls = data.gallery || [];
             const rowElements = [d.getElementById('gallery-row-0'), d.getElementById('gallery-row-1'), d.getElementById('gallery-row-2')];
-
             rowElements.forEach(row => { if(row) row.innerHTML = ''; });
-
             if (galleryUrls.length > 0) {
                 if(galleryPlaceholder) galleryPlaceholder.style.display = 'none';
                 galleryUrls.forEach((url, index) => {
@@ -1121,91 +1115,34 @@
                         }
                      } else { console.warn(`Invalid URL in gallery at index ${index}:`, url); }
                 });
-            } else if (galleryPlaceholder) {
-                galleryPlaceholder.textContent = 'No gallery images added yet.';
-                galleryPlaceholder.style.display = 'block';
-            }
+            } else if (galleryPlaceholder) { galleryPlaceholder.textContent = 'No gallery images yet.'; galleryPlaceholder.style.display = 'block'; }
 
-            // Footer
             setText('footer-institution-name', data.institution_name, 'Institution Name');
-            setText('footer-copyright', data.copyright_text, `© ${new Date().getFullYear()} Org Name. All rights reserved.`);
+            setText('footer-copyright', data.copyright_text, `© ${new Date().getFullYear()} Org`);
             if(socialIconsContainer){
-                 // Use more specific selectors for footer links
                  const igLink = socialIconsContainer.querySelector('a[aria-label="Instagram"]');
                  const ytLink = socialIconsContainer.querySelector('a[aria-label="YouTube"]');
                  const fbLink = socialIconsContainer.querySelector('a[aria-label="Facebook"]');
-                 setHref(igLink, data.social_instagram);
-                 setHref(ytLink, data.social_youtube);
-                 setHref(fbLink, data.social_facebook);
+                 setHref(igLink, data.social_instagram); setHref(ytLink, data.social_youtube); setHref(fbLink, data.social_facebook);
                  const hasSocials = !!(data.social_instagram || data.social_youtube || data.social_facebook);
                  socialIconsContainer.style.display = hasSocials ? 'flex' : 'none';
             }
          } catch(e) { console.error("Error generating static content:", e); }}
 
         // --- UI Interaction Functions ---
-        // Add try-catch wrappers here for safety
-        window.openNav = function() { try {
-             const menuOverlay = d.getElementById("menu-overlay"); const mainContent = d.getElementById("main-content");
-             if (menuOverlay) menuOverlay.style.display = "flex"; if(mainContent) mainContent.style.filter = 'blur(4px)';
-             setTimeout(() => { if(menuOverlay) menuOverlay.style.opacity = '1'; }, 10);
-         } catch(e) { console.error("Error openNav:", e); }}
-        window.closeNav = function() { try {
-             const menuOverlay = d.getElementById("menu-overlay"); const mainContent = d.getElementById("main-content");
-             if(menuOverlay) menuOverlay.style.opacity = '0'; setTimeout(() => { if(menuOverlay) menuOverlay.style.display = "none"; }, 300);
-             if(mainContent) mainContent.style.filter = 'none';
-         } catch(e) { console.error("Error closeNav:", e); }}
-        window.showPage = function(pageId) { try {
-             const homePage = d.getElementById('home-page'); const scoreboardPage = d.getElementById('scoreboard-page');
-             if(homePage) homePage.style.display = pageId === 'home-page' ? 'block' : 'none';
-             if(scoreboardPage) scoreboardPage.style.display = pageId === 'scoreboard-page' ? 'block' : 'none';
-             const scrollTopBtn = d.getElementById('scrollTopBtn');
-             if (scrollTopBtn) { if (pageId === 'home-page') { handleScroll(); } else { scrollTopBtn.classList.remove('show'); } }
-             updateMenuActiveState();
-         } catch(e) { console.error("Error showPage:", e); }}
-        window.showMainTab = function(tabId) { try {
-             const currentActiveButton = d.querySelector('#scoreboard-page .main-tab-button.active');
-             const clickedButton = d.querySelector(`.main-tab-button[onclick*="'${tabId}'"]`);
-             if (clickedButton && currentActiveButton && clickedButton.isSameNode(currentActiveButton)) return;
-             if (currentActiveButton) currentActiveButton.classList.remove('active');
-             d.querySelectorAll('.main-tab-content').forEach(tab => tab.classList.remove('active'));
-             const targetTab = d.getElementById(tabId);
-             if(targetTab) targetTab.classList.add('active'); else console.warn(`Target tab content not found: ${tabId}`);
-             if (clickedButton) clickedButton.classList.add('active'); else console.warn(`Clicked button not found for tab: ${tabId}`);
-             updateMenuActiveState();
-         } catch(e) { console.error("Error showMainTab:", e); }}
-        window.filterResults = function(category = 'all') { try {
-             d.querySelectorAll('#program-tab .filter-btn').forEach(btn => btn.classList.remove('active'));
-             const activeBtn = d.querySelector(`#program-tab .filter-btn[data-filter="${category}"]`);
-             if(activeBtn) activeBtn.classList.add('active');
-             const searchInput = d.getElementById('search-input'); const searchTerm = searchInput ? searchInput.value.toLowerCase() : '';
-             d.querySelectorAll('#program-results-grid .event-result-card').forEach(card => {
-                 const categoryMatch = (category === 'all' || card.dataset.category === category);
-                 const searchMatch = card.dataset.searchText ? card.dataset.searchText.includes(searchTerm) : true;
-                 card.style.display = (categoryMatch && searchMatch) ? 'block' : 'none';
-             });
-         } catch(e) { console.error("Error filterResults:", e); }}
-        window.filterScoreboard = function(category) { try {
-             if (!category) { console.warn("filterScoreboard called with no category"); return; }
-             console.log("Filtering scoreboard by:", category);
-             d.querySelectorAll('#scoreboard-filter-buttons .filter-btn').forEach(btn => btn.classList.remove('active'));
-             const activeButton = d.querySelector(`#scoreboard-filter-buttons .filter-btn[data-filter="${category}"]`);
-             if (activeButton) { activeButton.classList.add('active'); }
-             else { console.warn(`Scoreboard filter btn not found for '${category}', defaulting to 'All'.`); const allBtn = d.querySelector('#scoreboard-filter-buttons .filter-btn[data-filter="All"]'); if (allBtn) allBtn.classList.add('active'); category = 'All'; }
-             const totalCard = d.getElementById('scoreboard-total-card'); const countElement = d.getElementById('scoreboard-category-count');
-             if (totalCard && TEAM_NAMES && TEAM_NAMES.length > 0) {
-                  const totalsToShow = category === 'All' ? processedTeamData : (processedScoreboardData.categoryTotals[category] || {});
-                  TEAM_NAMES.forEach(team => { const teamSpan = totalCard.querySelector(`span[data-team="${team}"]`); if (teamSpan) { const points = category === 'All' ? (processedTeamData[team]?.total || 0) : (totalsToShow[team] || 0); teamSpan.textContent = points; } else { /* console.warn(`Team span !found for ${team} in total card.`); */ } }); // Reduce noise
-              } else if (totalCard) { console.warn("TEAM_NAMES !ready for scoreboard filter."); }
-             if (countElement) { const count = category === 'All' ? publishedResultsCount : (processedScoreboardData.categoryCounts && processedScoreboardData.categoryCounts[category] || 0); countElement.textContent = `Results: ${count}`; }
-             d.querySelectorAll('#scoreboard-container .scoreboard-card:not(.total-card)').forEach(card => { const cardCat = card.dataset.category; card.style.display = (category === 'All' || category === cardCat) ? 'block' : 'none'; });
-         } catch (e) { console.error("Error in filterScoreboard:", e); }}
-        window.updateResultCounts = function() { try { const el = d.getElementById('team-results-count'); if (el) el.innerText = `Team point status after ${publishedResultsCount} results`; } catch(e) { console.error("Error updateResultCounts:", e); }}
-        window.getTrophyIconsHTML = function(positions) { try { if (!positions || !Array.isArray(positions) || positions.length === 0) return ''; const uP = [...new Set(positions)].sort((a,b)=>a-b); return uP.map(p=>{ if(p===1)return'<i class="fas fa-trophy trophy-icon gold"></i>'; if(p===2)return'<i class="fas fa-trophy trophy-icon silver"></i>'; if(p===3)return'<i class="fas fa-trophy trophy-icon bronze"></i>'; return'';}).join(''); } catch(e) { console.error("Error getTrophyIconsHTML:", e); return ''; }}
-        window.toggleTalentDropdown = function(listId, button) { try { const list = d.getElementById(listId); if(list) list.classList.toggle('open'); if(button) button.textContent = list && list.classList.contains('open') ? 'Show Less' : 'Show More'; } catch(e) { console.error("Error toggleTalentDropdown:", e); }}
-        window.updateMenuActiveState = function() { try { const homePage = d.getElementById('home-page'), hPV = homePage ? homePage.style.display !== 'none' : false; d.querySelectorAll('.menu-link').forEach(l=>l.classList.remove('active')); if(hPV){ const hL=d.querySelector('.menu-link[data-target="home-page"]'); if(hL)hL.classList.add('active'); } else { const aTB=d.querySelector('#scoreboard-page .main-tab-button.active'); if(aTB){ const oA=aTB.getAttribute('onclick'), tIM=oA?oA.match(/'([^']+)'/):null; if(tIM&&tIM[1]){ const tId=tIM[1], aML=d.querySelector(`.menu-link[data-target="${tId}"]`); if(aML)aML.classList.add('active'); } } else { const pL=d.querySelector('.menu-link[data-target="program-tab"]'); if(pL)pL.classList.add('active'); } } } catch(e) { console.error("Error updateMenuActiveState:", e); }}
-        async function shareImage(imageUrl) { try { if (navigator.share) { await navigator.share({ title: 'Sadaye Madeena 2k25 Gallery Image', text: 'Check out this image!', url: imageUrl }); } else { const ta=d.createElement("textarea"); ta.value=imageUrl; ta.style.position="fixed"; ta.style.left="-9999px"; d.body.appendChild(ta); ta.select(); if (navigator.clipboard&&navigator.clipboard.writeText){await navigator.clipboard.writeText(imageUrl); alert('Link copied!');} else {document.execCommand('copy'); alert('Link copied!');} d.body.removeChild(ta); } } catch(err){ alert('Could not share or copy.'); console.error('Share/Copy fail:',err); } }
+        window.openNav = function() { try { const m=d.getElementById("menu-overlay"),c=d.getElementById("main-content"); if(m)m.style.display="flex"; if(c)c.style.filter='blur(4px)'; setTimeout(()=>{if(m)m.style.opacity='1'},10); } catch(e) { console.error("Error openNav:", e); }}
+        window.closeNav = function() { try { const m=d.getElementById("menu-overlay"),c=d.getElementById("main-content"); if(m)m.style.opacity='0'; setTimeout(()=>{if(m)m.style.display="none"},300); if(c)c.style.filter='none'; } catch(e) { console.error("Error closeNav:", e); }}
+        window.showPage = function(pageId) { try { const h=d.getElementById('home-page'),s=d.getElementById('scoreboard-page'); if(h)h.style.display=pageId==='home-page'?'block':'none'; if(s)s.style.display=pageId==='scoreboard-page'?'block':'none'; const btn=d.getElementById('scrollTopBtn'); if(btn){if(pageId==='home-page'){handleScroll();}else{btn.classList.remove('show');}} updateMenuActiveState(); } catch(e) { console.error("Error showPage:", e); }}
+        window.showMainTab = function(tabId) { try { const cur=d.querySelector('#scoreboard-page .main-tab-button.active'),clk=d.querySelector(`.main-tab-button[onclick*="'${tabId}'"]`); if(clk&&cur&&clk.isSameNode(cur))return; if(cur)cur.classList.remove('active'); d.querySelectorAll('.main-tab-content').forEach(t=>t.classList.remove('active')); const tgt=d.getElementById(tabId); if(tgt)tgt.classList.add('active'); else console.warn(`Target tab content !found: ${tabId}`); if(clk)clk.classList.add('active'); else console.warn(`Clicked btn !found for tab: ${tabId}`); updateMenuActiveState(); } catch(e) { console.error("Error showMainTab:", e); }}
+        window.filterResults = function(category = 'all') { try { d.querySelectorAll('#program-tab .filter-btn').forEach(b=>b.classList.remove('active')); const aB=d.querySelector(`#program-tab .filter-btn[data-filter="${category}"]`); if(aB)aB.classList.add('active'); const sI=d.getElementById('search-input'),sT=sI?sI.value.toLowerCase():''; d.querySelectorAll('#program-results-grid .event-result-card').forEach(c=>{const cM=(category==='all'||c.dataset.category===category),sM=c.dataset.searchText?c.dataset.searchText.includes(sT):true; c.style.display=(cM&&sM)?'block':'none';}); } catch(e) { console.error("Error filterResults:", e); }}
+        window.filterScoreboard = function(category) { try { if(!category){console.warn("filterScoreboard no category"); return;} console.log("Filtering scoreboard by:", category); d.querySelectorAll('#scoreboard-filter-buttons .filter-btn').forEach(b=>b.classList.remove('active')); const aB=d.querySelector(`#scoreboard-filter-buttons .filter-btn[data-filter="${category}"]`); if(aB){aB.classList.add('active');} else { console.warn(`Scoreboard filter btn !found for '${category}', default 'All'.`); const allB=d.querySelector('#scoreboard-filter-buttons .filter-btn[data-filter="All"]'); if(allB)allB.classList.add('active'); category='All';} const tCard=d.getElementById('scoreboard-total-card'), cEl=d.getElementById('scoreboard-category-count'); if(tCard&&Array.isArray(TEAM_NAMES)&&TEAM_NAMES.length>0){ const totals=category==='All'?processedTeamData:(processedScoreboardData.categoryTotals?processedScoreboardData.categoryTotals[category]:{}); TEAM_NAMES.forEach(t=>{const tS=tCard.querySelector(`span[data-team="${t}"]`); if(tS){const pts=category==='All'?(processedTeamData[t]?.total||0):(totals?totals[t]:0)||0; tS.textContent=pts;} }); } else if(tCard) console.warn("TEAM_NAMES !ready for scoreboard filter."); if(cEl){ const count=category==='All'?publishedResultsCount:(processedScoreboardData.categoryCounts&&processedScoreboardData.categoryCounts[category]||0); cEl.textContent=`Results: ${count}`; } d.querySelectorAll('#scoreboard-container .scoreboard-card:not(.total-card)').forEach(c=>{const cCat=c.dataset.category; c.style.display=(category==='All'||category===cCat)?'block':'none';}); } catch (e) { console.error("Error in filterScoreboard:", e); }}
+        window.updateResultCounts = function() { try { const el=d.getElementById('team-results-count'); if(el)el.innerText=`Team status after ${publishedResultsCount} results`; } catch(e) { console.error("Error updateResultCounts:", e); }}
+        window.getTrophyIconsHTML = function(positions) { try { if(!positions||!Array.isArray(positions)||positions.length===0)return''; const uP=[...new Set(positions)].sort((a,b)=>a-b); return uP.map(p=>{if(p===1)return'<i class="fas fa-trophy trophy-icon gold"></i>'; if(p===2)return'<i class="fas fa-trophy trophy-icon silver"></i>'; if(p===3)return'<i class="fas fa-trophy trophy-icon bronze"></i>'; return'';}).join(''); } catch(e) { console.error("Error getTrophyIconsHTML:", e); return ''; }}
+        window.toggleTalentDropdown = function(listId, button) { try { const list=d.getElementById(listId); if(list)list.classList.toggle('open'); if(button)button.textContent=list&&list.classList.contains('open')?'Show Less':'Show More'; } catch(e) { console.error("Error toggleTalentDropdown:", e); }}
+        window.updateMenuActiveState = function() { try { const hP=d.getElementById('home-page'),hPV=hP?hP.style.display!=='none':false; d.querySelectorAll('.menu-link').forEach(l=>l.classList.remove('active')); if(hPV){ const hL=d.querySelector('.menu-link[data-target="home-page"]'); if(hL)hL.classList.add('active'); } else { const aTB=d.querySelector('#scoreboard-page .main-tab-button.active'); if(aTB){ const oA=aTB.getAttribute('onclick'),tIM=oA?oA.match(/'([^']+)'/):null; if(tIM&&tIM[1]){ const tId=tIM[1],aML=d.querySelector(`.menu-link[data-target="${tId}"]`); if(aML)aML.classList.add('active'); } } else { const pL=d.querySelector('.menu-link[data-target="program-tab"]'); if(pL)pL.classList.add('active'); } } } catch(e) { console.error("Error updateMenuActiveState:", e); }}
+        async function shareImage(imageUrl) { try { if (navigator.share) { await navigator.share({ title: 'Sadaye Madeena 2k25 Image', text: 'Check out this image!', url: imageUrl }); } else { const ta=d.createElement("textarea"); ta.value=imageUrl; ta.style.position="fixed"; ta.style.left="-9999px"; d.body.appendChild(ta); ta.select(); if(navigator.clipboard&&navigator.clipboard.writeText){await navigator.clipboard.writeText(imageUrl); alert('Link copied!');} else {document.execCommand('copy'); alert('Link copied!');} d.body.removeChild(ta); } } catch(err){ alert('Could not share or copy.'); console.error('Share/Copy fail:',err); } }
         const gallerySection = d.getElementById('gallery'); if (gallerySection) { gallerySection.addEventListener('click', (e)=>{ const btn=e.target.closest('.share-btn'); if (btn&&btn.dataset.url){ e.stopPropagation(); shareImage(btn.dataset.url); }}); } else { console.warn("Gallery section !found."); }
-        const scrollTopBtn = d.getElementById('scrollTopBtn'); function handleScroll(){ try { const hP=d.getElementById('home-page'), hPV=hP?hP.style.display!=='none':false; if(scrollTopBtn){scrollTopBtn.classList.toggle('show', hPV&&window.scrollY>300);} } catch(e) { console.error("Error handleScroll:", e); }}
+        const scrollTopBtn = d.getElementById('scrollTopBtn'); function handleScroll(){ try { const hP=d.getElementById('home-page'),hPV=hP?hP.style.display!=='none':false; if(scrollTopBtn){scrollTopBtn.classList.toggle('show', hPV&&window.scrollY>300);} } catch(e) { console.error("Error handleScroll:", e); }}
         window.scrollToTop = function() { try { window.scrollTo({top:0, behavior:'smooth'}); } catch(e) { console.error("Error scrollToTop:", e); }}; window.addEventListener('scroll', handleScroll);
 
 
@@ -1217,24 +1154,26 @@
                  try {
                      const allFlagsTrue = Object.values(loadStatus).every(status => status === true);
                      if (allFlagsTrue) {
-                          const teamsReady = dbTeams && Object.keys(dbTeams).length > 0;
+                          const teamsReady = dbTeams && typeof dbTeams === 'object' && Object.keys(dbTeams).length > 0;
                           const categoriesReady = dbCategories && Array.isArray(dbCategories) && dbCategories.length > 0;
+                          console.log(`Data flags true. teamsReady: ${teamsReady}, categoriesReady: ${categoriesReady}`); // Detailed check log
+
                           if (teamsReady && categoriesReady) {
                               if (!allDataLoaded) {
                                   allDataLoaded = true;
-                                  console.log("All necessary data loaded. Processing for the first time...");
-                                  clearTimeout(loadingTimeout);
-                                  processAllData(); // Process data and render
-                              } else if (!isProcessing) { // Check if not already processing an update
+                                  console.log("All necessary data loaded and valid. Processing for the first time...");
+                                  clearTimeout(loadingTimeout); // Crucial: stop timeout
+                                  processAllData();
+                              } else if (!isProcessing) {
                                    console.log("Data updated. Re-processing...");
                                    clearTimeout(dataProcessingTimeout);
-                                   dataProcessingTimeout = setTimeout(processAllData, 250); // Slightly longer debounce for updates
-                              } else { console.log("Skipping re-process: Already processing an update."); }
+                                   dataProcessingTimeout = setTimeout(processAllData, 250);
+                              } else { console.log("Skipping re-process: Already processing."); }
                           } else { // Essential config missing
                               const missing = !teamsReady ? 'Teams' : 'Categories';
-                              console.error(`Config Error: ${missing} not found or empty.`);
-                              displayGlobalError(`Configuration Incomplete: ${missing} missing.`, `Please add ${missing.toLowerCase()} in the Admin Panel and ensure Firestore rules allow access.`);
-                              clearTimeout(loadingTimeout); // Stop timeout as it's a config error
+                              console.error(`Config Error: ${missing} not found or empty after flags are true. dbTeams:`, dbTeams, "dbCategories:", dbCategories);
+                              displayGlobalError(`Configuration Incomplete: ${missing} missing.`, `Please add ${missing.toLowerCase()} in the Admin Panel and ensure Firestore rules allow read access.`);
+                              clearTimeout(loadingTimeout); // Stop timeout
                           }
                      } else { // Still waiting for data
                          const pending = Object.keys(loadStatus).filter(k => !loadStatus[k]).join(', ') || 'initial checks';
@@ -1254,7 +1193,7 @@
             setupFirestoreListeners.called = true;
             console.log("Setting up Firestore listeners...");
             const createErrorHandler = (sourceName) => (error) => {
-                console.error(`Error loading ${sourceName}: `, error);
+                console.error(`Error loading ${sourceName}: `, error); // Log the actual error object
                 switch (sourceName) { /* Set defaults */
                     case 'results': dbResults = {}; break; case 'programs': dbPrograms = {}; break;
                     case 'teams': dbTeams = {}; TEAM_NAMES = []; break; case 'homepage': dbHomepage = {}; break;
@@ -1263,32 +1202,33 @@
                 loadStatus[sourceName] = true; // Mark as loaded (with error)
                  // Display persistent error for critical config failures
                  if (['teams', 'categories'].includes(sourceName)) {
-                     displayGlobalError(`Error Loading ${sourceName}`, `Could not load ${sourceName.toLowerCase()}. Check Firestore rules/data. Details: ${error.message}`);
+                     // Provide more context in the error message
+                     displayGlobalError(`Error Loading ${sourceName}`, `Could not load ${sourceName.toLowerCase()}. Check Firestore path, Security Rules, and if data exists. Details: ${error.message}`);
                  }
-                 try { checkAllDataLoaded(`error in ${sourceName}`); } // Trigger check to potentially show config error msg
+                 try { checkAllDataLoaded(`error in ${sourceName}`); }
                  catch (checkError) { console.error(`Error calling checkAllDataLoaded after ${sourceName} error:`, checkError); }
             };
 
             // Define listeners with safer data processing in callbacks and logging
-             const resultsPath = `artifacts/${appId}/public/data/results`; console.log("Listening to:", resultsPath);
-             onSnapshot(query(collection(db, resultsPath)), (snapshot) => { console.log(`Listener: results (${snapshot.size})`); try { const data={}; snapshot.docs.forEach(doc=>{data[doc.id]=doc.data();}); dbResults=data; loadStatus.results=true; checkAllDataLoaded('results'); } catch(e){ createErrorHandler('results')(e);}}, createErrorHandler('results'));
+            const resultsPath = `artifacts/${appId}/public/data/results`; console.log("Listening to:", resultsPath);
+            onSnapshot(query(collection(db, resultsPath)), (snapshot) => { console.log(`Listener: results snapshot received (${snapshot.size} docs)`); try { const data={}; snapshot.docs.forEach(doc=>{data[doc.id]=doc.data();}); dbResults=data; loadStatus.results=true; checkAllDataLoaded('results'); } catch(e){ createErrorHandler('results')(e);}}, createErrorHandler('results'));
 
-             const programsPath = `artifacts/${appId}/public/data/programs`; console.log("Listening to:", programsPath);
-             onSnapshot(query(collection(db, programsPath)), (snapshot) => { console.log(`Listener: programs (${snapshot.size})`); try { const data={}; snapshot.docs.forEach(doc=>{data[doc.id]=doc.data();}); dbPrograms=data; loadStatus.programs=true; checkAllDataLoaded('programs'); } catch(e){ createErrorHandler('programs')(e);}}, createErrorHandler('programs'));
+            const programsPath = `artifacts/${appId}/public/data/programs`; console.log("Listening to:", programsPath);
+            onSnapshot(query(collection(db, programsPath)), (snapshot) => { console.log(`Listener: programs snapshot received (${snapshot.size} docs)`); try { const data={}; snapshot.docs.forEach(doc=>{data[doc.id]=doc.data();}); dbPrograms=data; loadStatus.programs=true; checkAllDataLoaded('programs'); } catch(e){ createErrorHandler('programs')(e);}}, createErrorHandler('programs'));
 
-             const teamsPath = `artifacts/${appId}/public/data/teams`; console.log("Listening to:", teamsPath);
-             onSnapshot(query(collection(db, teamsPath)), (snapshot) => { console.log(`Listener: teams (${snapshot.size})`); try { const data={}; snapshot.docs.forEach(doc=>{data[doc.id]={name:doc.id, ...doc.data()};}); dbTeams=data; loadStatus.teams=true; checkAllDataLoaded('teams'); } catch(e){ createErrorHandler('teams')(e);}}, createErrorHandler('teams'));
+            const teamsPath = `artifacts/${appId}/public/data/teams`; console.log("Listening to:", teamsPath);
+            onSnapshot(query(collection(db, teamsPath)), (snapshot) => { console.log(`Listener: teams snapshot received (${snapshot.size} docs)`); try { const data={}; snapshot.docs.forEach(doc=>{data[doc.id]={name:doc.id, ...doc.data()};}); console.log('Raw teams data from Firestore:', data); dbTeams=data; loadStatus.teams=true; checkAllDataLoaded('teams'); } catch(e){ createErrorHandler('teams')(e);}}, createErrorHandler('teams'));
 
-             const homepagePath = `artifacts/${appId}/public/data/config/homepage`; console.log("Listening to:", homepagePath);
-             onSnapshot(doc(db, homepagePath), (docSnap) => { console.log(`Listener: homepage (${docSnap.exists()})`); try { dbHomepage=docSnap.exists()?docSnap.data():{}; loadStatus.homepage=true; checkAllDataLoaded('homepage'); } catch(e){ createErrorHandler('homepage')(e);}}, createErrorHandler('homepage'));
+            const homepagePath = `artifacts/${appId}/public/data/config/homepage`; console.log("Listening to:", homepagePath);
+            onSnapshot(doc(db, homepagePath), (docSnap) => { console.log(`Listener: homepage snapshot received (${docSnap.exists()})`); try { dbHomepage=docSnap.exists()?docSnap.data():{}; loadStatus.homepage=true; checkAllDataLoaded('homepage'); } catch(e){ createErrorHandler('homepage')(e);}}, createErrorHandler('homepage'));
 
-             const categoriesPath = `artifacts/${appId}/public/data/categories`; console.log("Listening to:", categoriesPath);
-             onSnapshot(query(collection(db, categoriesPath)), (snapshot) => { console.log(`Listener: categories (${snapshot.size})`); try { dbCategories=snapshot.docs.map(doc=>({id:doc.id, ...doc.data()})).sort((a,b)=>(a.name||'').localeCompare(b.name||'')); loadStatus.categories=true; checkAllDataLoaded('categories'); } catch(e){ createErrorHandler('categories')(e);}}, createErrorHandler('categories'));
+            const categoriesPath = `artifacts/${appId}/public/data/categories`; console.log("Listening to:", categoriesPath);
+            onSnapshot(query(collection(db, categoriesPath)), (snapshot) => { console.log(`Listener: categories snapshot received (${snapshot.size} docs)`); try { dbCategories=snapshot.docs.map(doc=>({id:doc.id, ...doc.data()})).sort((a,b)=>(a.name||'').localeCompare(b.name||'')); console.log('Loaded categories:', dbCategories); loadStatus.categories=true; checkAllDataLoaded('categories'); } catch(e){ createErrorHandler('categories')(e);}}, createErrorHandler('categories'));
 
-             const participantsPath = `artifacts/${appId}/public/data/participants`; console.log("Listening to:", participantsPath);
-             onSnapshot(query(collection(db, participantsPath)), (snapshot) => { console.log(`Listener: participants (${snapshot.size})`); try { const data={}; snapshot.docs.forEach(doc=>{data[doc.id]=doc.data();}); dbParticipants=data; loadStatus.participants=true; checkAllDataLoaded('participants'); } catch(e){ createErrorHandler('participants')(e);}}, createErrorHandler('participants'));
+            const participantsPath = `artifacts/${appId}/public/data/participants`; console.log("Listening to:", participantsPath);
+            onSnapshot(query(collection(db, participantsPath)), (snapshot) => { console.log(`Listener: participants snapshot received (${snapshot.size} docs)`); try { const data={}; snapshot.docs.forEach(doc=>{data[doc.id]=doc.data();}); dbParticipants=data; loadStatus.participants=true; checkAllDataLoaded('participants'); } catch(e){ createErrorHandler('participants')(e);}}, createErrorHandler('participants'));
 
-             console.log("Firestore listeners attached.");
+            console.log("Firestore listeners attached.");
         }
 
 
@@ -1296,8 +1236,15 @@
         loadingTimeout = setTimeout(() => {
             if (!allDataLoaded) { // Only trigger if data hasn't loaded successfully
                  console.error("Loading timeout reached (30 seconds).");
-                 const pending = Object.keys(loadStatus).filter(k => !loadStatus[k]).join(', ') || 'initial checks';
-                  displayGlobalError( "Loading Timeout", `Could not load: ${pending}. Check connection & ensure Teams/Categories exist in Firestore & Security Rules allow access.` ); // Added rules hint
+                 const pending = Object.keys(loadStatus).filter(k => !loadStatus[k]).join(', ') || 'initial setup';
+                  // Make the error message more actionable
+                  displayGlobalError(
+                     "Loading Timeout (30s)",
+                     `Could not load required data (${pending}). Please verify:
+                     1. Internet Connection.
+                     2. Firestore Security Rules allow public read access to 'artifacts/${appId}/public/data/*'.
+                     3. 'Teams' and 'Categories' collections exist and are not empty in Firestore.`
+                 );
             }
         }, 30000); // 30 seconds timeout
 
