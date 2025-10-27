@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sadaye Madeena 2k25 - Admin Panel (v5.0)</title> <!-- Version Updated -->
+    <title>Sadaye Madeena 2k25 - Admin Panel (v5.1)</title> <!-- Version Updated -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/papaparse/5.4.1/papaparse.min.js"></script>
     <style>
-        /* CSS styles remain the same as v4.9/v5.0 */
-         :root {
+        /* CSS styles remain the same */
+        :root {
             --primary-color: #4f46e5; /* Indigo 600 */
             --primary-hover-color: #4338ca; /* Indigo 700 */
             --primary-focus-ring: #a5b4fc; /* Indigo 300 lighter ring */
@@ -32,8 +32,6 @@
             --light-hover-bg: #f9fafb; /* Gray 50 */
         }
         body { font-family: 'Inter', sans-serif; background-color: #f3f4f6; /* Gray 100 */ }
-
-        /* Contained Button Styles - Rounded-lg */
         .btn { @apply inline-flex items-center justify-center px-5 py-2 border border-transparent rounded-lg shadow-sm font-medium text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-opacity-75 transition duration-150 ease-in-out; }
         .btn:hover:not(:disabled) { @apply shadow-md; }
         .btn:active:not(:disabled) { @apply shadow-inner; }
@@ -52,8 +50,6 @@
         .btn-light { background-color: var(--light-color); color: var(--light-text-color); border: 1px solid var(--light-border-color); focus:ring: var(--primary-focus-ring); box-shadow: none; }
         .btn-light:hover:not(:disabled) { background-color: var(--light-hover-bg); }
         .btn-sm { @apply px-4 py-1.5 text-sm rounded-md; }
-
-        /* Icon Button Style - Rounded-full */
         .btn-icon { @apply inline-flex items-center justify-center p-1.5 rounded-full text-gray-400 hover:text-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-indigo-500 hover:bg-gray-100 transition duration-150 ease-in-out; }
         .btn-icon:disabled { @apply opacity-50 cursor-not-allowed hover:bg-transparent hover:text-gray-400; }
         .btn-icon i { @apply h-4 w-4 pointer-events-none; }
@@ -61,20 +57,14 @@
         .btn-icon.warning:hover:not(:disabled) { @apply text-amber-600 bg-amber-50; focus:ring-amber-500; }
         .btn-icon.success:hover:not(:disabled) { @apply text-green-600 bg-green-50; focus:ring-green-500; }
         .btn-icon.secondary:hover:not(:disabled) { @apply text-gray-600 bg-gray-100; focus:ring-gray-500; }
-
-        /* Form & Card Styles - Rounded-xl */
         .form-input, .form-select, .form-textarea { @apply block w-full px-4 py-2 border border-gray-300 rounded-xl bg-gray-50 focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 transition duration-150 ease-in-out shadow-sm text-sm; }
         .form-label { @apply block text-xs font-medium text-gray-600 mb-1 uppercase tracking-wider; }
         .card { @apply bg-white shadow-lg rounded-xl p-6 md:p-8; }
         .card-header { @apply text-lg font-semibold text-gray-700 mb-5 border-b pb-3 border-gray-200; }
         .password-wrapper { @apply relative; }
         .password-toggle-btn { @apply absolute inset-y-0 right-0 pr-4 flex items-center text-gray-400 hover:text-gray-600 cursor-pointer focus:outline-none; }
-
-        /* Instruction Box - Rounded-lg */
         .info-text { @apply bg-indigo-50 text-indigo-700 p-4 border border-indigo-200 rounded-lg text-sm mb-6 shadow-sm; }
         .info-text strong { @apply font-medium text-indigo-800; }
-
-        /* Menu Overlay Styles - Rounded-xl */
         .menu-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.6); backdrop-filter: blur(4px); z-index: 1001; display: none; justify-content: center; align-items: flex-start; padding-top: 60px; opacity: 0; transition: opacity 0.3s ease; }
         .menu-box { background: white; width: 90%; max-width: 300px; border-radius: 1rem; box-shadow: 0 10px 30px rgba(0,0,0,0.2); padding: 15px; transform: translateY(-20px); opacity: 0; transition: all 0.3s ease-out; }
         .menu-box.open { transform: translateY(0); opacity: 1; }
@@ -86,13 +76,9 @@
         .menu-link.active { background-color: var(--primary-color); color: white; font-weight: 600; }
         .menu-link i { @apply w-5 mr-3 text-center text-gray-500; }
         .menu-link.active i { @apply text-indigo-100; }
-
-        /* Custom file input */
         .file-input-label { @apply btn btn-light text-sm rounded-lg; cursor: pointer; }
         .file-input-label i { @apply mr-2; }
         .file-input-filename { @apply text-sm text-gray-500 ml-4 inline-block align-middle; }
-
-        /* Table/List Styles - Rounded-lg container */
         .table-container { @apply border border-gray-200 rounded-lg overflow-hidden shadow-sm bg-white; }
         .table-header { @apply grid gap-4 px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-b border-gray-200 bg-gray-50/70; }
         .table-row { @apply grid gap-4 px-6 py-4 items-center border-b border-gray-200 bg-white hover:bg-gray-50/50 transition-colors duration-150 text-sm; }
@@ -105,34 +91,10 @@
         .badge-group { @apply bg-purple-100 text-purple-800; }
         .badge-individual { @apply bg-blue-100 text-blue-800; }
         .badge-general { @apply bg-green-100 text-green-800; }
-
-        /* Team Edit Styles - Simplified back to prompt */
-        /* ... removed styles related to team-edit-view ... */
-
-
-        /* Page title style */
         .page-title { @apply text-xl font-semibold text-gray-700 mb-6 pb-2 border-b border-gray-300; }
-
-        /* Login page gradient */
         #login-page { background: linear-gradient(135deg, #e0e7ff 0%, #ede9fe 50%, #fce7f3 100%); }
-
-         /* Responsive adjustments */
-        @media (max-width: 768px) {
-             .hide-md { @apply hidden md:block; }
-             .hide-md-grid { @apply hidden md:grid; }
-        }
-        @media (max-width: 640px) {
-            .btn { @apply px-4 py-2 text-sm; }
-            .card { @apply p-4 rounded-lg; }
-            .card-header { @apply text-base mb-4 pb-2; }
-            .page-title { @apply text-lg mb-4 pb-1; }
-            .table-header, .table-row { @apply px-4 py-3 text-xs grid-cols-2; }
-            .table-actions { @apply col-span-1 mt-1 sm:mt-0 justify-start sm:justify-end; }
-            .table-cell-primary { @apply text-sm; }
-            .hide-sm { @apply hidden sm:block; }
-            .hide-sm-grid { @apply hidden sm:grid; }
-            .form-input, .form-select, .form-textarea { @apply rounded-lg; }
-        }
+        @media (max-width: 768px) { .hide-md { @apply hidden md:block; } .hide-md-grid { @apply hidden md:grid; } }
+        @media (max-width: 640px) { .btn { @apply px-4 py-2 text-sm; } .card { @apply p-4 rounded-lg; } .card-header { @apply text-base mb-4 pb-2; } .page-title { @apply text-lg mb-4 pb-1; } .table-header, .table-row { @apply px-4 py-3 text-xs grid-cols-2; } .table-actions { @apply col-span-1 mt-1 sm:mt-0 justify-start sm:justify-end; } .table-cell-primary { @apply text-sm; } .hide-sm { @apply hidden sm:block; } .hide-sm-grid { @apply hidden sm:grid; } .form-input, .form-select, .form-textarea { @apply rounded-lg; } }
     </style>
 </head>
 <body class="bg-gray-100">
@@ -244,19 +206,18 @@
         const auth = getAuth(app);
         const db = getFirestore(app);
 
-        // --- [JavaScript Logic - v5.0 - Listener Attachment Fix] ---
+        // --- [JavaScript Logic - v5.1 - Listener Attachment Fix] ---
         document.addEventListener('DOMContentLoaded', () => {
-            console.log("Admin script loaded (v5.0)");
+            console.log("Admin script loaded (v5.1)");
             let allPrograms = {}; // Key: programId
             let allCategories = []; // Array of {id, name}
             let allParticipants = {}; // Key: chestNo
             let allTeamsAdmin = {}; // Key: teamId (doc id from Firestore)
-            let listenersAttached = false; // Flag to ensure listeners are attached only once
+            let listenersAttached = false; // Flag to ensure listeners are attached only once after login
             let dataLoaded = { categories: false, teams: false, participants: false, programs: false, homepage: false }; // Track data loading status
             const d = document;
 
             // --- DOM Selections ---
-            // (Ensure all elements exist)
             const loginPage=d.getElementById('login-page'), adminPanel=d.getElementById('admin-panel'), loginForm=d.getElementById('login-form'), registerForm=d.getElementById('register-form'), logoutButton=d.getElementById('logout-button'), adminEmail=d.getElementById('admin-email'), pages=d.querySelectorAll('.admin-page'), adminMenuOverlay=d.getElementById('admin-menu-overlay'), adminMenuBox=d.getElementById('admin-menu-box'), adminMenuBtn=d.getElementById('admin-menu-btn'), adminMenuCloseBtn=d.getElementById('admin-menu-close-btn'), navLinks=d.querySelectorAll('.menu-link');
             const participantAddForm = d.getElementById('form-add-participants'), participantAddTeam = d.getElementById('participant-add-team'), participantAddNames = d.getElementById('participant-add-names'), addLogContainer = d.getElementById('add-log-container'), addLog = d.getElementById('add-log'), participantCountEl=d.getElementById('participant-count'), deleteAllParticipantsBtn=d.getElementById('delete-all-participants-btn'), participantTeamFilter = d.getElementById('participant-team-filter'), participantSearch = d.getElementById('participant-search'), participantListAdmin = d.getElementById('participant-list-admin'), participantListContainer = d.getElementById('participant-list-container'), participantListPlaceholder = d.getElementById('participant-list-placeholder');
             const categoryForm=d.getElementById('form-add-category'), categoryInput=d.getElementById('category-name'), categoryList=d.getElementById('category-list'), categoryListContainer=d.getElementById('category-list-container');
@@ -275,8 +236,8 @@
             const toggleDisabled = (elementOrSelector, isDisabled) => { /* ... */ };
 
             // --- Navigation Logic ---
-             function openAdminNav() { /* ... */ }
-             function closeAdminNav() { /* ... */ }
+             function openAdminNav() { if(adminMenuOverlay && adminMenuBox) { adminMenuOverlay.style.display = 'flex'; setTimeout(() => { adminMenuOverlay.style.opacity = '1'; adminMenuBox.classList.add('open'); }, 10); } }
+             function closeAdminNav() { if(adminMenuOverlay && adminMenuBox) { adminMenuOverlay.style.opacity = '0'; adminMenuBox.classList.remove('open'); setTimeout(() => { adminMenuOverlay.style.display = 'none'; }, 300); } }
              if(adminMenuBtn) adminMenuBtn.addEventListener('click', openAdminNav); else console.error("Admin menu button missing");
              if(adminMenuCloseBtn) adminMenuCloseBtn.addEventListener('click', closeAdminNav); else console.error("Admin menu close button missing");
              if(adminMenuOverlay) adminMenuOverlay.addEventListener('click', (e) => { if (e.target === adminMenuOverlay) { closeAdminNav(); } }); else console.error("Admin menu overlay missing");
@@ -300,18 +261,18 @@
                     const defaultNavLink = d.querySelector(`.menu-link[data-target="${defaultPageId}"]`);
                     if (defaultNavLink) defaultNavLink.classList.add('active');
 
-                    // Load initial data only ONCE after login
-                    if (!dataLoaded.categories) { // Use loading flags
+                    // Load initial data and attach listeners ONCE after login
+                    if (!listenersAttached) { // Check flag
                          try {
                              console.log("Loading initial data after login...");
-                             await Promise.all([ loadCategories(), loadTeamsForAdmin(), loadAllParticipants(), loadPrograms(), loadHomepageContent() ]);
+                             await Promise.all([ loadCategories(), loadTeamsForAdmin() ]); // Load essentials first
+                             await Promise.all([ loadHomepageContent(), loadAllParticipants(), loadPrograms() ]); // Load rest
                              dataLoaded = { categories: true, teams: true, participants: true, programs: true, homepage: true };
-                             attachEventListeners(); // Attach listeners AFTER initial data load succeeds
-                             console.log("Initial data load and listener attachment complete.");
+                             attachAdminListeners(); // Attach listeners for admin panel elements
+                             console.log("Initial data load and ADMIN listener attachment complete.");
                          } catch(e){ console.error("Error during initial data load:", e);}
                     } else {
-                         console.log("Initial data already loaded, ensuring listeners are attached.");
-                         if (!listenersAttached) attachEventListeners(); // Ensure listeners attached on potential reloads
+                         console.log("Initial data/listeners already handled.");
                     }
                 } else {
                     // Show Login, hide Admin Panel
@@ -320,18 +281,15 @@
                     // Clear data and reset flags
                     allPrograms = {}; allCategories = []; allParticipants = {}; allTeamsAdmin = {};
                     dataLoaded = { categories: false, teams: false, participants: false, programs: false, homepage: false };
-                    listenersAttached = false; // Reset listener flag
+                    listenersAttached = false; // Reset admin listener flag
                 }
             }, (error) => { console.error("Auth state listener error:", error); });
 
-
-            // --- Event Listener Attachment Function (Runs once on DOM load) ---
-             function attachEventListeners() {
-                 if (listenersAttached) return;
-                 console.log("Attaching event listeners...");
-
-                 // Login/Register Forms & Buttons are attached immediately
-                 if (loginForm) {
+            // --- Event Listener Attachment Functions ---
+            // Attach listeners for Login/Register immediately
+             function attachAuthListeners() {
+                 console.log("Attaching AUTH listeners...");
+                 if (loginForm && !loginForm.dataset.listenerAttached) {
                      const loginButton = loginForm.querySelector('button[type="submit"]');
                      loginForm.addEventListener('submit', async (e) => {
                          e.preventDefault();
@@ -344,20 +302,35 @@
                          try { await signInWithEmailAndPassword(auth, email, password); }
                          catch (error) { console.error("Login Error:", error); alert(`Login Failed: ${error.message}`); toggleDisabled(loginButton, false); }
                      });
-                     console.log("Login form listener attached.");
+                     loginForm.dataset.listenerAttached = 'true'; // Mark as attached
                      const loginToggleBtn = loginForm.querySelector('.password-toggle-btn');
                      if (loginToggleBtn) { loginToggleBtn.addEventListener('click', () => window.togglePasswordVisibility('login-password', loginToggleBtn)); }
-                 } else { console.error("Login form missing!"); }
+                     console.log("Login form listeners attached.");
+                 }
 
-                 if (registerForm) {
+                 if (registerForm && !registerForm.dataset.listenerAttached) {
                      const registerButton = registerForm.querySelector('button[type="submit"]');
-                     registerForm.addEventListener('submit', async (e) => { e.preventDefault(); const emailInput = d.getElementById('register-email'); const passwordInput = d.getElementById('register-password'); const email = emailInput?.value; const password = passwordInput?.value; if (!email || !password) { alert("Enter email and password."); return; } toggleDisabled(registerButton, true); try { await createUserWithEmailAndPassword(auth, email, password); alert('Admin registered! Please login.'); registerForm.reset(); } catch (error) { console.error("Registration Error:", error); alert(`Registration Failed: ${error.message}`); } finally { toggleDisabled(registerButton, false); } });
-                     console.log("Register form listener attached.");
+                     registerForm.addEventListener('submit', async (e) => {
+                        e.preventDefault(); const emailInput = d.getElementById('register-email'); const passwordInput = d.getElementById('register-password'); const email = emailInput?.value; const password = passwordInput?.value; if (!email || !password) { alert("Enter email and password."); return; } toggleDisabled(registerButton, true); try { await createUserWithEmailAndPassword(auth, email, password); alert('Admin registered! Please login.'); registerForm.reset(); } catch (error) { console.error("Registration Error:", error); alert(`Registration Failed: ${error.message}`); } finally { toggleDisabled(registerButton, false); }
+                     });
+                     registerForm.dataset.listenerAttached = 'true'; // Mark as attached
                      const registerToggleBtn = registerForm.querySelector('.password-toggle-btn');
                      if (registerToggleBtn) { registerToggleBtn.addEventListener('click', () => window.togglePasswordVisibility('register-password', registerToggleBtn)); }
-                 } else { console.error("Register form missing!"); }
+                      console.log("Register form listeners attached.");
+                 }
+                  // Make togglePasswordVisibility globally accessible IMMEDIATELY
+                 window.togglePasswordVisibility = (inputId, button) => { const input = d.getElementById(inputId); const icon = button?.querySelector('i'); if (!input || !icon) return; input.type = (input.type === "password") ? "text" : "password"; icon.classList.toggle("fa-eye"); icon.classList.toggle("fa-eye-slash"); };
+             }
 
-                // Attach other listeners only if elements exist
+            // Attach listeners for Admin Panel elements (called after login)
+            function attachAdminListeners() {
+                if (listenersAttached) {
+                     console.log("Admin listeners already attached.");
+                     return; // Prevent attaching multiple times
+                }
+                 console.log("Attaching ADMIN listeners...");
+
+                 // Attach listeners only if elements exist
                  if (logoutButton) { logoutButton.addEventListener('click', handleLogout); } else { console.error("Logout button missing!"); }
                  if (homepageForm) { homepageForm.addEventListener('submit', handleHomepageSave); } else { console.error("Homepage form missing"); }
                  if (participantAddForm) { participantAddForm.addEventListener('submit', handleAddParticipants); } else { console.error("Participant Add Form missing"); }
@@ -376,22 +349,17 @@
                  setupListActionDelegation();
 
                  listenersAttached = true;
-                 console.log("All static event listeners attached.");
+                 console.log("All ADMIN event listeners attached.");
             }
 
             // --- Logout Handler ---
-            async function handleLogout() {
-                 try { await signOut(auth); } catch(error) { alert(`Logout Failed: ${error.message}`); }
-            }
+            async function handleLogout() { /* ... */ }
 
             // Function to setup event delegation listeners for lists
-            function setupListActionDelegation() { /* ... Same as v4.7 ... */ }
+            function setupListActionDelegation() { /* ... */ }
 
             // Generic handler for list actions
-            function handleListAction(event, type) { /* ... Same as v4.7 ... */ }
-
-            // Make togglePasswordVisibility globally accessible IMMEDIATELY
-            window.togglePasswordVisibility = (inputId, button) => { const input = d.getElementById(inputId); const icon = button?.querySelector('i'); if (!input || !icon) return; input.type = (input.type === "password") ? "text" : "password"; icon.classList.toggle("fa-eye"); icon.classList.toggle("fa-eye-slash"); };
+            function handleListAction(event, type) { /* ... */ }
 
 
             // --- Participants Page Logic ---
@@ -440,8 +408,8 @@
              async function loadHomepageContent() { /* ... */ }
              async function handleHomepageSave(e) { /* ... */ }
 
-            // Attach listeners immediately for elements present on initial load (Login/Register)
-            attachEventListeners();
+            // Attach listeners for Login/Register immediately
+            attachAuthListeners();
 
             console.log("Initial setup complete. Waiting for Auth state...");
 
