@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sadaye Madeena 2k25 - Admin Panel (v5.0)</title> <!-- Version Updated -->
+    <title>Sadaye Madeena 2k25 - Admin Panel (v5.1)</title> <!-- Version Updated -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/papaparse/5.4.1/papaparse.min.js"></script>
     <style>
-        /* CSS styles remain the same as v4.9 */
-        :root {
+        /* CSS styles remain the same as v5.0 */
+         :root {
             --primary-color: #4f46e5; /* Indigo 600 */
             --primary-hover-color: #4338ca; /* Indigo 700 */
             --primary-focus-ring: #a5b4fc; /* Indigo 300 lighter ring */
@@ -256,9 +256,9 @@
             const d = document;
 
             // --- DOM Selections ---
-            // (Ensure all elements exist)
+            // (Ensure all element selections are valid)
             const loginPage=d.getElementById('login-page'), adminPanel=d.getElementById('admin-panel'), loginForm=d.getElementById('login-form'), registerForm=d.getElementById('register-form'), logoutButton=d.getElementById('logout-button'), adminEmail=d.getElementById('admin-email'), pages=d.querySelectorAll('.admin-page'), adminMenuOverlay=d.getElementById('admin-menu-overlay'), adminMenuBox=d.getElementById('admin-menu-box'), adminMenuBtn=d.getElementById('admin-menu-btn'), adminMenuCloseBtn=d.getElementById('admin-menu-close-btn'), navLinks=d.querySelectorAll('.menu-link');
-            const participantAddForm = d.getElementById('form-add-participants'), participantAddTeam = d.getElementById('participant-add-team'), participantAddNames = d.getElementById('participant-add-names'), addLogContainer = d.getElementById('add-log-container'), addLog = d.getElementById('add-log'), participantCountEl=d.getElementById('participant-count'), deleteAllParticipantsBtn=d.getElementById('delete-all-participants-btn'), participantTeamFilter = d.getElementById('participant-team-filter'), participantSearch = d.getElementById('participant-search'), participantListAdmin = d.getElementById('participant-list-admin'), participantListContainer = d.getElementById('participant-list-container'), participantListPlaceholder = d.getElementById('participant-list-placeholder'); // Added container
+            const participantAddForm = d.getElementById('form-add-participants'), participantAddTeam = d.getElementById('participant-add-team'), participantAddNames = d.getElementById('participant-add-names'), addLogContainer = d.getElementById('add-log-container'), addLog = d.getElementById('add-log'), participantCountEl=d.getElementById('participant-count'), deleteAllParticipantsBtn=d.getElementById('delete-all-participants-btn'), participantTeamFilter = d.getElementById('participant-team-filter'), participantSearch = d.getElementById('participant-search'), participantListAdmin = d.getElementById('participant-list-admin'), participantListContainer = d.getElementById('participant-list-container'), participantListPlaceholder = d.getElementById('participant-list-placeholder');
             const categoryForm=d.getElementById('form-add-category'), categoryInput=d.getElementById('category-name'), categoryList=d.getElementById('category-list'), categoryListContainer=d.getElementById('category-list-container');
             const programForm=d.getElementById('form-add-program'), programNameInput=d.getElementById('program-name'), programCategorySelect=d.getElementById('program-category'), programList=d.getElementById('program-list'), programListContainer=d.getElementById('program-list-container');
             const programPointsFirst = d.getElementById('program-points-first'), programPointsSecond = d.getElementById('program-points-second'), programPointsThird = d.getElementById('program-points-third');
@@ -269,18 +269,18 @@
 
              // --- Helper: Get Homepage Fields ---
              function getHomepageFields() { /* ... */ }
-            const homepageFields = getHomepageFields(); // Get fields after DOM load
+            const homepageFields = getHomepageFields();
 
             // Helper function to disable/enable forms/buttons
             const toggleDisabled = (elementOrSelector, isDisabled) => { /* ... */ };
 
             // --- Navigation Logic ---
-            function openAdminNav() { /* ... */ }
-            function closeAdminNav() { /* ... */ }
-            if(adminMenuBtn) adminMenuBtn.addEventListener('click', openAdminNav); else console.error("Admin menu button missing");
-            if(adminMenuCloseBtn) adminMenuCloseBtn.addEventListener('click', closeAdminNav); else console.error("Admin menu close button missing");
-            if(adminMenuOverlay) adminMenuOverlay.addEventListener('click', (e) => { if (e.target === adminMenuOverlay) { closeAdminNav(); } }); else console.error("Admin menu overlay missing");
-            if (navLinks && navLinks.length > 0) { navLinks.forEach(link => { link.addEventListener('click', (e) => { e.preventDefault(); const targetId = link.getAttribute('data-target'); if(!targetId) return; pages.forEach(page => page.classList.add('hidden')); const targetPage = d.getElementById(targetId); if (targetPage) { targetPage.classList.remove('hidden'); console.log("Navigated to:", targetId); } else { console.error("Target page missing:", targetId); return; } navLinks.forEach(nav => nav.classList.remove('active')); link.classList.add('active'); closeAdminNav(); loadDataForPage(targetId); }); }); } else { console.error("Nav links missing!"); }
+             function openAdminNav() { /* ... */ }
+             function closeAdminNav() { /* ... */ }
+             if(adminMenuBtn) adminMenuBtn.addEventListener('click', openAdminNav); else console.error("Admin menu button missing");
+             if(adminMenuCloseBtn) adminMenuCloseBtn.addEventListener('click', closeAdminNav); else console.error("Admin menu close button missing");
+             if(adminMenuOverlay) adminMenuOverlay.addEventListener('click', (e) => { if (e.target === adminMenuOverlay) { closeAdminNav(); } }); else console.error("Admin menu overlay missing");
+             if (navLinks && navLinks.length > 0) { navLinks.forEach(link => { link.addEventListener('click', (e) => { e.preventDefault(); const targetId = link.getAttribute('data-target'); if(!targetId) return; pages.forEach(page => page.classList.add('hidden')); const targetPage = d.getElementById(targetId); if (targetPage) { targetPage.classList.remove('hidden'); console.log("Navigated to:", targetId); } else { console.error("Target page missing:", targetId); return; } navLinks.forEach(nav => nav.classList.remove('active')); link.classList.add('active'); closeAdminNav(); loadDataForPage(targetId); }); }); } else { console.error("Nav links missing!"); }
 
             async function loadDataForPage(pageId) { /* ... */ }
 
@@ -300,20 +300,18 @@
                     const defaultNavLink = d.querySelector(`.menu-link[data-target="${defaultPageId}"]`);
                     if (defaultNavLink) defaultNavLink.classList.add('active');
 
-                    // Load initial data if not already loaded and attach listeners
-                    if (!dataLoaded.categories) { // Check if initial load is needed
+                    // Load initial data only ONCE after login
+                    if (!dataLoaded.categories) {
                          try {
                              console.log("Loading initial data after login...");
-                             await Promise.all([ loadCategories(), loadTeamsForAdmin() ]);
-                             await Promise.all([ loadHomepageContent(), loadAllParticipants(), loadPrograms() ]);
+                             await Promise.all([ loadCategories(), loadTeamsForAdmin(), loadAllParticipants(), loadPrograms(), loadHomepageContent() ]);
                              dataLoaded = { categories: true, teams: true, participants: true, programs: true, homepage: true };
-                             attachEventListeners(); // Attach listeners only after initial data load succeeds
+                             attachEventListeners(); // Attach listeners AFTER data is loaded
                              console.log("Initial data load and listener attachment complete.");
                          } catch(e){ console.error("Error during initial data load:", e);}
                     } else {
                          console.log("Initial data already loaded, ensuring listeners are attached.");
-                         // Ensure listeners are attached if page reloads but user is still logged in
-                         if (!listenersAttached) attachEventListeners();
+                         if (!listenersAttached) attachEventListeners(); // Ensure listeners attached on potential reloads
                     }
                 } else {
                     // Show Login, hide Admin Panel
@@ -326,12 +324,12 @@
                 }
             }, (error) => { console.error("Auth state listener error:", error); });
 
-            // --- Event Listener Attachment Function (Moved outside Auth listener) ---
-            function attachEventListeners() {
-                if (listenersAttached) return; // Prevent multiple attachments
-                 console.log("Attaching event listeners...");
+            // --- Event Listener Attachment Function (Runs once on DOM load) ---
+             function attachEventListeners() {
+                 if (listenersAttached) return;
+                 console.log("Attaching ALL event listeners ONCE...");
 
-                 // Login/Register Forms
+                 // Login/Register Forms & Buttons are outside the main panel logic, attach now
                  if (loginForm) {
                      const loginButton = loginForm.querySelector('button[type="submit"]');
                      loginForm.addEventListener('submit', async (e) => {
@@ -349,9 +347,14 @@
                              alert(`Login Failed: ${error.message}`);
                              toggleDisabled(loginButton, false); // Re-enable only on error
                          }
-                         // No finally here - let onAuthStateChanged handle UI/enable
                      });
                      console.log("Login form listener attached.");
+                     // Attach listener to password toggle button inside login form
+                     const loginToggleBtn = loginForm.querySelector('.password-toggle-btn');
+                     if (loginToggleBtn) {
+                         loginToggleBtn.addEventListener('click', () => window.togglePasswordVisibility('login-password', loginToggleBtn));
+                     }
+
                  } else { console.error("Login form missing!"); }
 
                  if (registerForm) {
@@ -375,30 +378,27 @@
                          }
                      });
                      console.log("Register form listener attached.");
+                      // Attach listener to password toggle button inside register form
+                     const registerToggleBtn = registerForm.querySelector('.password-toggle-btn');
+                     if (registerToggleBtn) {
+                         registerToggleBtn.addEventListener('click', () => window.togglePasswordVisibility('register-password', registerToggleBtn));
+                     }
                  } else { console.error("Register form missing!"); }
 
-
-                 // Logout Button
-                 if (logoutButton) {
-                     logoutButton.addEventListener('click', async () => {
-                         try { await signOut(auth); } catch(error) { alert(`Logout Failed: ${error.message}`); }
-                     });
-                     console.log("Logout button listener attached.");
-                 } else { console.error("Logout button missing!"); }
-
-                 // Add other listeners similarly, checking for element existence
-                 if (homepageForm) { homepageForm.addEventListener('submit', handleHomepageSave); } else { console.error("Homepage form missing"); }
-                 if (participantAddForm) { participantAddForm.addEventListener('submit', handleAddParticipants); } else { console.error("Participant Add Form missing"); }
-                 if (participantTeamFilter) participantTeamFilter.addEventListener('change', renderParticipantList); else { console.error("Participant team filter missing"); }
-                 if (participantSearch) participantSearch.addEventListener('input', renderParticipantList); else { console.error("Participant search input missing"); }
-                 if (deleteAllParticipantsBtn) { deleteAllParticipantsBtn.addEventListener('click', handleDeleteAllParticipants); } else { console.error("Delete all participants button missing"); }
-                 if (categoryForm) { categoryForm.addEventListener('submit', handleAddCategory); } else { console.error("Category form missing"); }
-                 if (programForm) { programForm.addEventListener('submit', handleAddProgram); } else { console.error("Program form missing"); }
-                 if (resultForm) { resultForm.addEventListener('submit', handlePublishResult); } else { console.error("Result form missing"); }
-                 if (resultCategorySelect) { resultCategorySelect.addEventListener('change', handleResultCategoryChange); } else { console.error("Result category select missing"); }
-                 if (resultProgramSelect) { resultProgramSelect.addEventListener('change', handleResultProgramChange); } else { console.error("Result program select missing"); }
+                // Attach other listeners if elements exist
+                 if (logoutButton) { logoutButton.addEventListener('click', async () => { try { await signOut(auth); } catch(error) { alert(`Logout Failed: ${error.message}`); } }); }
+                 if (homepageForm) { homepageForm.addEventListener('submit', handleHomepageSave); }
+                 if (participantAddForm) { participantAddForm.addEventListener('submit', handleAddParticipants); }
+                 if (participantTeamFilter) { participantTeamFilter.addEventListener('change', renderParticipantList); }
+                 if (participantSearch) { participantSearch.addEventListener('input', renderParticipantList); }
+                 if (deleteAllParticipantsBtn) { deleteAllParticipantsBtn.addEventListener('click', handleDeleteAllParticipants); }
+                 if (categoryForm) { categoryForm.addEventListener('submit', handleAddCategory); }
+                 if (programForm) { programForm.addEventListener('submit', handleAddProgram); }
+                 if (resultForm) { resultForm.addEventListener('submit', handlePublishResult); }
+                 if (resultCategorySelect) { resultCategorySelect.addEventListener('change', handleResultCategoryChange); }
+                 if (resultProgramSelect) { resultProgramSelect.addEventListener('change', handleResultProgramChange); }
                  Object.keys(resultInputs).forEach(pos => { const input = resultInputs[pos]; if(input) { input.addEventListener('input', () => updateWinnerName(pos)); } });
-                 if (teamForm) { teamForm.addEventListener('submit', handleAddTeam); } else { console.error("Team form missing"); }
+                 if (teamForm) { teamForm.addEventListener('submit', handleAddTeam); }
 
                  // Event Delegation Setup for lists
                  setupListActionDelegation();
@@ -413,21 +413,24 @@
             // Generic handler for list actions
             function handleListAction(event, type) { /* ... Same as v4.7 ... */ }
 
-            // Make togglePasswordVisibility globally accessible
+            // Make togglePasswordVisibility globally accessible IMMEDIATELY
             window.togglePasswordVisibility = (inputId, button) => { const input = d.getElementById(inputId); const icon = button?.querySelector('i'); if (!input || !icon) return; input.type = (input.type === "password") ? "text" : "password"; icon.classList.toggle("fa-eye"); icon.classList.toggle("fa-eye-slash"); };
 
 
             // --- Participants Page Logic ---
-             async function loadAllParticipants() { /* ... */ }
-             function renderParticipantList() { /* ... */ }
-             async function editParticipant(chestNo, currentName, currentTeam) { /* ... */ }
-             async function deleteParticipant(chestNo) { /* ... */ }
-             async function handleAddParticipants(e) { /* ... */ }
-             async function deleteAllParticipants(promptUser = true) { /* ... */ }
-             async function handleDeleteAllParticipants() { /* ... */ }
+            // (Functions: loadAllParticipants, renderParticipantList, editParticipant, deleteParticipant, handleAddParticipants, deleteAllParticipants, handleDeleteAllParticipants)
+            // (These should work correctly now with proper listener attachment)
+            async function loadAllParticipants() { /* ... */ }
+            function renderParticipantList() { /* ... */ }
+            async function editParticipant(chestNo, currentName, currentTeam) { /* ... */ }
+            async function deleteParticipant(chestNo) { /* ... */ }
+            async function handleAddParticipants(e) { /* ... */ }
+            async function deleteAllParticipants(promptUser = true) { /* ... */ }
+            async function handleDeleteAllParticipants() { /* ... */ }
 
 
             // --- Programs & Categories Page Logic ---
+            // (Functions: loadCategories, handleAddCategory, deleteCategory, editCategory, loadPrograms, handleAddProgram, deleteProgram, editProgram)
              async function loadCategories() { /* ... */ }
              async function handleAddCategory(e) { /* ... */ }
              async function deleteCategory(id) { /* ... */ }
@@ -439,6 +442,7 @@
 
 
             // --- Results Page Logic ---
+            // (Functions: updateWinnerName, clearNamePreviews, loadCategoriesForResults, loadProgramsForResults, handleResultCategoryChange, handleResultProgramChange, handlePublishResult)
              function updateWinnerName(position) { /* ... */ }
              function clearNamePreviews() { /* ... */ }
              async function loadCategoriesForResults() { /* ... */ }
@@ -449,11 +453,12 @@
 
 
             // --- Teams Page Logic ---
+            // (Functions: loadTeamsForAdmin, renderAdminTeamList, handleAddTeam, handleSaveTeamChanges, deleteTeam, handleEditTeamClick, handleCancelEditTeamClick, updateParticipantTeamNames)
              async function loadTeamsForAdmin() { /* ... */ }
              function renderAdminTeamList() { /* ... */ }
              async function handleAddTeam(e) { /* ... */ }
              async function handleSaveTeamChanges(event) { /* ... */ }
-             async function deleteTeam(id) { /* ... */ };
+             async function deleteTeam(id) { /* ... */ }
              function handleEditTeamClick(card) { /* ... */ }
              function handleCancelEditTeamClick(card) { /* ... */ }
              async function updateParticipantTeamNames(oldName, newName) { /* ... */ }
@@ -463,8 +468,10 @@
              async function loadHomepageContent() { /* ... */ }
              async function handleHomepageSave(e) { /* ... */ }
 
-            console.log("Functions defined. Waiting for DOMContentLoaded...");
-            // Initial listener attachment happens within Auth State Change after login.
+            // Attach listeners immediately for login/register
+            attachEventListeners(); // Call once on DOM load to attach non-authed listeners
+
+            console.log("Initial setup complete. Waiting for Auth state...");
 
         }); // End DOMContentLoaded
     </script>
