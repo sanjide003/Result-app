@@ -4,11 +4,18 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sadaye Madeena 2k25 - Admin Panel</title>
+    <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <!-- Google Font: Inter -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- PapaParse (CSV) - ഈ ഫയലിൽ ഉപയോഗിക്കുന്നില്ല, പക്ഷെ നിങ്ങൾ ചേർത്തതുകൊണ്ട് നിലനിർത്തുന്നു -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/papaparse/5.4.1/papaparse.min.js"></script>
+    
     <style>
+        /* CSS വേരിയബിളുകൾ (നിങ്ങൾ നൽകിയത്) */
         :root {
             --primary-color: #4f46e5; /* Indigo 600 */
             --primary-hover-color: #4338ca; /* Indigo 700 */
@@ -32,53 +39,110 @@
         }
         body { font-family: 'Inter', sans-serif; background-color: #f3f4f6; /* Gray 100 */ }
 
-        /* Updated Contained Button Styles */
+        /* --- @apply മാറ്റി സാധാരണ CSS ആക്കിയത് --- */
+        /* ബട്ടണുകൾ */
         .btn {
-            @apply inline-flex items-center justify-center px-5 py-2 border border-transparent rounded-md shadow-sm font-medium text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-opacity-75 transition duration-150 ease-in-out;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding-left: 1.25rem;
+            padding-right: 1.25rem;
+            padding-top: 0.5rem;
+            padding-bottom: 0.5rem;
+            border: 1px solid transparent;
+            border-radius: 0.375rem; /* rounded-md */
+            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05); /* shadow-sm */
+            font-weight: 500; /* font-medium */
+            color: white;
+            transition: all 0.15s ease-in-out;
+            cursor: pointer;
         }
-        .btn:hover {
-            @apply shadow-md; /* Subtle shadow on hover */
+        .btn:focus {
+            outline: none;
+            box-shadow: 0 0 0 2px var(--light-color), 0 0 0 4px var(--primary-focus-ring);
         }
-        .btn:active {
-            @apply shadow-inner; /* Inner shadow on click */
-        }
-        .btn i:not(.password-toggle-icon) { @apply mr-2 -ml-1 h-5 w-5; }
-        .btn-primary { background-color: var(--primary-color); border-color: var(--primary-color); focus:ring: var(--primary-focus-ring); }
+        .btn:hover { box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); /* shadow-md */ }
+        .btn:active { box-shadow: inset 0 2px 4px 0 rgba(0, 0, 0, 0.06); /* shadow-inner */ }
+        .btn i:not(.password-toggle-icon) { margin-right: 0.5rem; margin-left: -0.25rem; height: 1.25rem; width: 1.25rem; }
+
+        .btn-primary { background-color: var(--primary-color); border-color: var(--primary-color); }
         .btn-primary:hover { background-color: var(--primary-hover-color); border-color: var(--primary-hover-color); }
-        .btn-danger { background-color: var(--danger-color); border-color: var(--danger-color); focus:ring: var(--danger-focus-ring); }
+        .btn-primary:focus { box-shadow: 0 0 0 2px var(--light-color), 0 0 0 4px var(--primary-focus-ring); }
+        
+        .btn-danger { background-color: var(--danger-color); border-color: var(--danger-color); }
         .btn-danger:hover { background-color: var(--danger-hover-color); border-color: var(--danger-hover-color); }
-        .btn-secondary { background-color: var(--secondary-color); border-color: var(--secondary-color); focus:ring: var(--secondary-focus-ring); }
+        .btn-danger:focus { box-shadow: 0 0 0 2px var(--light-color), 0 0 0 4px var(--danger-focus-ring); }
+        
+        .btn-secondary { background-color: var(--secondary-color); border-color: var(--secondary-color); }
         .btn-secondary:hover { background-color: var(--secondary-hover-color); border-color: var(--secondary-hover-color); }
-        .btn-success { background-color: var(--success-color); border-color: var(--success-color); focus:ring: var(--success-focus-ring); }
+        .btn-secondary:focus { box-shadow: 0 0 0 2px var(--light-color), 0 0 0 4px var(--secondary-focus-ring); }
+        
+        .btn-success { background-color: var(--success-color); border-color: var(--success-color); }
         .btn-success:hover { background-color: var(--success-hover-color); border-color: var(--success-hover-color); }
-        .btn-warning { background-color: var(--warning-color); border-color: var(--warning-color); focus:ring: var(--warning-focus-ring); color: white; }
+        .btn-success:focus { box-shadow: 0 0 0 2px var(--light-color), 0 0 0 4px var(--success-focus-ring); }
+        
+        .btn-warning { background-color: var(--warning-color); border-color: var(--warning-color); color: white; }
         .btn-warning:hover { background-color: var(--warning-hover-color); border-color: var(--warning-hover-color); }
-        .btn-light { background-color: var(--light-color); color: var(--light-text-color); border: 1px solid var(--light-border-color); focus:ring: var(--primary-focus-ring); box-shadow: none; }
+        .btn-warning:focus { box-shadow: 0 0 0 2px var(--light-color), 0 0 0 4px var(--warning-focus-ring); }
+        
+        .btn-light { background-color: var(--light-color); color: var(--light-text-color); border: 1px solid var(--light-border-color); box-shadow: none; }
         .btn-light:hover { background-color: var(--light-hover-bg); }
-        .btn-sm { @apply px-4 py-1.5 text-sm rounded; } /* Slightly smaller radius for sm buttons */
+        .btn-light:focus { box-shadow: 0 0 0 2px var(--light-color), 0 0 0 4px var(--primary-focus-ring); }
 
-        /* Icon Button Style (used in tables) */
+        .btn-sm { padding: 0.375rem 1rem; font-size: 0.875rem; border-radius: 0.25rem; /* rounded */ }
+
+        /* ഐക്കൺ ബട്ടൺ */
         .btn-icon {
-            @apply inline-flex items-center justify-center p-1.5 rounded text-gray-400 hover:text-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-indigo-500 hover:bg-gray-100 transition duration-150 ease-in-out;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.375rem; /* p-1.5 */
+            border-radius: 0.25rem;
+            color: #9ca3af; /* text-gray-400 */
+            transition: all 0.15s ease-in-out;
+            cursor: pointer;
+            background: none;
+            border: none;
         }
-        .btn-icon i { @apply h-4 w-4; }
-        .btn-icon.danger:hover { @apply text-red-600 bg-red-50; focus:ring-red-500; }
-        .btn-icon.warning:hover { @apply text-amber-600 bg-amber-50; focus:ring-amber-500; }
+        .btn-icon:hover { color: #4b5563; /* text-gray-600 */ background-color: #f3f4f6; /* bg-gray-100 */ }
+        .btn-icon:focus { outline: none; box-shadow: 0 0 0 2px var(--light-color), 0 0 0 4px var(--primary-focus-ring); }
+        .btn-icon i { height: 1rem; width: 1rem; }
+        .btn-icon.danger:hover { color: var(--danger-color); background-color: #fee2e2; }
+        .btn-icon.danger:focus { box-shadow: 0 0 0 2px var(--light-color), 0 0 0 4px var(--danger-focus-ring); }
+        .btn-icon.warning:hover { color: var(--warning-hover-color); background-color: #fffbeb; }
+        .btn-icon.warning:focus { box-shadow: 0 0 0 2px var(--light-color), 0 0 0 4px var(--warning-focus-ring); }
 
+        /* ഫോം സ്റ്റൈലുകൾ */
+        .form-input, .form-select, .form-textarea {
+            display: block;
+            width: 100%;
+            padding: 0.5rem 1rem;
+            border: 1px solid #d1d5db; /* border-gray-300 */
+            border-radius: 0.375rem;
+            background-color: #f9fafb; /* bg-gray-50 */
+            transition: all 0.15s ease-in-out;
+            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05); /* shadow-sm */
+            font-size: 0.875rem;
+            color: #374151;
+        }
+        .form-input:focus, .form-select:focus, .form-textarea:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 1px var(--primary-color);
+        }
+        .form-label { display: block; font-size: 0.75rem; font-weight: 500; color: #4b5563; margin-bottom: 0.25rem; text-transform: uppercase; letter-spacing: 0.05em; }
+        .card { background-color: white; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); border-radius: 0.5rem; padding: 1.5rem 2rem; }
+        .card-header { font-size: 1.125rem; font-weight: 600; color: #374151; margin-bottom: 1.25rem; border-bottom: 1px solid #e5e7eb; padding-bottom: 0.75rem; }
+        .password-wrapper { position: relative; }
+        .password-toggle-btn { position: absolute; top: 0; bottom: 0; right: 0; padding-right: 0.75rem; display: flex; align-items: center; color: #9ca3af; cursor: pointer; border: none; background: none; }
+        .password-toggle-btn:hover { color: #4b5563; }
+        .password-toggle-btn:focus { outline: none; }
 
-        /* Modern Form & Card Styles */
-        .form-input, .form-select, .form-textarea { @apply block w-full px-4 py-2 border border-gray-300 rounded-md bg-gray-50 focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 transition duration-150 ease-in-out shadow-sm text-sm; }
-        .form-label { @apply block text-xs font-medium text-gray-600 mb-1 uppercase tracking-wider; } /* Updated label style */
-        .card { @apply bg-white shadow-md rounded-lg p-6 md:p-8; }
-        .card-header { @apply text-lg font-semibold text-gray-700 mb-5 border-b pb-3 border-gray-200; }
-        .password-wrapper { @apply relative; }
-        .password-toggle-btn { @apply absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600 cursor-pointer focus:outline-none; }
+        /* ഇൻഫോ ബോക്സ് */
+        .info-text { background-color: #eef2ff; color: #3730a3; padding: 1rem; border: 1px solid #c7d2fe; border-radius: 0.375rem; font-size: 0.875rem; margin-bottom: 1.5rem; box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05); }
+        .info-text strong { font-weight: 600; color: #312e81; }
 
-        /* Instruction Box */
-        .info-text { @apply bg-indigo-50 text-indigo-700 p-4 border border-indigo-200 rounded-md text-sm mb-6 shadow-sm; }
-        .info-text strong { @apply font-medium text-indigo-800; }
-
-        /* Menu Overlay Styles (Slightly adjusted) */
+        /* മെനു ഓവർലേ */
         .menu-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.6); backdrop-filter: blur(4px); z-index: 1001; display: none; justify-content: center; align-items: flex-start; padding-top: 60px; opacity: 0; transition: opacity 0.3s ease; }
         .menu-box { background: white; width: 90%; max-width: 300px; border-radius: 10px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); padding: 15px; transform: translateY(-20px); opacity: 0; transition: all 0.3s ease-out; }
         .menu-box.open { transform: translateY(0); opacity: 1; }
@@ -88,71 +152,198 @@
         .menu-link { display: flex; align-items: center; padding: 10px 15px; text-decoration: none; color: #334155; font-weight: 500; border-radius: 6px; transition: background-color 0.2s, color 0.2s; font-size: 0.95em; margin-bottom: 4px; }
         .menu-link:hover { background-color: #f1f5f9; }
         .menu-link.active { background-color: var(--primary-color); color: white; font-weight: 600; }
-        .menu-link i { @apply w-5 mr-3 text-center text-gray-500; }
-        .menu-link.active i { @apply text-indigo-100; }
+        .menu-link i { width: 1.25rem; /* w-5 */ margin-right: 0.75rem; text-align: center; color: #6b7280; /* text-gray-500 */ }
+        .menu-link.active i { color: #e0e7ff; /* text-indigo-100 */ }
 
-        /* Custom file input */
-        .file-input-label { @apply btn btn-light text-sm; cursor: pointer; }
-        .file-input-label i { @apply mr-2; }
-        .file-input-filename { @apply text-sm text-gray-500 ml-4 inline-block align-middle; }
+        /* ടേബിൾ സ്റ്റൈലുകൾ */
+        .table-container { border: 1px solid #e5e7eb; border-radius: 0.5rem; overflow: hidden; box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05); }
+        .table-header { display: grid; gap: 1rem; padding: 0.75rem 1.5rem; text-align: left; font-size: 0.75rem; font-weight: 500; color: #6b7280; text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 1px solid #e5e7eb; background-color: #f9fafb; }
+        .table-row { display: grid; gap: 1rem; padding: 1rem 1.5rem; align-items: center; border-bottom: 1px solid #e5e7eb; background-color: white; transition: background-color 0.15s; font-size: 0.875rem; }
+        .table-row:last-child { border-bottom: 0; }
+        .table-row:hover { background-color: rgba(249, 250, 251, 0.5); /* hover:bg-gray-50/50 */ }
+        .table-cell-primary { font-weight: 500; color: #1f2937; word-break: break-word; }
+        .table-cell-secondary { color: #6b7280; display: block; font-size: 0.75rem; }
+        .table-cell-highlight { color: var(--primary-color); font-weight: 500; }
+        .table-actions { display: flex; justify-content: flex-end; align-items: center; gap: 0.5rem; }
+        
+        .badge { font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; padding: 0.125rem 0.5rem; border-radius: 9999px; display: inline-block; line-height: 1.25; }
+        .badge-group { background-color: #f3e8ff; color: #7e22ce; } /* bg-purple-100 text-purple-800 */
+        .badge-individual { background-color: #dbeafe; color: #1d4ed8; } /* bg-blue-100 text-blue-800 */
 
-        /* --- New Table/List Styles --- */
-        .table-container { @apply border border-gray-200 rounded-lg overflow-hidden shadow-sm; }
-        .table-header { @apply grid gap-4 px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-b border-gray-200 bg-gray-50; }
-        .table-row { @apply grid gap-4 px-6 py-4 items-center border-b border-gray-200 bg-white hover:bg-gray-50/50 transition-colors duration-150 text-sm; }
-        .table-row:last-child { @apply border-b-0; }
-        .table-cell { /* Basic cell style, specific text styles applied below */ }
-        .table-cell-primary { @apply font-medium text-gray-800 break-words; }
-        .table-cell-secondary { @apply text-gray-500 block text-xs; } /* For subtext like category/team */
-        .table-cell-highlight { @apply text-indigo-600 font-medium; } /* For points */
-        .table-actions { @apply flex justify-end items-center gap-2; }
-        /* Badge for Type */
-        .badge { @apply text-xs font-semibold uppercase tracking-wider px-2 py-0.5 rounded-full inline-block leading-none; }
-        .badge-group { @apply bg-purple-100 text-purple-800; }
-        .badge-individual { @apply bg-blue-100 text-blue-800; }
+        /* ചെക്ക്ബോക്സ് */
+        .form-checkbox { height: 1rem; width: 1rem; color: var(--primary-color); border: 1px solid #d1d5db; border-radius: 0.25rem; cursor: pointer; box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05); }
+        .form-checkbox:focus { box-shadow: 0 0 0 2px var(--light-color), 0 0 0 4px var(--primary-focus-ring); }
+        .checkbox-label { margin-left: 0.5rem; font-size: 0.875rem; font-weight: 500; color: #374151; cursor: pointer; }
+        .checkbox-container { display: flex; align-items: center; }
 
-
-        /* Custom Checkbox */
-        .form-checkbox { @apply h-4 w-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500 cursor-pointer shadow-sm; }
-        .checkbox-label { @apply ml-2 text-sm font-medium text-gray-700 cursor-pointer; }
-        .checkbox-container { @apply flex items-center; } /* Wrapper for checkbox + label */
-
-        /* Page title style */
-        .page-title { @apply text-xl font-semibold text-gray-700 mb-6 pb-2 border-b border-gray-300; }
-
-        /* Login page gradient */
+        .page-title { font-size: 1.25rem; font-weight: 600; color: #374151; margin-bottom: 1.5rem; padding-bottom: 0.5rem; border-bottom: 1px solid #d1d5db; }
         #login-page { background: linear-gradient(135deg, #eef2ff 0%, #f5f3ff 50%, #fdf2f8 100%); }
 
-         /* Responsive adjustments */
+        /* --- [പുതിയത്] Toast നോട്ടിഫിക്കേഷൻ --- */
+        #toast-container {
+            position: fixed;
+            bottom: 1.5rem;
+            right: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            z-index: 9999;
+        }
+        .toast {
+            display: flex;
+            align-items: center;
+            padding: 1rem 1.25rem;
+            border-radius: 0.5rem;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            background-color: white;
+            border: 1px solid #e5e7eb;
+            transform: translateX(120%);
+            opacity: 0;
+            transition: all 0.4s ease-in-out;
+            min-width: 250px;
+            max-width: 350px;
+        }
+        .toast.show {
+            transform: translateX(0);
+            opacity: 1;
+        }
+        .toast i {
+            margin-right: 0.75rem;
+            font-size: 1.25rem;
+        }
+        .toast-success { color: var(--success-color); }
+        .toast-error { color: var(--danger-color); }
+        .toast-warning { color: var(--warning-color); }
+        .toast-info { color: var(--primary-color); }
+        .toast-message {
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: #374151;
+            word-break: break-word;
+        }
+
+        /* --- [പുതിയത്] Confirm മോഡൽ --- */
+        #modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(4px);
+            z-index: 9000;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        #modal-box {
+            background-color: white;
+            padding: 2rem;
+            border-radius: 0.5rem;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            width: 90%;
+            max-width: 400px;
+            transform: scale(0.95);
+            opacity: 0;
+            transition: all 0.3s ease-out;
+        }
+        #modal-overlay.show {
+            display: flex;
+            opacity: 1;
+        }
+        #modal-overlay.show #modal-box {
+            transform: scale(1);
+            opacity: 1;
+        }
+        #modal-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #1f2937;
+            margin-bottom: 0.75rem;
+        }
+        #modal-message {
+            font-size: 0.875rem;
+            color: #4b5563;
+            margin-bottom: 1.5rem;
+        }
+        #modal-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 0.75rem;
+        }
+
+
+        /* റെസ്പോൺസീവ് മാറ്റങ്ങൾ */
         @media (max-width: 640px) {
-            .btn { @apply px-4 py-2 text-sm; }
-            .card { @apply p-4; }
-            .card-header { @apply text-base mb-4 pb-2; }
-            .page-title { @apply text-lg mb-4 pb-1; }
-            .table-header, .table-row { @apply px-4 py-2 text-xs grid-cols-2; } /* Simple 2-col on small */
-            .table-actions { @apply col-span-1 mt-2 sm:mt-0 justify-start sm:justify-end; }
-            .table-cell-primary { @apply text-sm; }
-            /* Hide less important columns on small screens if needed */
-            .hide-sm { @apply hidden sm:block; }
-            .hide-sm-grid { @apply hidden sm:grid; }
+            .btn { padding: 0.5rem 1rem; font-size: 0.875rem; }
+            .card { padding: 1rem; }
+            .card-header { font-size: 1rem; margin-bottom: 1rem; padding-bottom: 0.5rem; }
+            .page-title { font-size: 1.125rem; margin-bottom: 1rem; padding-bottom: 0.25rem; }
+            
+            /* ടേബിൾ മൊബൈലിൽ */
+            .table-header, .table-row {
+                padding: 0.75rem 1rem;
+                font-size: 0.8125rem;
+                grid-template-columns: 2fr 1fr; /* 2-column layout */
+            }
+            .table-row {
+                gap: 0.25rem 1rem;
+            }
+            .table-header span:not(:first-child),
+            .table-row div:not(:first-child) {
+                text-align: right;
+            }
+             /* കൂടുതൽ കോംപ്ലക്സ് ടേബിളുകൾക്ക് പ്രത്യേകമായി */
+            #participant-list-admin .table-header,
+            #participant-list-admin .table-row {
+                grid-template-columns: 1.5fr 1fr 1fr 100px;
+            }
+             #program-list .table-header,
+             #program-list .table-row {
+                 grid-template-columns: 1.5fr 1fr 0.8fr 100px;
+             }
+             /* ചെറിയ സ്ക്രീനിൽ ചിലത് മറയ്ക്കാൻ (നിങ്ങൾ ഉപയോഗിച്ചത്) */
+            .hide-sm { display: none; }
+            .hide-sm-grid { display: none; }
+            @media (min-width: 640px) {
+                .hide-sm { display: block; }
+                .hide-sm-grid { display: grid; }
+            }
         }
 
     </style>
 </head>
 <body class="bg-gray-100">
 
+    <!-- [പുതിയത്] Toast നോട്ടിഫിക്കേഷൻ കണ്ടെയ്നർ -->
+    <div id="toast-container"></div>
+
+    <!-- [പുതിയത്] Confirm മോഡൽ -->
+    <div id="modal-overlay">
+        <div id="modal-box">
+            <h3 id="modal-title">സ്ഥിരീകരിക്കുക</h3>
+            <p id="modal-message">നിങ്ങൾക്ക് ഇത് ഡിലീറ്റ് ചെയ്യണോ?</p>
+            <div id="modal-actions">
+                <button id="modal-cancel-btn" class="btn btn-light">Cancel</button>
+                <button id="modal-confirm-btn" class="btn btn-danger">Confirm</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Login Page -->
     <div id="login-page" class="min-h-screen flex items-center justify-center p-4">
-        <div class="w-full max-w-sm space-y-6"> <!-- Reduced max-width -->
+        <div class="w-full max-w-sm space-y-6">
             <div class="text-center">
-                 <i class="fas fa-user-shield text-4xl text-indigo-600 mb-2"></i> <!-- Slightly smaller icon -->
-                 <h1 class="text-2xl font-bold text-gray-800">Admin Panel</h1>
-                 <p class="text-sm text-gray-600">Sadaye Madeena 2k25</p>
+                <i class="fas fa-user-shield text-4xl text-indigo-600 mb-2"></i>
+                <h1 class="text-2xl font-bold text-gray-800">Admin Panel</h1>
+                <p class="text-sm text-gray-600">Sadaye Madeena 2k25</p>
             </div>
             <!-- Login Card -->
-            <div class="card">
+            <div class="card !p-6 md:!p-8"> <!-- സ്റ്റൈൽ ശരിയാകാൻ !p-6 ചേർത്തു -->
                 <h2 class="card-header text-center">Login</h2>
-                <form id="login-form" class="space-y-4"> <!-- Reduced spacing -->
+                <form id="login-form" class="space-y-4">
                     <div>
                         <label for="login-email" class="form-label">Email</label>
                         <input type="email" id="login-email" class="form-input" required placeholder="your@email.com">
@@ -166,23 +357,23 @@
                             </button>
                         </div>
                     </div>
-                    <button type="submit" class="btn btn-primary w-full !mt-5"><i class="fas fa-sign-in-alt"></i>Login</button> <!-- Added !mt-5 -->
+                    <button type="submit" class="btn btn-primary w-full !mt-5"><i class="fas fa-sign-in-alt"></i>Login</button>
                 </form>
             </div>
             <!-- Register Card -->
-            <div class="card bg-gray-50/50"> <!-- Slightly transparent bg -->
+            <div class="card !p-6 md:!p-8 bg-gray-50/50">
                 <h2 class="card-header text-center">
                     Register New Admin
                     <span class="block text-xs font-normal text-gray-500 mt-1">(First Use Only)</span>
                 </h2>
-                 <form id="register-form" class="space-y-4">
+                <form id="register-form" class="space-y-4">
                     <div>
                         <label for="register-email" class="form-label">Email</label>
                         <input type="email" id="register-email" class="form-input" required placeholder="newadmin@email.com">
                     </div>
                     <div>
                         <label for="register-password" class="form-label">Password</label>
-                         <div class="password-wrapper">
+                        <div class="password-wrapper">
                             <input type="password" id="register-password" class="form-input pr-10" required placeholder="Choose a strong password">
                             <button type="button" aria-label="Show password" class="password-toggle-btn" onclick="togglePasswordVisibility('register-password', this)">
                                 <i class="fas fa-eye password-toggle-icon"></i>
@@ -201,13 +392,13 @@
         <!-- Menu Overlay -->
         <div id="admin-menu-overlay" class="menu-overlay">
             <div id="admin-menu-box" class="menu-box">
-                 <div class="menu-header"> <span class="header-title">Admin Menu</span> <button id="admin-menu-close-btn" class="close-btn">&times;</button> </div>
-                 <a href="#dashboard" data-target="page-dashboard" class="menu-link active"><i class="fas fa-home fa-fw"></i>Home Page</a> <!-- Added fa-fw -->
-                 <a href="#participants" data-target="page-participants" class="menu-link"><i class="fas fa-id-card fa-fw"></i>Participants</a>
-                 <a href="#programs" data-target="page-programs" class="menu-link"><i class="fas fa-calendar-alt fa-fw"></i>Programs</a>
-                 <a href="#teams" data-target="page-teams" class="menu-link"><i class="fas fa-users fa-fw"></i>Teams</a>
-                 <a href="#results" data-target="page-results" class="menu-link"><i class="fas fa-poll fa-fw"></i>Results</a>
-                 <div class="mt-5 border-t border-gray-200 pt-3"> <button id="logout-button" class="w-full btn btn-danger btn-sm"><i class="fas fa-sign-out-alt"></i>Logout</button> </div>
+                <div class="menu-header"> <span class="header-title">Admin Menu</span> <button id="admin-menu-close-btn" class="close-btn">&times;</button> </div>
+                <a href="#dashboard" data-target="page-dashboard" class="menu-link active"><i class="fas fa-home fa-fw"></i>Home Page</a>
+                <a href="#participants" data-target="page-participants" class="menu-link"><i class="fas fa-id-card fa-fw"></i>Participants</a>
+                <a href="#programs" data-target="page-programs" class="menu-link"><i class="fas fa-calendar-alt fa-fw"></i>Programs</a>
+                <a href="#teams" data-target="page-teams" class="menu-link"><i class="fas fa-users fa-fw"></i>Teams</a>
+                <a href="#results" data-target="page-results" class="menu-link"><i class="fas fa-poll fa-fw"></i>Results</a>
+                <div class="mt-5 border-t border-gray-200 pt-3"> <button id="logout-button" class="w-full btn btn-danger btn-sm"><i class="fas fa-sign-out-alt"></i>Logout</button> </div>
             </div>
         </div>
 
@@ -215,15 +406,15 @@
         <div id="main-content">
             <!-- Top Bar -->
             <header class="bg-white shadow sticky top-0 z-10">
-                 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                     <div class="flex justify-between items-center h-14"> <!-- Reduced height -->
-                         <div class="flex items-center">
-                             <button id="admin-menu-btn" aria-label="Open menu" class="text-gray-500 focus:outline-none focus:text-gray-700 mr-3 p-2 rounded-full hover:bg-gray-100 md:mr-4"> <i class="fas fa-bars text-lg"></i> </button>
-                             <h1 class="text-md md:text-lg font-semibold text-gray-800">Admin Panel</h1>
-                         </div>
-                         <div class="text-xs sm:text-sm text-gray-500 font-medium truncate" id="admin-email"></div>
-                     </div>
-                 </div>
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <div class="flex justify-between items-center h-14">
+                        <div class="flex items-center">
+                            <button id="admin-menu-btn" aria-label="Open menu" class="text-gray-500 focus:outline-none focus:text-gray-700 mr-3 p-2 rounded-full hover:bg-gray-100 md:mr-4"> <i class="fas fa-bars text-lg"></i> </button>
+                            <h1 class="text-md md:text-lg font-semibold text-gray-800">Admin Panel</h1>
+                        </div>
+                        <div class="text-xs sm:text-sm text-gray-500 font-medium truncate" id="admin-email"></div>
+                    </div>
+                </div>
             </header>
 
             <!-- Page Content Area -->
@@ -232,8 +423,8 @@
                 <!-- Home Page Settings -->
                 <div id="page-dashboard" class="admin-page space-y-6">
                     <h1 class="page-title">Home Page Settings</h1>
-                     <div class="info-text"> <strong>നിർദ്ദേശം:</strong> വെബ്സൈറ്റിന്റെ പ്രധാന പേജിൽ (ഹോം പേജ്) കാണിക്കേണ്ട വിവരങ്ങൾ ഇവിടെ നൽകുക... </div>
-                     <form id="form-homepage" class="space-y-6">
+                    <div class="info-text"> <strong>നിർദ്ദേശം:</strong> വെബ്സൈറ്റിന്റെ പ്രധാന പേജിൽ (ഹോം പേജ്) കാണിക്കേണ്ട വിവരങ്ങൾ ഇവിടെ നൽകുക... </div>
+                    <form id="form-homepage" class="space-y-6">
                         <div class="card"> <h2 class="card-header">Header & Hero Content</h2> <div class="space-y-4"> <div class="grid grid-cols-1 md:grid-cols-2 gap-4"> <div> <label for="homepage-header-title" class="form-label">Header Title</label> <input type="text" id="homepage-header-title" class="form-input" placeholder="e.g., Sadaye Madeena 2k25"> </div> <div> <label for="homepage-logo-url" class="form-label">Logo Image URL</label> <input type="url" id="homepage-logo-url" class="form-input" placeholder="https://..."> </div> </div> <div class="grid grid-cols-1 md:grid-cols-2 gap-4"> <div> <label for="homepage-main-title" class="form-label">Main Title</label> <input type="text" id="homepage-main-title" class="form-input" placeholder="e.g., Sadaye Madeena 2k25"> </div> <div> <label for="homepage-subtitle" class="form-label">Subtitle</label> <input type="text" id="homepage-subtitle" class="form-input" placeholder="e.g., Inter-Madrasa Art Fest"> </div> </div> </div> </div>
                         <div class="card"> <h2 class="card-header">About Section</h2> <div class="space-y-4"> <div> <label for="homepage-about-title" class="form-label">About Title</label> <input type="text" id="homepage-about-title" class="form-input" placeholder="e.g., About The Fest"> </div> <div> <label for="homepage-about-subtitle" class="form-label">About Subtitle</label> <input type="text" id="homepage-about-subtitle" class="form-input" placeholder="e.g., Thirunoor'25"> </div> <div> <label for="homepage-about" class="form-label">Description</label> <textarea id="homepage-about" class="form-textarea" rows="5" placeholder="Write something..."></textarea> </div> <div> <label for="homepage-about-image-url" class="form-label">About Image URL</label> <input type="url" id="homepage-about-image-url" class="form-input" placeholder="https://..."> </div> </div> </div>
                         <div class="card"> <h2 class="card-header">Statistics Texts</h2> <p class="text-xs text-gray-500 mb-4">ഹോം പേജിൽ കാണിക്കുന്ന സ്റ്റാറ്റിസ്റ്റിക്സ് (കണക്കുകൾ) ഇവിടെ നൽകാം.</p> <div class="grid grid-cols-2 md:grid-cols-4 gap-4"> <div> <label for="homepage-total-programs" class="form-label">Programs</label> <input type="text" id="homepage-total-programs" class="form-input" placeholder="e.g., 50+"> </div> <div> <label for="homepage-total-participants" class="form-label">Contestants</label> <input type="text" id="homepage-total-participants" class="form-input" placeholder="e.g., 200+"> </div> <div> <label for="homepage-total-categories" class="form-label">Categories</label> <input type="text" id="homepage-total-categories" class="form-input" placeholder="e.g., 5"> </div> <div> <label for="homepage-total-teams" class="form-label">Teams</label> <input type="text" id="homepage-total-teams" class="form-input" placeholder="e.g., 3"> </div> </div> </div>
@@ -273,8 +464,8 @@
                             </div>
                         </div>
                         <div class="mt-5 pt-5 border-t border-gray-200 flex flex-col sm:flex-row justify-between items-center gap-3">
-                             <p class="text-sm text-gray-600">Total Displayed: <strong id="participant-count" class="text-base text-gray-900 font-semibold">0</strong></p>
-                             <button id="delete-all-participants-btn" class="btn btn-danger btn-sm w-full sm:w-auto"> <i class="fas fa-exclamation-triangle"></i> Delete All Participants </button>
+                            <p class="text-sm text-gray-600">Total Displayed: <strong id="participant-count" class="text-base text-gray-900 font-semibold">0</strong></p>
+                            <button id="delete-all-participants-btn" class="btn btn-danger btn-sm w-full sm:w-auto"> <i class="fas fa-exclamation-triangle"></i> Delete All Participants </button>
                         </div>
                     </div>
                 </div>
@@ -282,7 +473,7 @@
                 <!-- Programs & Categories -->
                 <div id="page-programs" class="admin-page hidden space-y-6">
                     <h1 class="page-title">Manage Programs & Categories</h1>
-                     <div class="info-text"> <strong>നിർദ്ദേശം:</strong> കാറ്റഗറികളും പ്രോഗ്രാമുകളും ചേർക്കുക/എഡിറ്റ് ചെയ്യുക. ഗ്രൂപ്പ് ഇനങ്ങൾക്ക് "Is Group Event?" ടിക്ക് ചെയ്യുക. </div>
+                    <div class="info-text"> <strong>നിർദ്ദേശം:</strong> കാറ്റഗറികളും പ്രോഗ്രാമുകളും ചേർക്കുക/എഡിറ്റ് ചെയ്യുക. ഗ്രൂപ്പ് ഇനങ്ങൾക്ക് "Is Group Event?" ടിക്ക് ചെയ്യുക. </div>
                     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                         <div class="card">
                             <h2 class="card-header">Manage Categories</h2>
@@ -293,12 +484,12 @@
                             <div>
                                 <h3 class="text-sm font-semibold text-gray-600 mb-2 uppercase tracking-wider">Existing Categories</h3>
                                 <div class="table-container">
-                                     <div class="table-header" style="grid-template-columns: 2fr 100px;">
+                                    <div class="table-header" style="grid-template-columns: 2fr 100px;">
                                         <span>Name</span> <span class="text-right">Actions</span>
-                                     </div>
-                                     <div id="category-list" class="max-h-[40vh] overflow-y-auto">
+                                    </div>
+                                    <div id="category-list" class="max-h-[40vh] overflow-y-auto">
                                         <div class="table-row"><p class="text-gray-500 col-span-2 text-center py-3">Loading categories...</p></div>
-                                     </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -306,9 +497,9 @@
                         <div class="card">
                             <h2 class="card-header">Add New Program</h2>
                             <form id="form-add-program" class="space-y-4">
-                                 <div> <label for="program-name" class="form-label">Program Name</label> <input type="text" id="program-name" class="form-input" placeholder="e.g., പ്രസംഗം" required> </div>
-                                 <div> <label for="program-category" class="form-label">Category</label> <select id="program-category" class="form-select" required> <option value="">Select Category</option> </select> </div>
-                                 <div class="grid grid-cols-3 gap-3">
+                                <div> <label for="program-name" class="form-label">Program Name</label> <input type="text" id="program-name" class="form-input" placeholder="e.g., പ്രസംഗം" required> </div>
+                                <div> <label for="program-category" class="form-label">Category</label> <select id="program-category" class="form-select" required> <option value="">Select Category</option> </select> </div>
+                                <div class="grid grid-cols-3 gap-3">
                                     <div> <label for="program-points-first" class="form-label">1st Pts</label> <input type="number" id="program-points-first" class="form-input" value="5" required> </div>
                                     <div> <label for="program-points-second" class="form-label">2nd Pts</label> <input type="number" id="program-points-second" class="form-input" value="3" required> </div>
                                     <div> <label for="program-points-third" class="form-label">3rd Pts</label> <input type="number" id="program-points-third" class="form-input" value="1" required> </div>
@@ -316,15 +507,15 @@
                                 <div class="checkbox-container pt-1">
                                     <input id="program-is-group" type="checkbox" class="form-checkbox">
                                     <label for="program-is-group" class="checkbox-label">Is Group Event?</label>
-                                 </div>
-                                 <div class="flex justify-end pt-2"> <button type="submit" class="btn btn-success"><i class="fas fa-plus"></i>Add Program</button> </div>
+                                </div>
+                                <div class="flex justify-end pt-2"> <button type="submit" class="btn btn-success"><i class="fas fa-plus"></i>Add Program</button> </div>
                             </form>
                         </div>
                     </div>
-                     <div class="card">
-                         <h2 class="card-header">Existing Programs</h2>
-                         <div class="table-container">
-                             <div class="table-header" style="grid-template-columns: 1.5fr 1fr 0.8fr 100px;">
+                    <div class="card">
+                        <h2 class="card-header">Existing Programs</h2>
+                        <div class="table-container">
+                            <div class="table-header" style="grid-template-columns: 1.5fr 1fr 0.8fr 100px;">
                                 <span>Program (Category)</span>
                                 <span>Points (1/2/3)</span>
                                 <span>Type</span>
@@ -357,7 +548,7 @@
                 </div>
 
                 <!-- Publish Results -->
-                 <div id="page-results" class="admin-page hidden space-y-6">
+                <div id="page-results" class="admin-page hidden space-y-6">
                     <h1 class="page-title">Publish & Update Results</h1>
                     <div class="info-text"> <strong>നിർദ്ദേശം:</strong> കാറ്റഗറിയും പ്രോഗ്രാമും തിരഞ്ഞെടുക്കുക. ശേഷം, വിജയികളുടെ ചെസ്റ്റ് നമ്പർ/ടീം പേര് നൽകുക... </div>
                     <div class="card">
@@ -392,73 +583,514 @@
 
     <!-- Firebase SDK & Admin Logic -->
     <script type="module">
-        // Firebase Config & Init (Version 12.4.0)
-        // (Firebase config remains the same)
+        // Firebase Config (നിങ്ങൾ നൽകിയത്)
         const firebaseConfig = { apiKey: "AIzaSyDBfnce5gtJhW9u1xwU2FVPQGx2KvG1vw8", authDomain: "result25.firebaseapp.com", projectId: "result25", storageBucket: "result25.firebasestorage.app", messagingSenderId: "1099340945335", appId: "1:1099340945335:web:4fdc63db6bf6b40a30ba32", measurementId: "G-S4BJW3N642" };
-        const appId = typeof __app_id !== 'undefined' ? __app_id : firebaseConfig.projectId;
+        
+        // Canvas/പരിസ്ഥിതി അനുസരിച്ചുള്ള കോൺഫിഗറേഷൻ
         const finalFirebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : firebaseConfig;
-        finalFirebaseConfig.projectId = appId;
+        const appId = typeof __app_id !== 'undefined' ? __app_id : finalFirebaseConfig.projectId;
+        finalFirebaseConfig.projectId = appId; // Project ID അപ്ഡേറ്റ് ചെയ്യുന്നു
 
+        // Firebase v12.4.0 (നിങ്ങളുടെ പതിപ്പ്)
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js";
-        import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-auth.js";
-        import { getFirestore, doc, setDoc, addDoc, getDoc, getDocs, deleteDoc, collection, onSnapshot, query, writeBatch, updateDoc } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-firestore.js";
+        import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, signOut, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-auth.js";
+        import { getFirestore, doc, setDoc, addDoc, getDoc, getDocs, deleteDoc, collection, onSnapshot, query, writeBatch, updateDoc, setLogLevel } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-firestore.js";
 
         const app = initializeApp(finalFirebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
+        setLogLevel('debug'); // Firestore ലോഗിംഗ്
 
-        // --- [JavaScript Logic - Updated] ---
+        // --- [പുതിയത്] നോട്ടിഫിക്കേഷൻ സിസ്റ്റം ---
+        const toastContainer = document.getElementById('toast-container');
+        const modalOverlay = document.getElementById('modal-overlay');
+        const modalTitle = document.getElementById('modal-title');
+        const modalMessage = document.getElementById('modal-message');
+        const modalConfirmBtn = document.getElementById('modal-confirm-btn');
+        const modalCancelBtn = document.getElementById('modal-cancel-btn');
+
+        /**
+         * ഒരു ടോസ്റ്റ് നോട്ടിഫിക്കേഷൻ കാണിക്കുന്നു
+         * @param {string} message - കാണിക്കേണ്ട സന്ദേശം
+         * @param {'info'|'success'|'error'|'warning'} type - ടോസ്റ്റിന്റെ തരം
+         */
+        function showToast(message, type = 'info') {
+            if (!toastContainer) return;
+            const toast = document.createElement('div');
+            toast.className = `toast toast-${type}`;
+            
+            let iconClass = 'fa-info-circle';
+            if (type === 'success') iconClass = 'fa-check-circle';
+            if (type === 'error') iconClass = 'fa-exclamation-triangle';
+            if (type === 'warning') iconClass = 'fa-exclamation-circle';
+
+            toast.innerHTML = `<i class="fas ${iconClass}"></i> <span class="toast-message">${message}</span>`;
+            toastContainer.appendChild(toast);
+
+            // Animate in
+            setTimeout(() => {
+                toast.classList.add('show');
+            }, 100);
+
+            // Animate out and remove
+            setTimeout(() => {
+                toast.classList.remove('show');
+                setTimeout(() => {
+                    toast.remove();
+                }, 500); // transition time
+            }, 3000); // 3 സെക്കൻഡ് നേരത്തേക്ക്
+        }
+
+        /**
+         * ഒരു കൺഫർമേഷൻ മോഡൽ കാണിക്കുന്നു
+         * @param {string} title - മോഡലിന്റെ തലക്കെട്ട്
+         * @param {string} message - സന്ദേശം
+         * @returns {Promise<boolean>} - ഉപയോക്താവ് 'Confirm' ക്ലിക്ക് ചെയ്താൽ true, അല്ലെങ്കിൽ false
+         */
+        function showConfirm(title, message) {
+            return new Promise((resolve) => {
+                if (!modalOverlay || !modalTitle || !modalMessage || !modalConfirmBtn || !modalCancelBtn) {
+                    resolve(window.confirm(message)); // Fallback
+                    return;
+                }
+                
+                modalTitle.textContent = title;
+                modalMessage.textContent = message;
+
+                modalOverlay.classList.add('show');
+
+                const confirmHandler = () => {
+                    modalOverlay.classList.remove('show');
+                    cleanup();
+                    resolve(true);
+                };
+
+                const cancelHandler = () => {
+                    modalOverlay.classList.remove('show');
+                    cleanup();
+                    resolve(false);
+                };
+
+                const cleanup = () => {
+                    modalConfirmBtn.removeEventListener('click', confirmHandler);
+                    modalCancelBtn.removeEventListener('click', cancelHandler);
+                };
+
+                modalConfirmBtn.addEventListener('click', confirmHandler);
+                modalCancelBtn.addEventListener('click', cancelHandler);
+            });
+        }
+        // --- [പുതിയത്] നോട്ടിഫിക്കേഷൻ സിസ്റ്റം (അവസാനിച്ചു) ---
+
+
         document.addEventListener('DOMContentLoaded', () => {
-            let allPrograms = {}; // Use object for O(1) lookup by ID
-            let allCategories = [];
-            let allParticipants = {};
-            let allTeamsAdmin = {}; // Stores { TEAM_NAME_UPPERCASE: { id: 'TEAM_NAME', ...data } }
+            let allPrograms = {}; // ID വെച്ച് വേഗത്തിൽ എടുക്കാൻ Object
+            let allCategories = []; // ലിസ്റ്റ് ചെയ്യാൻ Array
+            let allParticipants = {}; // ID വെച്ച് വേഗത്തിൽ എടുക്കാൻ Object
+            let allTeamsAdmin = {}; // പേര് വെച്ച് വേഗത്തിൽ എടുക്കാൻ Object
 
-            const d = document; // Shortcut
+            const d = document; // കുറുക്കുവഴി
 
-            // --- DOM Element Selections (Mostly unchanged, added checkbox) ---
+            // DOM എലമെന്റുകൾ
             const loginPage=d.getElementById('login-page'), adminPanel=d.getElementById('admin-panel'), loginForm=d.getElementById('login-form'), registerForm=d.getElementById('register-form'), logoutButton=d.getElementById('logout-button'), adminEmail=d.getElementById('admin-email'), pages=d.querySelectorAll('.admin-page'), adminMenuOverlay=d.getElementById('admin-menu-overlay'), adminMenuBox=d.getElementById('admin-menu-box'), adminMenuBtn=d.getElementById('admin-menu-btn'), adminMenuCloseBtn=d.getElementById('admin-menu-close-btn'), navLinks=d.querySelectorAll('.menu-link');
             const participantAddForm = d.getElementById('form-add-participants'), participantAddTeam = d.getElementById('participant-add-team'), participantAddNames = d.getElementById('participant-add-names'), addLogContainer = d.getElementById('add-log-container'), addLog = d.getElementById('add-log'), participantCountEl=d.getElementById('participant-count'), deleteAllParticipantsBtn=d.getElementById('delete-all-participants-btn'), participantTeamFilter = d.getElementById('participant-team-filter'), participantSearch = d.getElementById('participant-search'), participantListAdmin = d.getElementById('participant-list-admin'), participantListPlaceholder = d.getElementById('participant-list-placeholder');
             const categoryForm=d.getElementById('form-add-category'), categoryInput=d.getElementById('category-name'), categoryList=d.getElementById('category-list'), programForm=d.getElementById('form-add-program'), programNameInput=d.getElementById('program-name'), programCategorySelect=d.getElementById('program-category'), programList=d.getElementById('program-list'), programPointsFirst = d.getElementById('program-points-first'), programPointsSecond = d.getElementById('program-points-second'), programPointsThird = d.getElementById('program-points-third');
-            const programIsGroupCheckbox = d.getElementById('program-is-group'); // Checkbox element
+            const programIsGroupCheckbox = d.getElementById('program-is-group');
             const resultForm=d.getElementById('form-publish-result'), resultCategorySelect=d.getElementById('result-category'), resultProgramSelect=d.getElementById('result-program'), resultInputs={'first':d.getElementById('result-first'), 'second':d.getElementById('result-second'), 'third':d.getElementById('result-third')}, nameSpans={'first':d.getElementById('name-first'), 'second':d.getElementById('name-second'), 'third':d.getElementById('name-third')};
             const teamForm=d.getElementById('form-add-team'), teamListAdmin=d.getElementById('team-list-admin');
             const homepageForm=d.getElementById('form-homepage'), homepageFields={'header_title':d.getElementById('homepage-header-title'), 'logo_url':d.getElementById('homepage-logo-url'), 'main_title':d.getElementById('homepage-main-title'), 'subtitle':d.getElementById('homepage-subtitle'), 'about_title':d.getElementById('homepage-about-title'), 'about_subtitle':d.getElementById('homepage-about-subtitle'), 'about':d.getElementById('homepage-about'), 'about_image_url':d.getElementById('homepage-about-image-url'), 'gallery':d.getElementById('homepage-gallery'), 'total_programs':d.getElementById('homepage-total-programs'), 'total_participants':d.getElementById('homepage-total-participants'), 'total_categories':d.getElementById('homepage-total-categories'), 'total_teams':d.getElementById('homepage-total-teams'), 'institution_name':d.getElementById('homepage-institution-name'), 'copyright_text':d.getElementById('homepage-copyright-text'), 'social_instagram':d.getElementById('homepage-social-instagram'), 'social_youtube':d.getElementById('homepage-social-youtube'), 'social_facebook':d.getElementById('homepage-social-facebook')};
 
-            // --- Navigation Logic (Unchanged) ---
+            // --- നാവിഗേഷൻ (മാറ്റമില്ല) ---
             function openAdminNav() { if(adminMenuOverlay && adminMenuBox) { adminMenuOverlay.style.display = 'flex'; setTimeout(() => { adminMenuOverlay.style.opacity = '1'; adminMenuBox.classList.add('open'); }, 10); } }
             function closeAdminNav() { if(adminMenuOverlay && adminMenuBox) { adminMenuOverlay.style.opacity = '0'; adminMenuBox.classList.remove('open'); setTimeout(() => { adminMenuOverlay.style.display = 'none'; }, 300); } }
             if(adminMenuBtn) adminMenuBtn.addEventListener('click', openAdminNav);
             if(adminMenuCloseBtn) adminMenuCloseBtn.addEventListener('click', closeAdminNav);
             if(adminMenuOverlay) adminMenuOverlay.addEventListener('click', (e) => { if (e.target === adminMenuOverlay) { closeAdminNav(); } });
             navLinks.forEach(link => { link.addEventListener('click', (e) => { e.preventDefault(); const targetId = link.getAttribute('data-target'); pages.forEach(page => page.classList.add('hidden')); const targetPage = d.getElementById(targetId); if (targetPage) targetPage.classList.remove('hidden'); navLinks.forEach(nav => nav.classList.remove('active')); link.classList.add('active'); closeAdminNav(); setTimeout(() => loadDataForPage(targetId), 0); }); });
-            function loadDataForPage(pageId) { console.log("Loading data for:", pageId); if (pageId === 'page-dashboard') loadHomepageContent(); if (pageId === 'page-participants') { loadTeamsForAdmin(); loadAllParticipants(); } if (pageId === 'page-programs') { loadCategories(); loadPrograms(); } if (pageId === 'page-results') { loadCategoriesForResults(); loadPrograms(); loadAllParticipants(); loadTeamsForAdmin(); } if (pageId === 'page-teams') loadTeamsForAdmin(); }
+            
+            // ഈ ഫംഗ്ഷൻ ഇപ്പോൾ ആവശ്യമില്ല, കാരണം onSnapshot എപ്പോഴും ഡാറ്റ ലോഡ് ചെയ്യും
+            function loadDataForPage(pageId) {
+                console.log("Navigated to:", pageId);
+                if (pageId === 'page-dashboard') loadHomepageContent();
+                // മറ്റ് പേജുകൾ onSnapshot വഴി ഓട്ടോമാറ്റിക്കായി ലോഡ് ആകും
+            }
 
-            // --- Authentication (Unchanged) ---
-            onAuthStateChanged(auth, (user) => { if (user) { if(loginPage) loginPage.style.display = 'none'; if(adminPanel) adminPanel.style.display = 'block'; if(adminEmail) adminEmail.textContent = user.email; const defaultPageId = 'page-dashboard'; pages.forEach(page => page.classList.add('hidden')); const defaultPageElement = d.getElementById(defaultPageId); if (defaultPageElement) defaultPageElement.classList.remove('hidden'); navLinks.forEach(nav => nav.classList.remove('active')); const defaultNavLink = d.querySelector(`.menu-link[data-target="${defaultPageId}"]`); if (defaultNavLink) defaultNavLink.classList.add('active'); setTimeout(() => { loadDataForPage(defaultPageId); loadAllParticipants(); loadTeamsForAdmin(); loadCategories(); loadPrograms(); }, 0); } else { if(loginPage) loginPage.style.display = 'flex'; if(adminPanel) adminPanel.style.display = 'none'; } });
-            if(loginForm) { loginForm.addEventListener('submit', async (e) => { e.preventDefault(); const emailEl = d.getElementById('login-email'); const passwordEl = d.getElementById('login-password'); if (!emailEl || !passwordEl) return; const email = emailEl.value; const password = passwordEl.value; if (!email || !password) { alert("Please enter both email and password."); return; } try { await signInWithEmailAndPassword(auth, email, password); } catch (error) { alert(`Login Failed: ${error.message}`); } }); } else { console.error("Login form not found!"); }
-            if(registerForm) { registerForm.addEventListener('submit', async (e) => { e.preventDefault(); const emailEl = d.getElementById('register-email'); const passwordEl = d.getElementById('register-password'); if (!emailEl || !passwordEl) return; const email = emailEl.value; const password = passwordEl.value; if (!email || !password) { alert("Please enter both email and password."); return; } try { await createUserWithEmailAndPassword(auth, email, password); alert('Admin user registered! Please login.'); registerForm.reset(); } catch (error) { alert(`Registration Failed: ${error.message}`); } }); } else { console.error("Register form not found!"); }
-            if(logoutButton) { logoutButton.addEventListener('click', async () => { try { await signOut(auth); } catch(error) { alert(`Logout Failed: ${error.message}`); } }); } else { console.error("Logout button not found!"); }
+            // --- ഓതന്റിക്കേഷൻ (alert മാറ്റി) ---
+            onAuthStateChanged(auth, async (user) => {
+                if (user) {
+                    if(loginPage) loginPage.style.display = 'none';
+                    if(adminPanel) adminPanel.style.display = 'block';
+                    if(adminEmail) adminEmail.textContent = user.email;
+                    
+                    // സ്ഥിരസ്ഥിതി പേജ് കാണിക്കുക
+                    const defaultPageId = 'page-dashboard';
+                    pages.forEach(page => page.classList.add('hidden'));
+                    const defaultPageElement = d.getElementById(defaultPageId);
+                    if (defaultPageElement) defaultPageElement.classList.remove('hidden');
+                    navLinks.forEach(nav => nav.classList.remove('active'));
+                    const defaultNavLink = d.querySelector(`.menu-link[data-target="${defaultPageId}"]`);
+                    if (defaultNavLink) defaultNavLink.classList.add('active');
+                    
+                    // എല്ലാ തത്സമയ ലിസണറുകളും ആരംഭിക്കുക
+                    initializeDataListeners();
+                    loadHomepageContent(); // ഇത് onSnapshot അല്ല, അതിനാൽ പ്രത്യേകം വിളിക്കണം
+                    
+                } else {
+                    // സൈൻ ഇൻ ചെയ്തിട്ടില്ലെങ്കിൽ, ക്യാൻവാസ് ടോക്കൺ പരിശോധിക്കുക
+                    if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                        try {
+                            console.log("Attempting sign in with custom token...");
+                            await signInWithCustomToken(auth, __initial_auth_token);
+                            // onAuthStateChanged വീണ്ടും ട്രിഗർ ആകും
+                        } catch (error) {
+                            console.error("Custom token sign-in failed:", error);
+                            // പരാജയപ്പെട്ടാൽ അനോണിമസ് ആയി ശ്രമിക്കുക
+                            try {
+                                await signInAnonymously(auth);
+                            } catch (anonError) {
+                                console.error("Anonymous sign-in failed:", anonError);
+                                if(loginPage) loginPage.style.display = 'flex';
+                                if(adminPanel) adminPanel.style.display = 'none';
+                            }
+                        }
+                    } else {
+                         // ടോക്കൺ ഇല്ലെങ്കിൽ, അനോണിമസ് ആയി ശ്രമിക്കുക
+                        try {
+                            console.log("No token, attempting anonymous sign-in...");
+                            await signInAnonymously(auth);
+                             // onAuthStateChanged വീണ്ടും ട്രിഗർ ആകും (ഒരു അനോണിമസ് യൂസറായി)
+                             // അനോണിമസ് യൂസറിന് അഡ്മിൻ പാനൽ കാണിക്കണോ എന്ന് ഇവിടെ തീരുമാനിക്കാം.
+                             // തൽക്കാലം ലോഗിൻ പേജ് തന്നെ കാണിക്കാം.
+                            if(loginPage) loginPage.style.display = 'flex';
+                            if(adminPanel) adminPanel.style.display = 'none';
+                        } catch (anonError) {
+                            console.error("Anonymous sign-in failed:", anonError);
+                            if(loginPage) loginPage.style.display = 'flex';
+                            if(adminPanel) adminPanel.style.display = 'none';
+                        }
+                    }
+                }
+            });
+            
+            if(loginForm) { loginForm.addEventListener('submit', async (e) => { e.preventDefault(); const emailEl = d.getElementById('login-email'); const passwordEl = d.getElementById('login-password'); if (!emailEl || !passwordEl) return; const email = emailEl.value; const password = passwordEl.value; if (!email || !password) { showToast("Please enter both email and password.", "warning"); return; } try { await signInWithEmailAndPassword(auth, email, password); showToast("Login Successful!", "success"); } catch (error) { showToast(`Login Failed: ${error.message}`, "error"); } }); } else { console.error("Login form not found!"); }
+            if(registerForm) { registerForm.addEventListener('submit', async (e) => { e.preventDefault(); const emailEl = d.getElementById('register-email'); const passwordEl = d.getElementById('register-password'); if (!emailEl || !passwordEl) return; const email = emailEl.value; const password = passwordEl.value; if (!email || !password) { showToast("Please enter both email and password.", "warning"); return; } try { await createUserWithEmailAndPassword(auth, email, password); showToast('Admin user registered! Please login.', 'success'); registerForm.reset(); } catch (error) { showToast(`Registration Failed: ${error.message}`, "error"); } }); } else { console.error("Register form not found!"); }
+            if(logoutButton) { logoutButton.addEventListener('click', async () => { try { await signOut(auth); showToast("Logged out successfully.", "info"); } catch(error) { showToast(`Logout Failed: ${error.message}`, "error"); } }); } else { console.error("Logout button not found!"); }
             window.togglePasswordVisibility = function(inputId, button) { const input = d.getElementById(inputId); const icon = button.querySelector('i'); if (!input || !icon) return; if (input.type === "password") { input.type = "text"; icon.classList.remove("fa-eye"); icon.classList.add("fa-eye-slash"); } else { input.type = "password"; icon.classList.remove("fa-eye-slash"); icon.classList.add("fa-eye"); } }
 
-            // --- Participants Page Logic (Unchanged) ---
-            async function loadAllParticipants() { /* ... */ onSnapshot(collection(db, `artifacts/${appId}/public/data/participants`), (snapshot) => { allParticipants = {}; snapshot.docs.forEach(doc => { allParticipants[doc.id] = { ...doc.data(), chestNo: doc.id }; }); renderParticipantList(); console.log('Participants updated:', Object.keys(allParticipants).length); }, (error) => { console.error("Error loading participants:", error); }); }
-            function renderParticipantList() { if (!participantListAdmin) return; const teamFilter = participantTeamFilter ? participantTeamFilter.value : ''; const searchFilter = participantSearch ? participantSearch.value.toLowerCase() : ''; participantListAdmin.innerHTML = ''; const participantValues = Object.values(allParticipants); let filteredParticipants = participantValues; if (teamFilter) { filteredParticipants = filteredParticipants.filter(p => p.team === teamFilter); } if (searchFilter) { filteredParticipants = filteredParticipants.filter(p => p.name.toLowerCase().includes(searchFilter) || p.chestNo.includes(searchFilter)); } filteredParticipants.sort((a,b) => parseInt(a.chestNo, 10) - parseInt(b.chestNo, 10)); if(participantCountEl) participantCountEl.textContent = filteredParticipants.length; if (filteredParticipants.length === 0) { participantListAdmin.innerHTML = `<div class="table-row"><p class="text-gray-500 italic col-span-4 text-center py-5">No participants found matching criteria.</p></div>`; if (participantListPlaceholder) participantListPlaceholder.style.display = 'none'; return; } if (participantListPlaceholder) participantListPlaceholder.style.display = 'none'; filteredParticipants.forEach(p => { const item = d.createElement('div'); item.className = 'table-row'; item.style.gridTemplateColumns = '1.5fr 1fr 1fr 100px'; item.innerHTML = `<div class="table-cell table-cell-primary">${p.name}</div> <div class="table-cell text-gray-500">${p.chestNo}</div> <div class="table-cell text-gray-500">${p.team}</div> <div class="table-actions"> <button class="btn-icon warning" onclick="editParticipant('${p.chestNo}', \`${p.name}\`, '${p.team}')" title="Edit"><i class="fas fa-edit"></i></button> <button class="btn-icon danger" onclick="deleteParticipant('${p.chestNo}')" title="Delete"><i class="fas fa-trash-alt"></i></button> </div>`; participantListAdmin.appendChild(item); }); }
-            window.editParticipant = async (chestNo, currentName, currentTeam) => { /* ... */ };
-            window.deleteParticipant = async (chestNo) => { /* ... */ };
-            if (participantAddForm) { /* ... Add multiple participants ... */ }
-            async function deleteAllParticipants(promptUser = true) { /* ... */ }
-            if(deleteAllParticipantsBtn) deleteAllParticipantsBtn.addEventListener('click', () => deleteAllParticipants(true));
+            // --- [പുതിയത്] എല്ലാ onSnapshot ലിസണറുകളും ഒരുമിച്ച് ആരംഭിക്കാൻ ---
+            function initializeDataListeners() {
+                console.log("Initializing all data listeners...");
+                loadAllParticipants(); // onSnapshot
+                loadCategories(); // onSnapshot (മാറ്റം വരുത്തി)
+                loadPrograms(); // onSnapshot (മാറ്റം വരുത്തി)
+                loadTeamsForAdmin(); // onSnapshot (മാറ്റം വരുത്തി)
+            }
+
+            // --- Participants (onSnapshot ഉപയോഗിക്കുന്നു, alert മാറ്റി) ---
+            function loadAllParticipants() {
+                const q = query(collection(db, `artifacts/${appId}/public/data/participants`));
+                onSnapshot(q, (snapshot) => {
+                    allParticipants = {};
+                    snapshot.docs.forEach(doc => {
+                        allParticipants[doc.id] = { ...doc.data(), chestNo: doc.id };
+                    });
+                    renderParticipantList();
+                    console.log('Participants updated:', Object.keys(allParticipants).length);
+                }, (error) => {
+                    console.error("Error loading participants:", error);
+                    showToast(`Error loading participants: ${error.message}`, "error");
+                    if (participantListAdmin) participantListAdmin.innerHTML = `<div class="table-row"><p class="text-red-500 col-span-4 text-center py-5">Error loading participants.</p></div>`;
+                });
+            }
+            
+            function renderParticipantList() { /* HTML നിർമ്മാണം, മാറ്റമില്ല */
+                if (!participantListAdmin) return;
+                const teamFilter = participantTeamFilter ? participantTeamFilter.value : '';
+                const searchFilter = participantSearch ? participantSearch.value.toLowerCase() : '';
+                participantListAdmin.innerHTML = '';
+                const participantValues = Object.values(allParticipants);
+                let filteredParticipants = participantValues;
+                if (teamFilter) { filteredParticipants = filteredParticipants.filter(p => p.team === teamFilter); }
+                if (searchFilter) { filteredParticipants = filteredParticipants.filter(p => p.name.toLowerCase().includes(searchFilter) || p.chestNo.includes(searchFilter)); }
+                filteredParticipants.sort((a,b) => parseInt(a.chestNo, 10) - parseInt(b.chestNo, 10));
+                if(participantCountEl) participantCountEl.textContent = filteredParticipants.length;
+                if (filteredParticipants.length === 0) {
+                    participantListAdmin.innerHTML = `<div class="table-row"><p class="text-gray-500 italic col-span-4 text-center py-5">No participants found matching criteria.</p></div>`;
+                    if (participantListPlaceholder) participantListPlaceholder.style.display = 'none';
+                    return;
+                }
+                if (participantListPlaceholder) participantListPlaceholder.style.display = 'none';
+                filteredParticipants.forEach(p => {
+                    const item = d.createElement('div');
+                    item.className = 'table-row';
+                    item.style.gridTemplateColumns = '1.5fr 1fr 1fr 100px';
+                    // Event Handlers നേരിട്ട് ചേർക്കുന്നു
+                    item.innerHTML = `
+                        <div class="table-cell table-cell-primary">${p.name}</div>
+                        <div class="table-cell text-gray-500">${p.chestNo}</div>
+                        <div class="table-cell text-gray-500">${p.team}</div>
+                        <div class="table-actions">
+                            <button class="btn-icon warning edit-participant-btn" data-chest="${p.chestNo}" data-name="${p.name}" data-team="${p.team}" title="Edit"><i class="fas fa-edit"></i></button>
+                            <button class="btn-icon danger delete-participant-btn" data-chest="${p.chestNo}" title="Delete"><i class="fas fa-trash-alt"></i></button>
+                        </div>`;
+                    participantListAdmin.appendChild(item);
+                });
+            }
+            
+            // Event Delegation (onclick="" മാറ്റി)
+            if(participantListAdmin) {
+                participantListAdmin.addEventListener('click', (e) => {
+                    const editBtn = e.target.closest('.edit-participant-btn');
+                    if (editBtn) {
+                        const { chest, name, team } = editBtn.dataset;
+                        editParticipant(chest, name, team);
+                        return;
+                    }
+                    const deleteBtn = e.target.closest('.delete-participant-btn');
+                    if (deleteBtn) {
+                        const { chest } = deleteBtn.dataset;
+                        deleteParticipant(chest);
+                        return;
+                    }
+                });
+            }
+
+            window.editParticipant = async (chestNo, currentName, currentTeam) => {
+                const newName = prompt("Enter new name:", currentName);
+                if (newName && newName.trim() !== '' && newName.trim() !== currentName) {
+                    try {
+                        await updateDoc(doc(db, `artifacts/${appId}/public/data/participants`, chestNo), { name: newName.trim() });
+                        showToast('Participant updated!', 'success');
+                        // onSnapshot യാന്ത്രികമായി ലിസ്റ്റ് അപ്ഡേറ്റ് ചെയ്യും
+                    } catch (error) {
+                        showToast(`Error: ${error.message}`, 'error');
+                    }
+                }
+            };
+            
+            window.deleteParticipant = async (chestNo) => {
+                const confirmed = await showConfirm('Delete Participant?', `Are you sure you want to delete ${chestNo}?`);
+                if (!confirmed) return;
+                try {
+                    await deleteDoc(doc(db, `artifacts/${appId}/public/data/participants`, chestNo));
+                    showToast('Participant deleted!', 'success');
+                    // onSnapshot യാന്ത്രികമായി ലിസ്റ്റ് അപ്ഡേറ്റ് ചെയ്യും
+                } catch (error) {
+                    showToast(`Error: ${error.message}`, 'error');
+                }
+            };
+            
+            if (participantAddForm) { /* മാറ്റമില്ല */
+                participantAddForm.addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    const team = participantAddTeam.value;
+                    const names = participantAddNames.value.split('\n').map(n => n.trim()).filter(Boolean);
+                    if (!team || names.length === 0) {
+                        showToast("Please select a team and enter names.", "warning");
+                        return;
+                    }
+                    const teamData = allTeamsAdmin[team.toUpperCase()];
+                    if (!teamData) {
+                        showToast("Selected team data not found.", "error");
+                        return;
+                    }
+                    if (addLogContainer) addLogContainer.classList.remove('hidden');
+                    if (addLog) addLog.textContent = 'Starting...\n';
+                    const btn = d.getElementById('add-participants-btn');
+                    if(btn) btn.disabled = true;
+
+                    const existingTeamParticipants = Object.values(allParticipants).filter(p => p.team === team);
+                    let nextChestNo = (teamData.id_from || 101) + existingTeamParticipants.length;
+                    const maxChestNo = teamData.id_to || (nextChestNo + names.length);
+
+                    const batch = writeBatch(db);
+                    let addedCount = 0;
+                    let errorCount = 0;
+
+                    for (const name of names) {
+                        if (nextChestNo > maxChestNo) {
+                            if (addLog) addLog.textContent += `ERROR: Chest number limit (${maxChestNo}) reached for team. "${name}" not added.\n`;
+                            errorCount++;
+                            continue;
+                        }
+                        const chestNoStr = String(nextChestNo);
+                        if (allParticipants[chestNoStr]) {
+                             if (addLog) addLog.textContent += `SKIP: Chest number ${chestNoStr} already exists. Trying next...\n`;
+                             // Find next available
+                             while(allParticipants[String(nextChestNo)] && nextChestNo <= maxChestNo) {
+                                 nextChestNo++;
+                             }
+                             if(nextChestNo > maxChestNo) {
+                                  if (addLog) addLog.textContent += `ERROR: No available chest number left for "${name}".\n`;
+                                  errorCount++;
+                                  continue;
+                             }
+                             // Found a free slot
+                             const newChestNoStr = String(nextChestNo);
+                             const participantRef = doc(db, `artifacts/${appId}/public/data/participants`, newChestNoStr);
+                             batch.set(participantRef, { name, team });
+                             if (addLog) addLog.textContent += `SUCCESS: Added "${name}" as ${newChestNoStr}\n`;
+                             addedCount++;
+                             nextChestNo++;
+                        } else {
+                            const participantRef = doc(db, `artifacts/${appId}/public/data/participants`, chestNoStr);
+                            batch.set(participantRef, { name, team });
+                            if (addLog) addLog.textContent += `SUCCESS: Added "${name}" as ${chestNoStr}\n`;
+                            addedCount++;
+                            nextChestNo++;
+                        }
+                    }
+
+                    try {
+                        await batch.commit();
+                        if (addLog) addLog.textContent += `\nDone! ${addedCount} added, ${errorCount} errors.`;
+                        showToast(`Successfully added ${addedCount} participants.`, 'success');
+                        participantAddForm.reset();
+                    } catch (error) {
+                        if (addLog) addLog.textContent += `\nBATCH FAILED: ${error.message}`;
+                        showToast(`Error saving participants: ${error.message}`, 'error');
+                    }
+                    if(btn) btn.disabled = false;
+                });
+            }
+            
+            async function deleteAllParticipants() {
+                const confirmed = await showConfirm('DELETE ALL?', 'This will delete ALL participants. This action cannot be undone. Are you sure?');
+                if (!confirmed) return;
+                
+                showToast('Deleting all participants... Please wait.', 'info');
+                
+                try {
+                    // Get all docs first
+                    const q = query(collection(db, `artifacts/${appId}/public/data/participants`));
+                    const snapshot = await getDocs(q);
+                    
+                    if (snapshot.empty) {
+                        showToast("No participants to delete.", "info");
+                        return;
+                    }
+
+                    const batch = writeBatch(db);
+                    snapshot.docs.forEach(doc => {
+                        batch.delete(doc.ref);
+                    });
+                    
+                    await batch.commit();
+                    showToast(`Successfully deleted ${snapshot.size} participants.`, 'success');
+                    // onSnapshot യാന്ത്രികമായി ലിസ്റ്റ് അപ്ഡേറ്റ് ചെയ്യും
+                } catch (error) {
+                    showToast(`Error deleting participants: ${error.message}`, 'error');
+                }
+            }
+            if(deleteAllParticipantsBtn) deleteAllParticipantsBtn.addEventListener('click', deleteAllParticipants);
             if (participantTeamFilter) participantTeamFilter.addEventListener('change', renderParticipantList);
             if (participantSearch) participantSearch.addEventListener('input', renderParticipantList);
 
-            // --- Programs & Categories Page Logic (Updated rendering) ---
-            async function loadCategories() { try { const q = query(collection(db, `artifacts/${appId}/public/data/categories`)); const snapshot = await getDocs(q); allCategories = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })).sort((a,b)=>a.name.localeCompare(b.name)); if (categoryList) categoryList.innerHTML = ''; if (programCategorySelect) programCategorySelect.innerHTML = '<option value="">Select Category</option>'; if (allCategories.length === 0) { if (categoryList) categoryList.innerHTML = '<div class="table-row"><p class="text-gray-500 italic col-span-2 text-center py-3">No categories added yet.</p></div>'; } else { allCategories.forEach(cat => { if (categoryList) { categoryList.innerHTML += ` <div class="table-row" style="grid-template-columns: 2fr 100px;"> <div class="table-cell table-cell-primary">${cat.name}</div> <div class="table-actions"> <button class="btn-icon warning" onclick="editCategory('${cat.id}', \`${cat.name}\`)"><i class="fas fa-edit"></i></button> <button class="btn-icon danger" onclick="deleteCategory('${cat.id}')"><i class="fas fa-trash-alt"></i></button> </div> </div>`; } if (programCategorySelect) programCategorySelect.innerHTML += `<option value="${cat.name}">${cat.name}</option>`; }); } } catch(error) { console.error("Error loading categories:", error); if (categoryList) categoryList.innerHTML = '<div class="table-row"><p class="text-red-500 col-span-2 text-center py-3">Error loading.</p></div>';} }
-            if(categoryForm && categoryInput) categoryForm.addEventListener('submit', async (e) => { e.preventDefault(); const name = categoryInput.value.trim(); if (!name) return; try { await addDoc(collection(db, `artifacts/${appId}/public/data/categories`), { name }); categoryInput.value = ''; await loadCategories(); } catch (error) { alert(`Error: ${error.message}`); }});
-            window.deleteCategory = async (id) => { if (!confirm('Are you sure you want to delete this category?')) return; try { await deleteDoc(doc(db, `artifacts/${appId}/public/data/categories`, id)); await loadCategories(); } catch (error) { alert(`Error: ${error.message}`); }};
-            window.editCategory = async (id, currentName) => { const newName = prompt("Enter new name:", currentName); if (newName && newName.trim() !== '' && newName.trim() !== currentName) { try { await updateDoc(doc(db, `artifacts/${appId}/public/data/categories`, id), { name: newName.trim() }); alert('Category updated!'); await loadCategories(); await loadPrograms(); } catch (error) { alert(`Error: ${error.message}`); } } };
+            // --- Programs & Categories (onSnapshot ഉപയോഗിക്കുന്നു, alert മാറ്റി) ---
+            function loadCategories() {
+                const q = query(collection(db, `artifacts/${appId}/public/data/categories`));
+                onSnapshot(q, (snapshot) => {
+                    allCategories = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })).sort((a,b)=>a.name.localeCompare(b.name));
+                    
+                    if (categoryList) categoryList.innerHTML = '';
+                    if (programCategorySelect) programCategorySelect.innerHTML = '<option value="">Select Category</option>';
+                    if (resultCategorySelect) resultCategorySelect.innerHTML = '<option value="">-- Select Category --</option>';
 
-            async function loadPrograms() { try { const q = query(collection(db, `artifacts/${appId}/public/data/programs`)); const snapshot = await getDocs(q); allPrograms = {}; snapshot.docs.forEach(docSnap => { allPrograms[docSnap.id] = { id: docSnap.id, ...docSnap.data() }; }); const sortedPrograms = Object.values(allPrograms).sort((a,b)=>a.name.localeCompare(b.name)); if (programList) programList.innerHTML = ''; if (sortedPrograms.length === 0) { if (programList) programList.innerHTML = '<div class="table-row"><p class="text-gray-500 italic col-span-4 text-center py-5">No programs added yet.</p></div>'; } else { sortedPrograms.forEach(prog => { if (programList) { const typeText = prog.isGroupEvent ? 'Group' : 'Individual'; const typeClass = prog.isGroupEvent ? 'badge-group' : 'badge-individual'; programList.innerHTML += ` <div class="table-row" style="grid-template-columns: 1.5fr 1fr 0.8fr 100px;"> <div class="table-cell"> <span class="table-cell-primary">${prog.name}</span> <span class="table-cell-secondary">${prog.category}</span> </div> <div class="table-cell table-cell-secondary"> ${prog.points_first || 0}, ${prog.points_second || 0}, ${prog.points_third || 0} </div> <div class="table-cell"> <span class="badge ${typeClass}">${typeText}</span> </div> <div class="table-actions"> <button class="btn-icon warning" onclick="editProgram('${prog.id}', \`${prog.name}\`, '${prog.category}', '${prog.points_first || 0}', '${prog.points_second || 0}', '${prog.points_third || 0}', ${prog.isGroupEvent || false})"><i class="fas fa-edit"></i></button> <button class="btn-icon danger" onclick="deleteProgram('${prog.id}')"><i class="fas fa-trash-alt"></i></button> </div> </div>`; } }); } } catch(error) { console.error("Error loading programs:", error); if (programList) programList.innerHTML = '<div class="table-row"><p class="text-red-500 col-span-4 text-center py-5">Error loading.</p></div>';} }
+                    if (allCategories.length === 0) {
+                        if (categoryList) categoryList.innerHTML = '<div class="table-row"><p class="text-gray-500 italic col-span-2 text-center py-3">No categories added yet.</p></div>';
+                    } else {
+                        allCategories.forEach(cat => {
+                            if (categoryList) {
+                                categoryList.innerHTML += `
+                                    <div class="table-row" style="grid-template-columns: 2fr 100px;">
+                                        <div class="table-cell table-cell-primary">${cat.name}</div>
+                                        <div class="table-actions">
+                                            <button class="btn-icon warning" onclick="editCategory('${cat.id}', \`${cat.name}\`)"><i class="fas fa-edit"></i></button>
+                                            <button class="btn-icon danger" onclick="deleteCategory('${cat.id}')"><i class="fas fa-trash-alt"></i></button>
+                                        </div>
+                                    </div>`;
+                            }
+                            if (programCategorySelect) programCategorySelect.innerHTML += `<option value="${cat.name}">${cat.name}</option>`;
+                            if (resultCategorySelect) resultCategorySelect.innerHTML += `<option value="${cat.name}">${cat.name}</option>`;
+                        });
+                    }
+                    console.log('Categories updated:', allCategories.length);
+                }, (error) => {
+                    console.error("Error loading categories:", error);
+                    showToast(`Error loading categories: ${error.message}`, "error");
+                    if (categoryList) categoryList.innerHTML = '<div class="table-row"><p class="text-red-500 col-span-2 text-center py-3">Error loading.</p></div>';
+                });
+            }
+            
+            if(categoryForm && categoryInput) categoryForm.addEventListener('submit', async (e) => { e.preventDefault(); const name = categoryInput.value.trim(); if (!name) return; try { await addDoc(collection(db, `artifacts/${appId}/public/data/categories`), { name }); categoryInput.value = ''; showToast("Category added!", "success"); } catch (error) { showToast(`Error: ${error.message}`, "error"); }});
+            
+            window.deleteCategory = async (id) => {
+                const confirmed = await showConfirm('Delete Category?', 'Are you sure you want to delete this category?');
+                if (!confirmed) return;
+                try {
+                    await deleteDoc(doc(db, `artifacts/${appId}/public/data/categories`, id));
+                    showToast("Category deleted.", "success");
+                } catch (error) { showToast(`Error: ${error.message}`, "error"); }
+            };
+            
+            window.editCategory = async (id, currentName) => {
+                const newName = prompt("Enter new name:", currentName);
+                if (newName && newName.trim() !== '' && newName.trim() !== currentName) {
+                    try {
+                        await updateDoc(doc(db, `artifacts/${appId}/public/data/categories`, id), { name: newName.trim() });
+                        showToast('Category updated!', 'success');
+                    } catch (error) { showToast(`Error: ${error.message}`, "error"); }
+                }
+            };
+
+            function loadPrograms() {
+                const q = query(collection(db, `artifacts/${appId}/public/data/programs`));
+                onSnapshot(q, (snapshot) => {
+                    allPrograms = {};
+                    snapshot.docs.forEach(docSnap => {
+                        allPrograms[docSnap.id] = { id: docSnap.id, ...docSnap.data() };
+                    });
+
+                    const sortedPrograms = Object.values(allPrograms).sort((a,b)=>a.name.localeCompare(b.name));
+                    if (programList) programList.innerHTML = '';
+                    
+                    if (sortedPrograms.length === 0) {
+                        if (programList) programList.innerHTML = '<div class="table-row"><p class="text-gray-500 italic col-span-4 text-center py-5">No programs added yet.</p></div>';
+                    } else {
+                        sortedPrograms.forEach(prog => {
+                            if (programList) {
+                                const typeText = prog.isGroupEvent ? 'Group' : 'Individual';
+                                const typeClass = prog.isGroupEvent ? 'badge-group' : 'badge-individual';
+                                programList.innerHTML += `
+                                    <div class="table-row" style="grid-template-columns: 1.5fr 1fr 0.8fr 100px;">
+                                        <div class="table-cell">
+                                            <span class="table-cell-primary">${prog.name}</span>
+                                            <span class="table-cell-secondary">${prog.category}</span>
+                                        </div>
+                                        <div class="table-cell table-cell-secondary">
+                                            ${prog.points_first || 0}, ${prog.points_second || 0}, ${prog.points_third || 0}
+                                        </div>
+                                        <div class="table-cell">
+                                            <span class="badge ${typeClass}">${typeText}</span>
+                                        </div>
+                                        <div class="table-actions">
+                                            <button class="btn-icon warning" onclick="editProgram('${prog.id}', \`${prog.name}\`, '${prog.category}', '${prog.points_first || 0}', '${prog.points_second || 0}', '${prog.points_third || 0}', ${prog.isGroupEvent || false})"><i class="fas fa-edit"></i></button>
+                                            <button class="btn-icon danger" onclick="deleteProgram('${prog.id}')"><i class="fas fa-trash-alt"></i></button>
+                                        </div>
+                                    </div>`;
+                            }
+                        });
+                    }
+                    console.log('Programs updated:', Object.keys(allPrograms).length);
+                    // റിസൾട്ട് പേജിലെ പ്രോഗ്രാം ലിസ്റ്റ് അപ്ഡേറ്റ് ചെയ്യുക (കാറ്റഗറി തിരഞ്ഞെടുത്തിട്ടുണ്ടെങ്കിൽ)
+                    if(resultCategorySelect) loadProgramsForResults(resultCategorySelect.value);
+
+                }, (error) => {
+                    console.error("Error loading programs:", error);
+                    showToast(`Error loading programs: ${error.message}`, "error");
+                    if (programList) programList.innerHTML = '<div class="table-row"><p class="text-red-500 col-span-4 text-center py-5">Error loading.</p></div>';
+                });
+            }
 
             if(programForm && programNameInput && programCategorySelect && programIsGroupCheckbox) {
                 programForm.addEventListener('submit', async (e) => {
@@ -469,52 +1101,273 @@
                     const points_second = parseInt(programPointsSecond.value, 10);
                     const points_third = parseInt(programPointsThird.value, 10);
                     const isGroupEvent = programIsGroupCheckbox.checked;
-                    if (!name || !category || isNaN(points_first) || isNaN(points_second) || isNaN(points_third)) { alert('Please fill in all fields correctly.'); return; }
-                    try { await addDoc(collection(db, `artifacts/${appId}/public/data/programs`), { name, category, points_first, points_second, points_third, isGroupEvent }); programForm.reset(); programIsGroupCheckbox.checked = false; await loadPrograms(); }
-                    catch (error) { alert(`Error: ${error.message}`); }
+                    if (!name || !category || isNaN(points_first) || isNaN(points_second) || isNaN(points_third)) {
+                        showToast('Please fill in all fields correctly.', 'warning');
+                        return;
+                    }
+                    try {
+                        await addDoc(collection(db, `artifacts/${appId}/public/data/programs`), { name, category, points_first, points_second, points_third, isGroupEvent });
+                        programForm.reset();
+                        programIsGroupCheckbox.checked = false;
+                        showToast("Program added!", "success");
+                    }
+                    catch (error) { showToast(`Error: ${error.message}`, "error"); }
                 });
             }
-            window.deleteProgram = async (id) => { if (!confirm('Are you sure? This also deletes results.')) return; try { const batch = writeBatch(db); batch.delete(doc(db, `artifacts/${appId}/public/data/programs`, id)); batch.delete(doc(db, `artifacts/${appId}/public/data/results`, id)); await batch.commit(); delete allPrograms[id]; await loadPrograms(); } catch (error) { alert(`Error: ${error.message}`); }};
+            
+            window.deleteProgram = async (id) => {
+                const confirmed = await showConfirm('Delete Program?', 'Are you sure? This also deletes any existing results for this program.');
+                if (!confirmed) return;
+                try {
+                    const batch = writeBatch(db);
+                    batch.delete(doc(db, `artifacts/${appId}/public/data/programs`, id));
+                    batch.delete(doc(db, `artifacts/${appId}/public/data/results`, id)); // റിസൾട്ടും ഡിലീറ്റ് ചെയ്യുന്നു
+                    await batch.commit();
+                    showToast("Program and its results deleted.", "success");
+                } catch (error) { showToast(`Error: ${error.message}`, "error"); }
+            };
+            
             window.editProgram = async (id, currentName, currentCategory, p1, p2, p3, currentIsGroup) => {
                 const newName = prompt("New program name:", currentName);
                 let categoryOptions = allCategories.map((cat, index) => `${index + 1}: ${cat.name}`).join('\n');
                 let categoryPromptMsg = `Enter number for new category (current: '${currentCategory}'):\n${categoryOptions}`;
                 const categoryChoiceIndex = prompt(categoryPromptMsg);
                 let newCategory = currentCategory;
-                if (categoryChoiceIndex && !isNaN(categoryChoiceIndex)) { let index = parseInt(categoryChoiceIndex) - 1; if (index >= 0 && index < allCategories.length) { newCategory = allCategories[index].name; } else { alert("Invalid category number. Keeping original."); } }
-                const newP1 = prompt("New 1st points:", p1); const newP2 = prompt("New 2nd points:", p2); const newP3 = prompt("New 3rd points:", p3);
-                const changeGroupStatus = confirm(`Marked as: ${currentIsGroup ? 'GROUP' : 'INDIVIDUAL'}.\nChange status?`);
+                if (categoryChoiceIndex && !isNaN(categoryChoiceIndex)) { let index = parseInt(categoryChoiceIndex) - 1; if (index >= 0 && index < allCategories.length) { newCategory = allCategories[index].name; } else { showToast("Invalid category number. Keeping original.", "warning"); } }
+                const newP1 = prompt("New 1st points:", p1);
+                const newP2 = prompt("New 2nd points:", p2);
+                const newP3 = prompt("New 3rd points:", p3);
+                const changeGroupStatus = await showConfirm('Change Event Type?', `Marked as: ${currentIsGroup ? 'GROUP' : 'INDIVIDUAL'}.\nChange status?`);
                 const newIsGroup = changeGroupStatus ? !currentIsGroup : currentIsGroup;
                 const dataToUpdate = { name: (newName && newName.trim() !== '') ? newName.trim() : currentName, category: newCategory, points_first: (newP1 && !isNaN(newP1)) ? parseInt(newP1, 10) : parseInt(p1, 10), points_second: (newP2 && !isNaN(newP2)) ? parseInt(newP2, 10) : parseInt(p2, 10), points_third: (newP3 && !isNaN(newP3)) ? parseInt(newP3, 10) : parseInt(p3, 10), isGroupEvent: newIsGroup };
-                if (dataToUpdate.name === currentName && dataToUpdate.category === currentCategory && dataToUpdate.points_first === parseInt(p1, 10) && dataToUpdate.points_second === parseInt(p2, 10) && dataToUpdate.points_third === parseInt(p3, 10) && dataToUpdate.isGroupEvent === currentIsGroup) { alert("No changes made."); return; }
-                try { await updateDoc(doc(db, `artifacts/${appId}/public/data/programs`, id), dataToUpdate); alert('Program updated!'); allPrograms[id] = { ...allPrograms[id], ...dataToUpdate }; await loadPrograms(); } catch (error) { alert(`Error: ${error.message}`); }
+                if (dataToUpdate.name === currentName && dataToUpdate.category === currentCategory && dataToUpdate.points_first === parseInt(p1, 10) && dataToUpdate.points_second === parseInt(p2, 10) && dataToUpdate.points_third === parseInt(p3, 10) && dataToUpdate.isGroupEvent === currentIsGroup) {
+                    showToast("No changes made.", "info");
+                    return;
+                }
+                try {
+                    await updateDoc(doc(db, `artifacts/${appId}/public/data/programs`, id), dataToUpdate);
+                    showToast('Program updated!', 'success');
+                } catch (error) { showToast(`Error: ${error.message}`, "error"); }
             };
 
-            // --- Results Page Logic (Unchanged logic, just ensure functions are called) ---
-            function updateWinnerName(position) { /* ... Logic unchanged ... */ const inputElement = resultInputs[position]; const spanElement = nameSpans[position]; if (!inputElement || !spanElement) return; const chestNoInput = inputElement.value.trim(); const chestNos = chestNoInput.split(',').map(s => s.trim().toUpperCase()).filter(Boolean); const names = chestNos.map(cn => { if (allParticipants[cn]) { return `${allParticipants[cn].name} (${allParticipants[cn].team})`; } const teamMatch = Object.keys(allTeamsAdmin).find(teamName => teamName.toUpperCase() === cn); if (teamMatch) { return `Team: ${teamMatch}`; } return `${cn} (Unknown)`; }).join(', '); spanElement.textContent = names; }
+            // --- Results Page (alert മാറ്റി) ---
+            function updateWinnerName(position) {
+                const inputElement = resultInputs[position];
+                const spanElement = nameSpans[position];
+                if (!inputElement || !spanElement) return;
+                const chestNoInput = inputElement.value.trim();
+                const chestNos = chestNoInput.split(',').map(s => s.trim().toUpperCase()).filter(Boolean);
+                const names = chestNos.map(cn => {
+                    if (allParticipants[cn]) {
+                        return `${allParticipants[cn].name} (${allParticipants[cn].team})`;
+                    }
+                    const teamMatch = Object.keys(allTeamsAdmin).find(teamName => teamName.toUpperCase() === cn);
+                    if (teamMatch) {
+                        return `Team: ${teamMatch}`;
+                    }
+                    return `${cn} (Unknown)`;
+                }).join(', ');
+                spanElement.textContent = names;
+            }
             if(resultInputs.first) resultInputs.first.addEventListener('input', () => updateWinnerName('first'));
             if(resultInputs.second) resultInputs.second.addEventListener('input', () => updateWinnerName('second'));
             if(resultInputs.third) resultInputs.third.addEventListener('input', () => updateWinnerName('third'));
+            
             function clearNamePreviews() { if(nameSpans.first) nameSpans.first.textContent = ''; if(nameSpans.second) nameSpans.second.textContent = ''; if(nameSpans.third) nameSpans.third.textContent = ''; }
-            async function loadCategoriesForResults() { await loadCategories(); if (!resultCategorySelect) return; resultCategorySelect.innerHTML = '<option value="">-- Select Category --</option>'; allCategories.forEach(cat => { resultCategorySelect.innerHTML += `<option value="${cat.name}">${cat.name}</option>`; }); }
-            async function loadProgramsForResults(selectedCategory = null) { if (!allPrograms || Object.keys(allPrograms).length === 0) await loadPrograms(); if (!resultProgramSelect) return; resultProgramSelect.innerHTML = '<option value="">-- Select Program --</option>'; const filteredPrograms = selectedCategory ? Object.values(allPrograms).filter(p => p.category === selectedCategory) : []; filteredPrograms.sort((a,b) => a.name.localeCompare(b.name)); if (filteredPrograms.length > 0) { filteredPrograms.forEach(program => { resultProgramSelect.innerHTML += `<option value="${program.id}">${program.name}</option>`; }); resultProgramSelect.disabled = false; } else { resultProgramSelect.innerHTML = `<option value="">${selectedCategory ? 'No programs' : '-- Select Category --'}</option>`; resultProgramSelect.disabled = true; } }
+            
+            // loadCategoriesForResults() ഇപ്പോൾ loadCategories() യാന്ത്രികമായി ചെയ്യുന്നു
+            
+            function loadProgramsForResults(selectedCategory = null) {
+                if (!resultProgramSelect) return;
+                
+                const currentProgramId = resultProgramSelect.value; // നിലവിലെ വാല്യു സൂക്ഷിക്കുന്നു
+                
+                resultProgramSelect.innerHTML = '<option value="">-- Select Program --</option>';
+                const filteredPrograms = selectedCategory ? Object.values(allPrograms).filter(p => p.category === selectedCategory) : [];
+                filteredPrograms.sort((a,b) => a.name.localeCompare(b.name));
+                
+                if (filteredPrograms.length > 0) {
+                    filteredPrograms.forEach(program => {
+                        resultProgramSelect.innerHTML += `<option value="${program.id}">${program.name}</option>`;
+                    });
+                    resultProgramSelect.disabled = false;
+                    
+                    // കാറ്റഗറി മാറുമ്പോൾ മുമ്പത്തെ പ്രോഗ്രാം തിരഞ്ഞെടുത്തിട്ടുണ്ടെങ്കിൽ അത് നിലനിർത്താൻ ശ്രമിക്കുക
+                    if (allPrograms[currentProgramId] && allPrograms[currentProgramId].category === selectedCategory) {
+                        resultProgramSelect.value = currentProgramId;
+                    }
+
+                } else {
+                    resultProgramSelect.innerHTML = `<option value="">${selectedCategory ? 'No programs' : '-- Select Category --'}</option>`;
+                    resultProgramSelect.disabled = true;
+                }
+            }
+            
             if(resultCategorySelect) { resultCategorySelect.addEventListener('change', (e) => { const selectedCategory = e.target.value; if(resultForm) resultForm.reset(); clearNamePreviews(); d.getElementById('result-category').value = selectedCategory; loadProgramsForResults(selectedCategory); resultProgramSelect.disabled = !selectedCategory; }); }
-            if(resultProgramSelect) { resultProgramSelect.addEventListener('change', async (e) => { const programId = e.target.value; if(resultInputs.first) resultInputs.first.value = ''; if(resultInputs.second) resultInputs.second.value = ''; if(resultInputs.third) resultInputs.third.value = ''; clearNamePreviews(); if (!programId) return; try { const docSnap = await getDoc(doc(db, `artifacts/${appId}/public/data/results`, programId)); if (docSnap.exists()) { const data = docSnap.data(); if(resultInputs.first) resultInputs.first.value = data.first ? data.first.map(w => w.chest).join(', ') : ''; if(resultInputs.second) resultInputs.second.value = data.second ? data.second.map(w => w.chest).join(', ') : ''; if(resultInputs.third) resultInputs.third.value = data.third ? data.third.map(w => w.chest).join(', ') : ''; updateWinnerName('first'); updateWinnerName('second'); updateWinnerName('third'); } } catch(error){ console.error("Error fetching result:", error);} }); }
-            if(resultForm) { resultForm.addEventListener('submit', async (e) => { e.preventDefault(); const programId = resultProgramSelect ? resultProgramSelect.value : null; if (!programId) { alert('Please select a program.'); return; } if (!allPrograms[programId]) { alert('Selected program data not found.'); return; } const mapToWinnerData = (inputId) => { const inputElement = d.getElementById(inputId); if (!inputElement) return []; const inputString = inputElement.value.trim().toUpperCase(); const items = inputString.split(',').map(s => s.trim()).filter(Boolean); return items.map(item => { let winnerName = 'Unknown'; let winnerTeam = null; if (allParticipants[item]) { winnerName = allParticipants[item].name; winnerTeam = allParticipants[item].team; } else { const teamMatch = Object.keys(allTeamsAdmin).find(teamName => teamName.toUpperCase() === item); if (teamMatch) { winnerName = `Team: ${teamMatch}`; winnerTeam = teamMatch; } else { winnerName = `${item} (Unknown)`; } } return { chest: item, name: winnerName, team: winnerTeam }; }); }; const resultData = { first: mapToWinnerData('result-first'), second: mapToWinnerData('result-second'), third: mapToWinnerData('result-third') }; let validationPassed = true; ['first', 'second', 'third'].forEach(pos => { resultData[pos].forEach(winner => { if (winner.team === null && !allPrograms[programId]?.isGroupEvent) { const isLikelyTeamName = Object.keys(allTeamsAdmin).find(tName => tName.toUpperCase() === winner.chest); if(!isLikelyTeamName){ console.error(`Validation Error: No team for ${winner.chest} in ${pos}.`); validationPassed = false; } else { winner.team = isLikelyTeamName; } } else if (winner.team === null && allPrograms[programId]?.isGroupEvent) { const teamMatch = Object.keys(allTeamsAdmin).find(tName => tName.toUpperCase() === winner.chest); if (teamMatch) { winner.team = teamMatch; winner.name = `Team: ${teamMatch}`; } else { console.error(`Validation Error: Team name ${winner.chest} not verified for group event in ${pos}.`); validationPassed = false; } } }); }); if (!validationPassed) { alert('Error: Could not verify team/participant. Check inputs.'); return; } try { await setDoc(doc(db, `artifacts/${appId}/public/data/results`, programId), resultData); alert('Result published/updated!'); } catch (error) { alert(`Error: ${error.message}`); } }); }
+            
+            if(resultProgramSelect) { resultProgramSelect.addEventListener('change', async (e) => { const programId = e.target.value; if(resultInputs.first) resultInputs.first.value = ''; if(resultInputs.second) resultInputs.second.value = ''; if(resultInputs.third) resultInputs.third.value = ''; clearNamePreviews(); if (!programId) return; try { const docSnap = await getDoc(doc(db, `artifacts/${appId}/public/data/results`, programId)); if (docSnap.exists()) { const data = docSnap.data(); if(resultInputs.first) resultInputs.first.value = data.first ? data.first.map(w => w.chest).join(', ') : ''; if(resultInputs.second) resultInputs.second.value = data.second ? data.second.map(w => w.chest).join(', ') : ''; if(resultInputs.third) resultInputs.third.value = data.third ? data.third.map(w => w.chest).join(', ') : ''; updateWinnerName('first'); updateWinnerName('second'); updateWinnerName('third'); } } catch(error){ console.error("Error fetching result:", error); showToast("Could not load previous result.", "error");} }); }
+            
+            if(resultForm) { resultForm.addEventListener('submit', async (e) => { e.preventDefault(); const programId = resultProgramSelect ? resultProgramSelect.value : null; if (!programId) { showToast('Please select a program.', 'warning'); return; } if (!allPrograms[programId]) { showToast('Selected program data not found.', 'error'); return; } const mapToWinnerData = (inputId) => { const inputElement = d.getElementById(inputId); if (!inputElement) return []; const inputString = inputElement.value.trim().toUpperCase(); const items = inputString.split(',').map(s => s.trim()).filter(Boolean); return items.map(item => { let winnerName = 'Unknown'; let winnerTeam = null; if (allParticipants[item]) { winnerName = allParticipants[item].name; winnerTeam = allParticipants[item].team; } else { const teamMatch = Object.keys(allTeamsAdmin).find(teamName => teamName.toUpperCase() === item); if (teamMatch) { winnerName = `Team: ${teamMatch}`; winnerTeam = teamMatch; } else { winnerName = `${item} (Unknown)`; } } return { chest: item, name: winnerName, team: winnerTeam }; }); }; const resultData = { first: mapToWinnerData('result-first'), second: mapToWinnerData('result-second'), third: mapToWinnerData('result-third') }; let validationPassed = true; ['first', 'second', 'third'].forEach(pos => { resultData[pos].forEach(winner => { if (winner.team === null && !allPrograms[programId]?.isGroupEvent) { const isLikelyTeamName = Object.keys(allTeamsAdmin).find(tName => tName.toUpperCase() === winner.chest); if(!isLikelyTeamName){ console.error(`Validation Error: No team for ${winner.chest} in ${pos}.`); validationPassed = false; } else { winner.team = isLikelyTeamName; } } else if (winner.team === null && allPrograms[programId]?.isGroupEvent) { const teamMatch = Object.keys(allTeamsAdmin).find(tName => tName.toUpperCase() === winner.chest); if (teamMatch) { winner.team = teamMatch; winner.name = `Team: ${teamMatch}`; } else { console.error(`Validation Error: Team name ${winner.chest} not verified for group event in ${pos}.`); validationPassed = false; } } }); }); if (!validationPassed) { showToast('Error: Could not verify team/participant. Check inputs.', 'error'); return; } try { await setDoc(doc(db, `artifacts/${appId}/public/data/results`, programId), resultData); showToast('Result published/updated!', 'success'); } catch (error) { showToast(`Error: ${error.message}`, 'error'); } }); }
 
-            // --- Teams Page Logic (Admin - Updated rendering) ---
-            async function loadTeamsForAdmin() { try { const q = query(collection(db, `artifacts/${appId}/public/data/teams`)); const snapshot = await getDocs(q); allTeamsAdmin = {}; snapshot.docs.forEach(doc => { allTeamsAdmin[doc.id] = { id: doc.id, ...doc.data() }; }); renderAdminTeamList(); const sortedTeamNames = Object.keys(allTeamsAdmin).sort(); if(participantTeamFilter) { participantTeamFilter.innerHTML = '<option value="">All Teams</option>'; sortedTeamNames.forEach(teamName => { participantTeamFilter.innerHTML += `<option value="${teamName}">${teamName}</option>`; }); } if(participantAddTeam) { participantAddTeam.innerHTML = '<option value="">-- Select a Team --</option>'; sortedTeamNames.forEach(teamName => { participantAddTeam.innerHTML += `<option value="${teamName}">${teamName}</option>`; }); } } catch(error) { console.error("Error loading teams:", error); if(teamListAdmin) teamListAdmin.innerHTML = '<p class="text-red-500 p-4">Error loading.</p>'; } }
-            function renderAdminTeamList() { if (!teamListAdmin) return; teamListAdmin.innerHTML = ''; if (Object.keys(allTeamsAdmin).length === 0) { teamListAdmin.innerHTML = '<div class="text-center py-5"><p class="text-gray-500 italic">No teams added yet.</p></div>'; return; } const sortedTeams = Object.values(allTeamsAdmin).sort((a, b) => a.name.localeCompare(b.name)); sortedTeams.forEach(team => { const teamElement = d.createElement('div'); teamElement.className = 'border border-gray-200 rounded-lg p-4 mb-4 bg-white shadow-sm'; teamElement.innerHTML = ` <h3 class="text-md font-semibold text-gray-800 mb-3">${team.name}</h3> <form class="space-y-3" data-team-id="${team.id}"> <div class="grid grid-cols-1 md:grid-cols-2 gap-3"> <div><label class="form-label text-xs">Leader</label><input type="text" class="form-input text-sm" value="${team.leader || ''}" data-field="leader"></div> <div><label class="form-label text-xs">Asst. Leader</label><input type="text" class="form-input text-sm" value="${team.asst || ''}" data-field="asst"></div> </div> <div class="grid grid-cols-1 md:grid-cols-2 gap-3"> <div><label class="form-label text-xs">Chest No From</label><input type="number" class="form-input text-sm" value="${team.id_from || ''}" data-field="id_from"></div> <div><label class="form-label text-xs">Chest No To</label><input type="number" class="form-input text-sm" value="${team.id_to || ''}" data-field="id_to"></div> </div> <div class="flex justify-end gap-2 pt-2"> <button type="button" class="btn-icon danger" onclick="deleteTeam('${team.id}')" title="Delete Team"><i class="fas fa-trash-alt"></i></button> <button type="submit" class="btn btn-secondary btn-sm" title="Update Team"><i class="fas fa-sync-alt"></i>Update</button> </div> </form>`; teamListAdmin.appendChild(teamElement); const updateForm = teamElement.querySelector('form'); if(updateForm) updateForm.addEventListener('submit', handleUpdateTeam); }); }
-            if(teamForm) teamForm.addEventListener('submit', async (e) => { e.preventDefault(); const nameInput = d.getElementById('team-name'); const leaderInput = d.getElementById('team-leader'); const asstInput = d.getElementById('team-asst'); const idFromInput = d.getElementById('team-id-from'); const idToInput = d.getElementById('team-id-to'); if (!nameInput || !leaderInput || !asstInput || !idFromInput || !idToInput) return; const name = nameInput.value.trim().toUpperCase(); const leader = leaderInput.value.trim(); const asst = asstInput.value.trim(); const id_from = idFromInput.value; const id_to = idToInput.value; if (!name) { alert("Team Name required."); return; } if (!id_from || !id_to) { alert("Chest No range required."); return; } const teamData = { name, leader, asst, id_from: parseInt(id_from, 10), id_to: parseInt(id_to, 10) }; try { await setDoc(doc(db, `artifacts/${appId}/public/data/teams`, name), teamData); alert(`Team ${name} added!`); teamForm.reset(); loadTeamsForAdmin(); } catch (error) { alert(`Error: ${error.message}`); } });
-            async function handleUpdateTeam(e) { e.preventDefault(); const form = e.target; const teamId = form.dataset.teamId; if (!teamId) return; const updatedData = { name: teamId }; let hasError = false; form.querySelectorAll('input[data-field]').forEach(input => { const field = input.dataset.field; let value = input.value.trim(); if (field === 'id_from' || field === 'id_to') { if (value === '') { alert(`${field === 'id_from' ? 'Chest No From' : 'Chest No To'} required.`); hasError = true; return; } value = parseInt(value, 10); if (isNaN(value)) { alert(`${field === 'id_from' ? 'Chest No From' : 'Chest No To'} must be number.`); hasError = true; return; } } updatedData[field] = value; }); if(hasError) return; try { await setDoc(doc(db, `artifacts/${appId}/public/data/teams`, teamId), updatedData); alert(`Team ${teamId} updated!`); allTeamsAdmin[teamId] = { id: teamId, ...updatedData }; } catch (error) { alert(`Error: ${error.message}`); } }
-            window.deleteTeam = async (id) => { if (!confirm(`Delete team ${id}?`)) return; try { await deleteDoc(doc(db, `artifacts/${appId}/public/data/teams`, id)); alert(`Team ${id} deleted!`); delete allTeamsAdmin[id]; renderAdminTeamList(); loadTeamsForAdmin(); } catch (error) { alert(`Error: ${error.message}`); }};
+            // --- Teams Page (onSnapshot ഉപയോഗിക്കുന്നു, alert മാറ്റി) ---
+            function loadTeamsForAdmin() {
+                const q = query(collection(db, `artifacts/${appId}/public/data/teams`));
+                onSnapshot(q, (snapshot) => {
+                    allTeamsAdmin = {};
+                    snapshot.docs.forEach(doc => {
+                        allTeamsAdmin[doc.id.toUpperCase()] = { id: doc.id, ...doc.data() };
+                    });
+                    
+                    renderAdminTeamList();
+                    
+                    const sortedTeamNames = Object.keys(allTeamsAdmin).sort();
+                    
+                    if(participantTeamFilter) {
+                        const currentVal = participantTeamFilter.value;
+                        participantTeamFilter.innerHTML = '<option value="">All Teams</option>';
+                        sortedTeamNames.forEach(teamName => {
+                            participantTeamFilter.innerHTML += `<option value="${teamName}">${teamName}</option>`;
+                        });
+                        participantTeamFilter.value = currentVal; // പഴയ വാല്യു നിലനിർത്തുന്നു
+                    }
+                    if(participantAddTeam) {
+                        const currentVal = participantAddTeam.value;
+                        participantAddTeam.innerHTML = '<option value="">-- Select a Team --</option>';
+                        sortedTeamNames.forEach(teamName => {
+                            participantAddTeam.innerHTML += `<option value="${teamName}">${teamName}</option>`;
+                        });
+                        participantAddTeam.value = currentVal; // പഴയ വാല്യു നിലനിർത്തുന്നു
+                    }
+                    console.log('Teams updated:', Object.keys(allTeamsAdmin).length);
+                }, (error) => {
+                    console.error("Error loading teams:", error);
+                    showToast(`Error loading teams: ${error.message}`, 'error');
+                    if(teamListAdmin) teamListAdmin.innerHTML = '<p class="text-red-500 p-4">Error loading.</p>';
+                });
+            }
+            
+            function renderAdminTeamList() {
+                if (!teamListAdmin) return;
+                teamListAdmin.innerHTML = '';
+                if (Object.keys(allTeamsAdmin).length === 0) {
+                    teamListAdmin.innerHTML = '<div class="text-center py-5"><p class="text-gray-500 italic">No teams added yet.</p></div>';
+                    return;
+                }
+                const sortedTeams = Object.values(allTeamsAdmin).sort((a, b) => a.name.localeCompare(b.name));
+                sortedTeams.forEach(team => {
+                    const teamElement = d.createElement('div');
+                    teamElement.className = 'border border-gray-200 rounded-lg p-4 mb-4 bg-white shadow-sm';
+                    teamElement.innerHTML = `
+                        <h3 class="text-md font-semibold text-gray-800 mb-3">${team.name}</h3>
+                        <form class="space-y-3" data-team-id="${team.id}">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                <div><label class="form-label text-xs">Leader</label><input type="text" class="form-input text-sm" value="${team.leader || ''}" data-field="leader"></div>
+                                <div><label class="form-label text-xs">Asst. Leader</label><input type="text" class="form-input text-sm" value="${team.asst || ''}" data-field="asst"></div>
+                            </div>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                <div><label class="form-label text-xs">Chest No From</label><input type="number" class="form-input text-sm" value="${team.id_from || ''}" data-field="id_from" required></div>
+                                <div><label class="form-label text-xs">Chest No To</label><input type="number" class="form-input text-sm" value="${team.id_to || ''}" data-field="id_to" required></div>
+                            </div>
+                            <div class="flex justify-end gap-2 pt-2">
+                                <button type="button" class="btn-icon danger delete-team-btn" data-team-id="${team.id}" title="Delete Team"><i class="fas fa-trash-alt"></i></button>
+                                <button type="submit" class="btn btn-secondary btn-sm" title="Update Team"><i class="fas fa-sync-alt"></i>Update</button>
+                            </div>
+                        </form>`;
+                    teamListAdmin.appendChild(teamElement);
+                });
+            }
+            
+            // Event Delegation (onclick="" മാറ്റി)
+            if(teamListAdmin) {
+                teamListAdmin.addEventListener('click', (e) => {
+                    const deleteBtn = e.target.closest('.delete-team-btn');
+                    if (deleteBtn) {
+                        deleteTeam(deleteBtn.dataset.teamId);
+                    }
+                });
+                teamListAdmin.addEventListener('submit', (e) => {
+                     if (e.target.tagName === 'FORM' && e.target.dataset.teamId) {
+                         handleUpdateTeam(e);
+                     }
+                });
+            }
 
-            // --- Home Page Content (Admin - Unchanged) ---
-            async function loadHomepageContent() { try { const docRef = doc(db, `artifacts/${appId}/public/data/config`, 'homepage'); const docSnap = await getDoc(docRef); if (docSnap.exists()) { const data = docSnap.data(); Object.keys(homepageFields).forEach(key => { const fieldElement = homepageFields[key]; if (fieldElement) { if (key === 'gallery') { fieldElement.value = (data[key] || []).join('\n'); } else { fieldElement.value = data[key] || ''; } } }); } else { console.log("Homepage config doc missing!"); } } catch(error) { console.error("Error loading homepage:", error); alert("Could not load settings."); } }
-            if(homepageForm) homepageForm.addEventListener('submit', async (e) => { e.preventDefault(); const galleryArray = homepageFields.gallery ? homepageFields.gallery.value.split('\n').map(url => url.trim()).filter(Boolean) : []; const dataToSave = {}; Object.keys(homepageFields).forEach(key => { const fieldElement = homepageFields[key]; if (fieldElement) { if (key === 'gallery') { dataToSave[key] = galleryArray; } else { dataToSave[key] = fieldElement.value.trim(); } } }); try { await setDoc(doc(db, `artifacts/${appId}/public/data/config`, 'homepage'), dataToSave); alert('Homepage settings saved!'); } catch (error) { alert(`Error: ${error.message}`); } });
+            if(teamForm) teamForm.addEventListener('submit', async (e) => { e.preventDefault(); const nameInput = d.getElementById('team-name'); const leaderInput = d.getElementById('team-leader'); const asstInput = d.getElementById('team-asst'); const idFromInput = d.getElementById('team-id-from'); const idToInput = d.getElementById('team-id-to'); if (!nameInput || !leaderInput || !asstInput || !idFromInput || !idToInput) return; const name = nameInput.value.trim().toUpperCase(); const leader = leaderInput.value.trim(); const asst = asstInput.value.trim(); const id_from = idFromInput.value; const id_to = idToInput.value; if (!name) { showToast("Team Name required.", "warning"); return; } if (!id_from || !id_to) { showToast("Chest No range required.", "warning"); return; } const teamData = { name, leader, asst, id_from: parseInt(id_from, 10), id_to: parseInt(id_to, 10) }; try { await setDoc(doc(db, `artifacts/${appId}/public/data/teams`, name), teamData); showToast(`Team ${name} added!`, 'success'); teamForm.reset(); } catch (error) { showToast(`Error: ${error.message}`, "error"); } });
+            
+            async function handleUpdateTeam(e) {
+                e.preventDefault();
+                const form = e.target;
+                const teamId = form.dataset.teamId;
+                if (!teamId) return;
+                
+                const updatedData = { name: teamId };
+                let hasError = false;
+                
+                form.querySelectorAll('input[data-field]').forEach(input => {
+                    const field = input.dataset.field;
+                    let value = input.value.trim();
+                    if (field === 'id_from' || field === 'id_to') {
+                        if (value === '') {
+                            showToast(`${field === 'id_from' ? 'Chest No From' : 'Chest No To'} required.`, 'warning');
+                            hasError = true;
+                            return;
+                        }
+                        value = parseInt(value, 10);
+                        if (isNaN(value)) {
+                            showToast(`${field === 'id_from' ? 'Chest No From' : 'Chest No To'} must be number.`, 'warning');
+                            hasError = true;
+                            return;
+                        }
+                    }
+                    updatedData[field] = value;
+                });
+                
+                if(hasError) return;
+                
+                try {
+                    await setDoc(doc(db, `artifacts/${appId}/public/data/teams`, teamId), updatedData);
+                    showToast(`Team ${teamId} updated!`, 'success');
+                } catch (error) { showToast(`Error: ${error.message}`, 'error'); }
+            }
+            
+            window.deleteTeam = async (id) => {
+                const confirmed = await showConfirm('Delete Team?', `Delete team ${id}? This cannot be undone.`);
+                if (!confirmed) return;
+                try {
+                    await deleteDoc(doc(db, `artifacts/${appId}/public/data/teams`, id));
+                    showToast(`Team ${id} deleted!`, 'success');
+                } catch (error) { showToast(`Error: ${error.message}`, "error"); }
+            };
+
+            // --- Home Page Content (alert മാറ്റി) ---
+            async function loadHomepageContent() {
+                try {
+                    const docRef = doc(db, `artifacts/${appId}/public/data/config`, 'homepage');
+                    const docSnap = await getDoc(docRef);
+                    if (docSnap.exists()) {
+                        const data = docSnap.data();
+                        Object.keys(homepageFields).forEach(key => {
+                            const fieldElement = homepageFields[key];
+                            if (fieldElement) {
+                                if (key === 'gallery') {
+                                    fieldElement.value = (data[key] || []).join('\n');
+                                } else {
+                                    fieldElement.value = data[key] || '';
+                                }
+                            }
+                        });
+                    } else {
+                        console.log("Homepage config doc missing!");
+                    }
+                } catch(error) {
+                    console.error("Error loading homepage:", error);
+                    showToast("Could not load settings.", "error");
+                }
+            }
+            
+            if(homepageForm) homepageForm.addEventListener('submit', async (e) => { e.preventDefault(); const galleryArray = homepageFields.gallery ? homepageFields.gallery.value.split('\n').map(url => url.trim()).filter(Boolean) : []; const dataToSave = {}; Object.keys(homepageFields).forEach(key => { const fieldElement = homepageFields[key]; if (fieldElement) { if (key === 'gallery') { dataToSave[key] = galleryArray; } else { dataToSave[key] = fieldElement.value.trim(); } } }); try { await setDoc(doc(db, `artifacts/${appId}/public/data/config`, 'homepage'), dataToSave); showToast('Homepage settings saved!', 'success'); } catch (error) { showToast(`Error: ${error.message}`, "error"); } });
 
         }); // End DOMContentLoaded
     </script>
 </body>
 </html>
-
