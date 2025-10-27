@@ -1,11 +1,10 @@
 // Firebase Config & Init
-// ഫയർബേസ് കോൺഫിഗറേഷൻ (ഇത് നിങ്ങളുടെ പഴയ കോഡിൽ നിന്നും എടുത്തതാണ്)
+// ഫയർബേസ് കോൺഫിഗറേഷൻ (വേർഷൻ 12.4.0)
 const firebaseConfig = { apiKey: "AIzaSyDBfnce5gtJhW9u1xwU2FVPQGx2KvG1vw8", authDomain: "result25.firebaseapp.com", projectId: "result25", storageBucket: "result25.firebasestorage.app", messagingSenderId: "1099340945335", appId: "1:1099340945335:web:4fdc63db6bf6b40a30ba32", measurementId: "G-S4BJW3N642" };
 const appId = typeof __app_id !== 'undefined' ? __app_id : firebaseConfig.projectId;
 const finalFirebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : firebaseConfig;
 finalFirebaseConfig.projectId = appId;
 
-// Firebase മൊഡ്യൂളുകൾ ഇമ്പോർട്ട് ചെയ്യുന്നു (വേർഷൻ 12.4.0)
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js";
 import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-auth.js";
 import { getFirestore, doc, onSnapshot, collection, query } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-firestore.js";
@@ -14,29 +13,55 @@ const app = initializeApp(finalFirebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-// ആരും ലോഗിൻ ചെയ്തിട്ടില്ലെങ്കിലും ഡാറ്റ കാണാൻ വേണ്ടി അനോണിമസ് ആയി സൈൻ-ഇൻ ചെയ്യുന്നു
 try { await signInAnonymously(auth); } catch(error) { console.error("Anonymous sign-in failed: ", error); }
 
 // ===================================
 // ഡാറ്റാ കോൺഫിഗറേഷൻ
 // ===================================
 let TEAM_NAMES = [];
-// *** മാറ്റം വരുത്തി: groupEvents എന്ന ഹാർഡ്‌കോഡ് ലിസ്റ്റ് നീക്കം ചെയ്തു ***
-// (ഇപ്പോൾ ഇത് പ്രോഗ്രാമിൽ നിന്നാണ് നേരിട്ട് വരുന്നത്)
-
 let processedTeamData = {}, processedProgramData = [], processedTalentData = {}, processedScoreboardData = {};
 let publishedResultsCount = 0;
 let dbPrograms = null, dbTeams = null, dbCategories = null, dbHomepage = null;
-// *** മാറ്റം വരുത്തി: dbParticipants നീക്കം ചെയ്തു (സുരക്ഷയ്ക്കും വേഗതയ്ക്കും വേണ്ടി) ***
 let dbResults = null; 
-const d = document; // document എന്ന് മുഴുവൻ എഴുതാതിരിക്കാൻ
+const d = document;
+
+// *** മാറ്റം വരുത്തി (തിരികെ കൊണ്ടുവന്നു) ***
+// പഴയ റിസൾട്ടുകൾ വായിക്കാൻ വേണ്ടി `dbParticipants` വീണ്ടും ചേർക്കുന്നു
+let dbParticipants = null; 
 
 // ===================================
 // ഡാറ്റാ പ്രോസസ്സിംഗ്
 // ===================================
 
-// *** മാറ്റം വരുത്തി: getTeamFromChest() എന്ന ഫംഗ്ഷൻ പൂർണ്ണമായും നീക്കം ചെയ്തു ***
-// (കാരണം, ടീമിന്റെ പേര് ഇപ്പോൾ റിസൾട്ട് ഡോക്യുമെന്റിൽ നിന്ന് നേരിട്ട് ലഭിക്കും)
+// *** മാറ്റം വരുത്തി (തിരികെ കൊണ്ടുവന്നു) ***
+// ചെസ്റ്റ് നമ്പറിൽ നിന്നും ടീമിനെ കണ്ടെത്താനുള്ള ഫംഗ്ഷൻ.
+// പഴയ റിസൾട്ടുകൾക്ക് ഇത് ആവശ്യമാണ്.
+function getTeamFromChest(chestNo) {
+    if (!chestNo || typeof chestNo !== 'string') return null;
+    if (dbTeams == null || dbParticipants == null) return null; 
+    
+    // ഇതൊരു ടീമിന്റെ പേരാണോ എന്ന് നോക്കുന്നു (ഗ്രൂപ്പ് ഇവന്റ്)
+    for (const teamName of TEAM_NAMES) { if (chestNo.toUpperCase() === teamName) return teamName; }
+    
+    // ഇത് മത്സരാർത്ഥിയുടെ ചെസ്റ്റ് നമ്പർ ആണോ എന്ന് നോക്കുന്നു
+    if (dbParticipants[chestNo] && dbParticipants[chestNo].team) { 
+        return dbParticipants[chestNo].team; 
+    }
+    
+    // ചെസ്റ്റ് നമ്പറിന്റെ റേഞ്ച് വെച്ച് ടീമിനെ കണ്ടെത്തുന്നു
+    const chestNumberMatch = chestNo.match(/^\d+/);
+    if (chestNumberMatch) {
+        const chestNumber = parseInt(chestNumberMatch[0], 10);
+        for (const team of Object.values(dbTeams)) {
+            const idFrom = parseInt(team.id_from, 10);
+            const idTo = parseInt(team.id_to, 10);
+            if (!isNaN(idFrom) && !isNaN(idTo) && chestNumber >= idFrom && chestNumber <= idTo) {
+                return team.name;
+            }
+        }
+    }
+    return null;
+}
 
 function initializeTeamData() { 
     const data = {}; 
@@ -51,8 +76,8 @@ function initializeTeamData() {
 }
 
 function processAllData() { 
-    // *** മാറ്റം വരുത്തി: dbParticipants എന്ന ഭാഗം നീക്കം ചെയ്തു ***
-    if (dbCategories == null || dbTeams == null || dbHomepage == null || dbPrograms == null || dbResults == null) {
+    // *** മാറ്റം വരുത്തി: dbParticipants ലോഡ് ആയോ എന്ന് കൂടി പരിശോധിക്കുന്നു ***
+    if (dbCategories == null || dbTeams == null || dbHomepage == null || dbPrograms == null || dbResults == null || dbParticipants == null) {
         console.warn("processAllData called, but essential data is null. Waiting...");
         return;
     }
@@ -64,7 +89,7 @@ function processAllData() {
     processedScoreboardData = { eventPoints: {}, categoryTotals: {}, categoryCounts: {} };
     let resultsCount = 0;
     const categoryNames = dbCategories.map(cat => cat.name);
-    categoryNames.push('group'); // 'group' എന്ന പേര് ആന്തരിക പ്രവർത്തനങ്ങൾക്ക് മാത്രം
+    categoryNames.push('group'); 
     categoryNames.forEach(catName => { 
         processedScoreboardData.categoryTotals[catName] = {}; 
         TEAM_NAMES.forEach(team => { processedScoreboardData.categoryTotals[catName][team] = 0; }); 
@@ -73,23 +98,20 @@ function processAllData() {
     
     for (const programId in currentResults) {
         const program = dbPrograms[programId];
-        if (!program) continue; // പ്രോഗ്രാം ഡാറ്റ കിട്ടിയില്ലെങ്കിൽ ഒഴിവാക്കുക
+        if (!program) continue; 
 
         const eventName = program.name, categoryName = program.category, winners = currentResults[programId];
         if (!((winners.first && winners.first.length > 0) || (winners.second && winners.second.length > 0) || (winners.third && winners.third.length > 0))) continue;
         resultsCount++;
 
-        // പോയിന്റുകൾ പ്രോഗ്രാം ഡോക്യുമെന്റിൽ നിന്ന് എടുക്കുന്നു
         const currentPoints = {
             first: parseInt(program.points_first || 5, 10), 
             second: parseInt(program.points_second || 3, 10), 
             third: parseInt(program.points_third || 1, 10) 
         };
         
-        // *** മാറ്റം വരുത്തി: 'groupEvents' ലിസ്റ്റിന് പകരം പ്രോഗ്രാമിലെ 'isGroupEvent' ഫീൽഡ് ഉപയോഗിക്കുന്നു ***
         const isGroupEvent = program.isGroupEvent || false;
         
-        // ഇത് ഗ്രൂപ്പ് ഇവന്റ് ആണെങ്കിൽ, പോയിന്റുകൾ മാറ്റിയെഴുതുന്നു (ഉദാഹരണത്തിന് 10, 8, 5)
         if (isGroupEvent && program.points_first === 5 && program.points_second === 3) {
             currentPoints.first = 10;
             currentPoints.second = 8;
@@ -97,17 +119,19 @@ function processAllData() {
         }
 
         const filterCategory = isGroupEvent ? 'group' : categoryName;
-        const eventScore = { category: categoryName, isGroup: isGroupEvent }; // isGroup കൂടി ചേർത്തു
+        const eventScore = { category: categoryName, isGroup: isGroupEvent };
         TEAM_NAMES.forEach(team => { eventScore[team] = { points: 0, positions: [] }; });
         
         for (const position of ['first', 'second', 'third']) {
             if (winners[position] && winners[position].length > 0) {
                 winners[position].forEach(winner => {
-                    // *** മാറ്റം വരുത്തി: 'getTeamFromChest' ന് പകരം 'winner.team' ഉപയോഗിക്കുന്നു ***
-                    // ഇത് പ്രവർത്തിക്കാൻ അഡ്മിൻ പാനൽ ശരിയാക്കണം!
-                    const team = winner.team; 
                     
-                    if (team && processedTeamData[team]) { // ടീം നിലവിലുണ്ടോ എന്ന് പരിശോധിക്കുന്നു
+                    // *** ഏറ്റവും പ്രധാനപ്പെട്ട മാറ്റം ***
+                    // റിസൾട്ടിൽ 'winner.team' ഉണ്ടെങ്കിൽ അത് എടുക്കും (പുതിയ രീതി).
+                    // ഇല്ലെങ്കിൽ, getTeamFromChest() ഉപയോഗിച്ച് കണ്ടെത്തും (പഴയ രീതി).
+                    const team = winner.team || getTeamFromChest(winner.chest); 
+                    
+                    if (team && processedTeamData[team]) { 
                         const pointValue = currentPoints[position]; 
                         processedTeamData[team].total += pointValue;
                         const pointCategoryKey = isGroupEvent ? 'group' : categoryName;
@@ -115,10 +139,11 @@ function processAllData() {
                            processedTeamData[team][pointCategoryKey] += pointValue;
                         }
                         if (!isGroupEvent) {
-                            // *** മാറ്റം വരുത്തി: 'winner.name' ഇപ്പോൾ റിസൾട്ടിൽ നിന്ന് നേരിട്ട് വരണം ***
-                            const winnerIdentifier = `${winner.chest} ${winner.name || 'N/A'}`;
+                            // *** മാറ്റം വരുത്തി: 'winner.name' ഇല്ലെങ്കിൽ, dbParticipants-ൽ നിന്നും എടുക്കും ***
+                            const winnerName = winner.name || (dbParticipants[winner.chest] ? dbParticipants[winner.chest].name : 'Unknown');
+                            const winnerIdentifier = `${winner.chest} ${winnerName}`;
+                            
                             if (!talentPoints[winnerIdentifier]) {
-                                // *** മാറ്റം വരുത്തി: ടാലന്റ് പോയിന്റിൽ ടീമിന്റെ പേര് കൂടി സേവ് ചെയ്യുന്നു ***
                                 talentPoints[winnerIdentifier] = { points: 0, category: categoryName, team: team };
                             }
                             talentPoints[winnerIdentifier].points += pointValue;
@@ -135,26 +160,36 @@ function processAllData() {
             TEAM_NAMES.forEach(team => { processedScoreboardData.categoryTotals[scoreboardCat][team] += eventScore[team].points; });
             processedScoreboardData.categoryCounts[scoreboardCat]++;
         }
-        // *** മാറ്റം വരുത്തി: 'winner.name', 'winner.team' എന്നിവ ഇപ്പോൾ 'winners' ഒബ്ജക്റ്റിൽ ഉണ്ടാകണം ***
-        processedProgramData.push({ eventName, categoryName, filterCategory, winners, currentPoints }); 
+        
+        // റിസൾട്ട് കാർഡിൽ കാണിക്കാൻ വേണ്ടി പേര് കൂടി ചേർക്കുന്നു
+        const populatedWinners = {};
+        for (const pos of ['first', 'second', 'third']) {
+            if (winners[pos]) {
+                populatedWinners[pos] = winners[pos].map(w => ({
+                    ...w,
+                    name: w.name || (dbParticipants[w.chest] ? dbParticipants[w.chest].name : (TEAM_NAMES.includes(w.chest.toUpperCase()) ? w.chest.toUpperCase() : 'Unknown')),
+                    team: w.team || getTeamFromChest(w.chest) || 'N/A'
+                }));
+            }
+        }
+        
+        processedProgramData.push({ eventName, categoryName, filterCategory, winners: populatedWinners, currentPoints }); 
     }
     
     processedTalentData = {};
     for (const studentKey in talentPoints) {
-        // *** മാറ്റം വരുത്തി: ടീം ഡാറ്റ കൂടി എടുക്കുന്നു ***
         const { points, category, team } = talentPoints[studentKey];
         if (!processedTalentData[category]) processedTalentData[category] = [];
-        // *** മാറ്റം വരുത്തി: ടീം ഡാറ്റ കൂടി സേവ് ചെയ്യുന്നു ***
         processedTalentData[category].push({ name: studentKey, points, team: team });
     }
     for (const category in processedTalentData) { processedTalentData[category].sort((a, b) => b.points - a.points); }
     
     publishedResultsCount = resultsCount;
-    renderAllComponents(); // എല്ലാ ഡാറ്റയും പ്രോസസ്സ് ചെയ്ത ശേഷം പേജ് റെൻഡർ ചെയ്യുന്നു
+    renderAllComponents(); 
 }
 
 // ===================================
-// റെൻഡറിംഗ് ഫംഗ്ഷനുകൾ (പേജിൽ കാണിക്കുന്നത്)
+// റെൻഡറിംഗ് ഫംഗ്ഷനുകൾ
 // ===================================
 
 function renderAllComponents() {
@@ -171,7 +206,6 @@ function renderAllComponents() {
     generateStaticContent(); 
     updateResultCounts();
     
-    // ഡിഫോൾട്ടായി ഒരു ഫിൽട്ടർ തിരഞ്ഞെടുക്കുന്നു
     const defaultScoreboardFilter = (dbCategories && dbCategories.length > 0) ? dbCategories[0].name : '';
     if (defaultScoreboardFilter) {
         filterScoreboard(defaultScoreboardFilter);
@@ -180,7 +214,6 @@ function renderAllComponents() {
         if (scoreboardFiltersEl) scoreboardFiltersEl.innerHTML = "<p class='text-gray-500'>Please add categories in the admin panel.</p>";
     }
     
-    // ലോഡിംഗ് സ്ക്രീൻ മറയ്ക്കുന്നു
     d.getElementById('loading-overlay').style.opacity = '0';
     setTimeout(() => { 
         d.getElementById('loading-overlay').style.display = 'none'; 
@@ -195,12 +228,16 @@ function generateFilterButtons() {
     (dbCategories || []).forEach(cat => { 
         buttonsHtml += `<button class="filter-btn" data-filter="${cat.name}" onclick="filterResults('${cat.name}')">${cat.name}</button>`; 
     }); 
+    // ഗ്രൂപ്പ് ഇവന്റുകൾക്ക് വേണ്ടി ഒരു ബട്ടൺ കൂടി ചേർക്കുന്നു
+    buttonsHtml += `<button class="filter-btn" data-filter="group" onclick="filterResults('group')">Group Events</button>`;
     if (programFiltersEl) programFiltersEl.innerHTML = buttonsHtml;
     
     let scoreboardButtonsHtml = ''; 
     (dbCategories || []).forEach((cat, index) => { 
         scoreboardButtonsHtml += `<button class="filter-btn ${index === 0 ? 'active' : ''}" data-filter="${cat.name}" onclick="filterScoreboard('${cat.name}')">${cat.name}</button>`; 
     }); 
+    // സ്കോർബോർഡിലും ഗ്രൂപ്പ് ഇവന്റ് ബട്ടൺ ചേർക്കുന്നു
+    scoreboardButtonsHtml += `<button class="filter-btn" data-filter="group" onclick="filterScoreboard('group')">Group Events</button>`;
     if (scoreboardFiltersEl) {
         if(scoreboardButtonsHtml === '') {
             scoreboardButtonsHtml = "<p class='text-gray-500'>No categories added yet.</p>";
@@ -258,7 +295,6 @@ function generateDetailedRankings() {
         (dbCategories || []).forEach((cat, i) => {
             pointsCols += `<div><span class="points-pill default-pill-${(i % 6) + 1}">${team[cat.name] || 0}</span></div>`;
         });
-        // 'group' പോയിന്റുകൾ ചേർക്കുന്നു
         pointsCols += `<div><span class="points-pill group">${team['group'] || 0}</span></div>`;
 
         tableHtml += `<div class="ranking-row" style="grid-template-columns: ${gridTemplateCols};">
@@ -290,9 +326,7 @@ function renderProgramResults() {
         positions.forEach(position => { 
             if (program.winners[position] && program.winners[position].length > 0) { 
                 program.winners[position].forEach(winner => { 
-                    // *** മാറ്റം വരുത്തി: 'getTeamFromChest' ന് പകരം 'winner.team' ഉപയോഗിക്കുന്നു ***
                     const teamName = winner.team || 'N/A'; 
-                    // *** മാറ്റം വരുത്തി: 'winner.name' ഇപ്പോൾ റിസൾട്ടിൽ നിന്ന് നേരിട്ട് വരണം ***
                     const winnerName = winner.name || 'N/A';
                     searchText += `${winnerName} ${winner.chest} ${teamName} `.toLowerCase(); 
                     winnersHtml += `<div class="winner-entry ${positionClasses[position]}">${positionIcons[position]}<div class="winner-details"><div class="name">${winnerName}</div><div class="id-team"><span>${winner.chest}</span>${teamName}</div></div><div class="winner-points"><div class="points-value">${program.currentPoints[position]}</div><div class="points-label">Points</div></div></div>`; 
@@ -324,8 +358,6 @@ function generateTalentList() {
             const nameParts = student.name.split(' '); 
             const chest = nameParts.length > 1 ? nameParts[0] : student.name; 
             const name = nameParts.length > 1 ? nameParts.slice(1).join(' ') : 'Unknown Name'; 
-            
-            // *** മാറ്റം വരുത്തി: 'getTeamFromChest' ന് പകരം 'student.team' ഉപയോഗിക്കുന്നു ***
             const teamName = student.team || 'N/A';
             
             const entryHtml = `<div class="winner-entry ${positionClasses[index] || ''}">${positionIcons[index] || `<span class="medal-icon">${index + 1}</span>`}<div class="winner-details"><div class="name">${name}</div><div class="id-team"><span>${chest}</span>${teamName}</div></div><div class="winner-points"><div class="points-value">${student.points}</div><div class="points-label">Points</div></div></div>`; 
@@ -384,14 +416,15 @@ function generateScoreboard() {
          }); 
          
          if (eventRows) { 
-             const cardCategory = eventData.isGroup ? 'group' : eventData.category; 
+             // *** ബഗ് പരിഹരിച്ചു: dbPrograms[eventName] എന്നതിന് പകരം eventData.isGroup ഉപയോഗിക്കുന്നു ***
+             const isGroup = eventData.isGroup || false;
+             const cardCategory = isGroup ? 'group' : eventData.category; 
              eventCardsHTML += `<div class="scoreboard-card" data-event-name="${eventName}" data-category="${cardCategory}" style="display: none;"><div class="scoreboard-event-header"><span>${eventName}</span></div>${eventRows}</div>`; 
          }
     }); 
     
     tableContent.insertAdjacentHTML('beforeend', eventCardsHTML);
     
-    // ലെജൻഡ് ചേർക്കുന്നു
     container.innerHTML = tableContent.innerHTML + `<div class="scoreboard-legend"><span><i class="fas fa-trophy trophy-icon gold"></i> Gold</span><span><i class="fas fa-trophy trophy-icon silver"></i> Silver</span><span><i class="fas fa-trophy trophy-icon bronze"></i> Bronze</span></div>`;
 }
 
@@ -495,7 +528,43 @@ window.closeNav = function() { d.getElementById("menu-overlay").style.opacity = 
 window.showPage = function(pageId) { d.getElementById('home-page').style.display = pageId === 'home-page' ? 'block' : 'none'; d.getElementById('scoreboard-page').style.display = pageId === 'scoreboard-page' ? 'block' : 'none'; const scrollTopBtn = d.getElementById('scrollTopBtn'); if (scrollTopBtn) { if (pageId === 'home-page') { handleScroll(); } else { scrollTopBtn.classList.remove('show'); } } updateMenuActiveState(); }
 window.showMainTab = function(tabId) { const currentActiveButton = d.querySelector('#scoreboard-page .main-tab-button.active'); const clickedButton = d.querySelector(`.main-tab-button[onclick*="'${tabId}'"]`); if (clickedButton && clickedButton.isSameNode(currentActiveButton)) return; if (currentActiveButton) currentActiveButton.classList.remove('active'); d.querySelectorAll('.main-tab-content').forEach(tab => tab.classList.remove('active')); d.getElementById(tabId).classList.add('active'); if (clickedButton) clickedButton.classList.add('active'); updateMenuActiveState(); }
 window.filterResults = function(category = 'all') { d.querySelectorAll('#program-tab .filter-btn').forEach(btn => btn.classList.remove('active')); d.querySelector(`#program-tab .filter-btn[data-filter="${category}"]`).classList.add('active'); const searchTerm = d.getElementById('search-input').value.toLowerCase(); d.querySelectorAll('.event-result-card').forEach(card => { const categoryMatch = (category === 'all' || card.dataset.category === category); const searchMatch = (card.dataset.searchText.includes(searchTerm)); card.style.display = (categoryMatch && searchMatch) ? 'block' : 'none'; }); }
-window.filterScoreboard = function(category) { if (!category) return; d.querySelectorAll('#scoreboard-filter-buttons .filter-btn').forEach(btn => btn.classList.remove('active')); const activeButton = d.querySelector(`#scoreboard-filter-buttons .filter-btn[data-filter="${category}"]`); if (activeButton) activeButton.classList.add('active'); const totalsToShow = processedScoreboardData.categoryTotals[category]; const totalCard = d.getElementById('scoreboard-total-card'); const countElement = d.getElementById('scoreboard-category-count'); if (totalCard && totalsToShow) { TEAM_NAMES.forEach(team => { const teamSpan = totalCard.querySelector(`span[data-team="${team}"]`); if (teamSpan) teamSpan.textContent = totalsToShow[team] || 0; }); } if (countElement) { const count = processedScoreboardData.categoryCounts[category] || 0; countElement.textContent = `Published Results: ${count}`; } d.querySelectorAll('#scoreboard-container .scoreboard-card:not(.total-card)').forEach(card => { const eventName = card.dataset.eventName; const eventData = eventName ? processedScoreboardData.eventPoints[eventName] : undefined; if (!eventData) { card.style.display = 'none'; return; } const eventCategory = eventData.isGroup ? 'group' : eventData.category; card.style.display = (category === eventCategory) ? 'block' : 'none'; }); }
+
+window.filterScoreboard = function(category) { 
+    if (!category) return; 
+    d.querySelectorAll('#scoreboard-filter-buttons .filter-btn').forEach(btn => btn.classList.remove('active')); 
+    const activeButton = d.querySelector(`#scoreboard-filter-buttons .filter-btn[data-filter="${category}"]`); 
+    if (activeButton) activeButton.classList.add('active'); 
+    
+    const totalsToShow = processedScoreboardData.categoryTotals[category]; 
+    const totalCard = d.getElementById('scoreboard-total-card'); 
+    const countElement = d.getElementById('scoreboard-category-count'); 
+    
+    if (totalCard && totalsToShow) { 
+        TEAM_NAMES.forEach(team => { 
+            const teamSpan = totalCard.querySelector(`span[data-team="${team}"]`); 
+            if (teamSpan) teamSpan.textContent = totalsToShow[team] || 0; 
+        }); 
+    } 
+    if (countElement) { 
+        const count = processedScoreboardData.categoryCounts[category] || 0; 
+        countElement.textContent = `Published Results: ${count}`; 
+    } 
+    
+    d.querySelectorAll('#scoreboard-container .scoreboard-card:not(.total-card)').forEach(card => { 
+        const eventName = card.dataset.eventName; 
+        const eventData = eventName ? processedScoreboardData.eventPoints[eventName] : undefined; 
+        if (!eventData) { 
+            card.style.display = 'none'; 
+            return; 
+        } 
+        
+        // *** ബഗ് പരിഹരിച്ചു: dbPrograms[eventName] എന്നതിന് പകരം eventData.isGroup ഉപയോഗിക്കുന്നു ***
+        const isGroup = eventData.isGroup || false;
+        const eventCategory = isGroup ? 'group' : eventData.category; 
+        card.style.display = (category === eventCategory) ? 'block' : 'none'; 
+    }); 
+}
+
 window.updateResultCounts = function() { const el = d.getElementById('team-results-count'); if (el) el.innerText = `Team point status after ${publishedResultsCount} results`; }
 window.getTrophyIconsHTML = function(positions) { if (!positions || positions.length === 0) return ''; return positions.map(pos => { if (pos === 1) return '<i class="fas fa-trophy trophy-icon gold"></i>'; if (pos === 2) return '<i class="fas fa-trophy trophy-icon silver"></i>'; if (pos === 3) return '<i class="fas fa-trophy trophy-icon bronze"></i>'; return ''; }).join(''); }
 window.toggleTalentDropdown = function(listId, button) { const list = d.getElementById(listId); list.classList.toggle('open'); button.textContent = list.classList.contains('open') ? 'Show Less' : 'Show More'; }
@@ -511,15 +580,16 @@ window.addEventListener('scroll', handleScroll);
 // ആപ്ലിക്കേഷൻ ആരംഭിക്കുമ്പോൾ
 // ===================================
 let allDataLoaded = false;
-// *** മാറ്റം വരുത്തി: 'participants' സ്റ്റാറ്റസ് നീക്കം ചെയ്തു ***
-let loadStatus = { results: false, programs: false, teams: false, homepage: false, categories: false };
+// *** മാറ്റം വരുത്തി: 'participants' സ്റ്റാറ്റസ് തിരികെ ചേർത്തു ***
+let loadStatus = { results: false, programs: false, teams: false, homepage: false, categories: false, participants: false };
+
 function checkAllDataLoaded() { 
     if (allDataLoaded) { 
         processAllData(); 
         return; 
     } 
-    // *** മാറ്റം വരുത്തി: 'participants' സ്റ്റാറ്റസ് നീക്കം ചെയ്തു ***
-    if (loadStatus.results && loadStatus.programs && loadStatus.teams && loadStatus.homepage && loadStatus.categories) { 
+    // *** മാറ്റം വരുത്തി: 'participants' ലോഡ് ആയോ എന്ന് കൂടി പരിശോധിക്കുന്നു ***
+    if (loadStatus.results && loadStatus.programs && loadStatus.teams && loadStatus.homepage && loadStatus.categories && loadStatus.participants) { 
         allDataLoaded = true; 
         console.log("All data loaded. Processing..."); 
         processAllData(); 
@@ -532,10 +602,23 @@ onSnapshot(query(collection(db, `artifacts/${appId}/public/data/teams`)), (snaps
 onSnapshot(doc(db, `artifacts/${appId}/public/data/config`, 'homepage'), (docSnap) => { dbHomepage = docSnap.exists() ? docSnap.data() : {}; loadStatus.homepage = true; checkAllDataLoaded(); }, (e) => { console.error("Error loading homepage: ", e); dbHomepage = {}; loadStatus.homepage = true; checkAllDataLoaded(); });
 onSnapshot(query(collection(db, `artifacts/${appId}/public/data/categories`)), (snapshot) => { dbCategories = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })).sort((a,b) => a.name.localeCompare(b.name)); loadStatus.categories = true; checkAllDataLoaded(); }, (e) => { console.error("Error loading categories: ", e); dbCategories = []; loadStatus.categories = true; checkAllDataLoaded(); });
 
-// *** മാറ്റം വരുത്തി: 'participants' ലിസണർ പൂർണ്ണമായും നീക്കം ചെയ്തു ***
+// *** മാറ്റം വരുത്തി: 'participants' ലിസണർ തിരികെ ചേർത്തു ***
+onSnapshot(query(collection(db, `artifacts/${appId}/public/data/participants`)), (snapshot) => { 
+    dbParticipants = {}; 
+    snapshot.docs.forEach(doc => { dbParticipants[doc.id] = doc.data(); }); 
+    loadStatus.participants = true; 
+    checkAllDataLoaded(); 
+}, (e) => { 
+    console.error("Error loading participants: ", e); 
+    dbParticipants = {}; 
+    loadStatus.participants = true; 
+    checkAllDataLoaded(); 
+});
+
 
 window.onload = function() {
     showPage('home-page'); 
     updateMenuActiveState(); 
     showMainTab('team-tab'); 
 };
+
