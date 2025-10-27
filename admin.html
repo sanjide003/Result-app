@@ -55,7 +55,7 @@
         /* Icon Button Style - Rounded-full */
         .btn-icon { @apply inline-flex items-center justify-center p-1.5 rounded-full text-gray-400 hover:text-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-indigo-500 hover:bg-gray-100 transition duration-150 ease-in-out; }
         .btn-icon:disabled { @apply opacity-50 cursor-not-allowed hover:bg-transparent hover:text-gray-400; }
-        .btn-icon i { @apply h-4 w-4; }
+        .btn-icon i { @apply h-4 w-4 pointer-events-none; } /* Added pointer-events-none */
         .btn-icon.danger:hover:not(:disabled) { @apply text-red-600 bg-red-50; focus:ring-red-500; }
         .btn-icon.warning:hover:not(:disabled) { @apply text-amber-600 bg-amber-50; focus:ring-amber-500; }
         .btn-icon.success:hover:not(:disabled) { @apply text-green-600 bg-green-50; focus:ring-green-500; }
@@ -109,7 +109,6 @@
         .team-display-view .form-label { @apply text-gray-500 normal-case tracking-normal; }
         .team-display-value { @apply text-gray-800 font-medium text-base; }
         .team-edit-view { @apply hidden; }
-
 
         /* Page title style */
         .page-title { @apply text-xl font-semibold text-gray-700 mb-6 pb-2 border-b border-gray-300; }
@@ -229,12 +228,12 @@
 
     <!-- Firebase SDK & Admin Logic -->
     <script type="module">
-        // Firebase Imports (Corrected URLs)
+        // Firebase Imports
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js";
         import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-auth.js";
-        import { getFirestore, doc, setDoc, addDoc, getDoc, getDocs, deleteDoc, collection, onSnapshot, query, writeBatch, updateDoc, where } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-firestore.js"; // Added 'where'
+        import { getFirestore, doc, setDoc, addDoc, getDoc, getDocs, deleteDoc, collection, onSnapshot, query, writeBatch, updateDoc, where } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-firestore.js";
 
-        // Firebase Config & Init (Same as before)
+        // Firebase Config & Init
         const firebaseConfig = { apiKey: "AIzaSyDBfnce5gtJhW9u1xwU2FVPQGx2KvG1vw8", authDomain: "result25.firebaseapp.com", projectId: "result25", storageBucket: "result25.firebasestorage.app", messagingSenderId: "1099340945335", appId: "1:1099340945335:web:4fdc63db6bf6b40a30ba32", measurementId: "G-S4BJW3N642" };
         const appId = typeof __app_id !== 'undefined' ? __app_id : firebaseConfig.projectId;
         const finalFirebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : firebaseConfig;
@@ -266,67 +265,129 @@
             const homepageForm=d.getElementById('form-homepage'), homepageFields={'header_title':d.getElementById('homepage-header-title'), 'logo_url':d.getElementById('homepage-logo-url'), 'main_title':d.getElementById('homepage-main-title'), 'subtitle':d.getElementById('homepage-subtitle'), 'about_title':d.getElementById('homepage-about-title'), 'about_subtitle':d.getElementById('homepage-about-subtitle'), 'about':d.getElementById('homepage-about'), 'about_image_url':d.getElementById('homepage-about-image-url'), 'gallery':d.getElementById('homepage-gallery'), 'total_programs':d.getElementById('homepage-total-programs'), 'total_participants':d.getElementById('homepage-total-participants'), 'total_categories':d.getElementById('homepage-total-categories'), 'total_teams':d.getElementById('homepage-total-teams'), 'institution_name':d.getElementById('homepage-institution-name'), 'copyright_text':d.getElementById('homepage-copyright-text'), 'social_instagram':d.getElementById('homepage-social-instagram'), 'social_youtube':d.getElementById('homepage-social-youtube'), 'social_facebook':d.getElementById('homepage-social-facebook')};
 
             // Helper function to disable/enable forms/buttons
-            const toggleDisabled = (elementOrSelector, isDisabled) => { /* ... */ };
+            const toggleDisabled = (elementOrSelector, isDisabled) => {
+                try {
+                    const elements = typeof elementOrSelector === 'string'
+                        ? d.querySelectorAll(elementOrSelector)
+                        : (elementOrSelector instanceof NodeList ? Array.from(elementOrSelector) : [elementOrSelector]); // Ensure it's an array
+                    elements.forEach(el => { if(el && typeof el.disabled !== 'undefined') el.disabled = isDisabled; }); // Check if element exists and has disabled property
+                } catch (err) {
+                    console.error("Error toggling disabled state:", err, elementOrSelector);
+                }
+            };
 
             // --- Navigation Logic ---
-            function openAdminNav() { /* ... */ }
-            function closeAdminNav() { /* ... */ }
+            function openAdminNav() { if(adminMenuOverlay && adminMenuBox) { adminMenuOverlay.style.display = 'flex'; setTimeout(() => { adminMenuOverlay.style.opacity = '1'; adminMenuBox.classList.add('open'); }, 10); } }
+            function closeAdminNav() { if(adminMenuOverlay && adminMenuBox) { adminMenuOverlay.style.opacity = '0'; adminMenuBox.classList.remove('open'); setTimeout(() => { adminMenuOverlay.style.display = 'none'; }, 300); } }
             if(adminMenuBtn) adminMenuBtn.addEventListener('click', openAdminNav); else console.error("Admin menu button not found");
             if(adminMenuCloseBtn) adminMenuCloseBtn.addEventListener('click', closeAdminNav); else console.error("Admin menu close button not found");
             if(adminMenuOverlay) adminMenuOverlay.addEventListener('click', (e) => { if (e.target === adminMenuOverlay) { closeAdminNav(); } }); else console.error("Admin menu overlay not found");
             navLinks.forEach(link => { link.addEventListener('click', (e) => { e.preventDefault(); const targetId = link.getAttribute('data-target'); if(!targetId) return; pages.forEach(page => page.classList.add('hidden')); const targetPage = d.getElementById(targetId); if (targetPage) { targetPage.classList.remove('hidden'); console.log("Navigated to:", targetId); } else { console.error("Target page not found:", targetId); return; } navLinks.forEach(nav => nav.classList.remove('active')); link.classList.add('active'); closeAdminNav(); loadDataForPage(targetId); }); });
 
-            async function loadDataForPage(pageId) { /* ... */ }
+            async function loadDataForPage(pageId) {
+                console.log("Attempting to load data for:", pageId);
+                const targetPage = d.getElementById(pageId);
+                if (targetPage) targetPage.style.opacity = '0.7';
+
+                try {
+                    let promises = [];
+                    // Always load these essential ones if not loaded
+                    if (allCategories.length === 0) promises.push(loadCategories());
+                    if (Object.keys(allTeamsAdmin).length === 0) promises.push(loadTeamsForAdmin());
+                    if (Object.keys(allParticipants).length === 0) promises.push(loadAllParticipants()); // Load participants once initially or if empty
+                    if (Object.keys(allPrograms).length === 0) promises.push(loadPrograms()); // Load programs once initially or if empty
+
+                    // Page-specific loading (can potentially re-fetch if needed)
+                    switch (pageId) {
+                        case 'page-dashboard': promises.push(loadHomepageContent()); break;
+                        // For others, essential data might already be loading/loaded above
+                        case 'page-results': promises.push(loadCategoriesForResults()); break; // Ensure dropdowns are correct
+                    }
+                    await Promise.allSettled(promises); // Wait for all essential loads
+                    console.log("Data loading complete/attempted for:", pageId);
+                } catch (error) { console.error(`Error during loadDataForPage for ${pageId}:`, error); }
+                finally { if (targetPage) targetPage.style.opacity = '1'; }
+            }
+
 
             // --- Authentication ---
-            onAuthStateChanged(auth, async (user) => { /* ... */ });
-            if(loginForm) { /* ... */ } else { console.error("Login form missing!"); }
-            if (registerForm) { /* ... */ } else { console.error("Register form missing!"); }
-            if(logoutButton) { /* ... */ } else { console.error("Logout button missing!"); }
+            onAuthStateChanged(auth, async (user) => {
+                console.log("Auth state changed. User:", user ? user.email : 'None');
+                if (user) {
+                    if(loginPage) loginPage.style.display = 'none';
+                    if(adminPanel) adminPanel.style.display = 'block';
+                    if(adminEmail) adminEmail.textContent = user.email;
+                    const defaultPageId = 'page-dashboard';
+                    pages.forEach(page => { if (page.id !== defaultPageId) page.classList.add('hidden'); else page.classList.remove('hidden'); });
+                    navLinks.forEach(nav => nav.classList.remove('active'));
+                    const defaultNavLink = d.querySelector(`.menu-link[data-target="${defaultPageId}"]`);
+                    if (defaultNavLink) defaultNavLink.classList.add('active');
+                    try {
+                        console.log("Loading initial data after login...");
+                        // Load critical data first, then others
+                        await Promise.all([ loadCategories(), loadTeamsForAdmin() ]);
+                        await Promise.all([ loadHomepageContent(), loadAllParticipants(), loadPrograms() ]);
+                         console.log("Initial data load complete.");
+                    } catch(e){ console.error("Error during initial data load:", e);}
+                } else {
+                    if(loginPage) loginPage.style.display = 'flex';
+                    if(adminPanel) adminPanel.style.display = 'none';
+                    allPrograms = {}; allCategories = []; allParticipants = {}; allTeamsAdmin = {}; // Clear data
+                }
+            }, (error) => { console.error("Auth state listener error:", error); });
+
+            // Ensure login/register forms exist before adding listeners
+            if (loginForm) {
+                 const loginButton = loginForm.querySelector('button[type="submit"]');
+                 loginForm.addEventListener('submit', async (e) => { e.preventDefault(); const email = d.getElementById('login-email')?.value; const password = d.getElementById('login-password')?.value; if (!email || !password) { alert("Enter email and password."); return; } toggleDisabled(loginButton, true); try { await signInWithEmailAndPassword(auth, email, password); } catch (error) { console.error("Login Error:", error); alert(`Login Failed: ${error.message}`); } finally { toggleDisabled(loginButton, false); } });
+            } else { console.error("Login form missing!"); }
+
+            if (registerForm) {
+                 const registerButton = registerForm.querySelector('button[type="submit"]');
+                 registerForm.addEventListener('submit', async (e) => { e.preventDefault(); const email = d.getElementById('register-email')?.value; const password = d.getElementById('register-password')?.value; if (!email || !password) { alert("Enter email and password."); return; } toggleDisabled(registerButton, true); try { await createUserWithEmailAndPassword(auth, email, password); alert('Admin registered! Please login.'); registerForm.reset(); } catch (error) { console.error("Registration Error:", error); alert(`Registration Failed: ${error.message}`); } finally { toggleDisabled(registerButton, false); } });
+             } else { console.error("Register form missing!"); }
+
+            if(logoutButton) { logoutButton.addEventListener('click', async () => { try { await signOut(auth); } catch(error) { alert(`Logout Failed: ${error.message}`); } }); } else { console.error("Logout button missing!"); }
             // Make togglePasswordVisibility globally accessible
             window.togglePasswordVisibility = (inputId, button) => { const input = d.getElementById(inputId); const icon = button?.querySelector('i'); if (!input || !icon) return; input.type = (input.type === "password") ? "text" : "password"; icon.classList.toggle("fa-eye"); icon.classList.toggle("fa-eye-slash"); };
 
             // --- Participants Page Logic ---
-             async function loadAllParticipants() { /* ... */ }
-             function renderParticipantList() { if (!participantListAdmin) { console.error("Participant list element missing in render"); return; } /* ... rest of render ... */ }
-             async function editParticipant(chestNo, currentName, currentTeam) { /* Logic unchanged */ }
-             async function deleteParticipant(chestNo) { /* Logic unchanged */ }
-             if (participantAddForm) { /* ... Add multiple participants ... */ } else { console.error("Participant Add Form missing") }
-             async function deleteAllParticipants(promptUser = true) { /* Logic unchanged */ }
-             if(deleteAllParticipantsBtn) { deleteAllParticipantsBtn.addEventListener('click', () => { /* ... */ }); } else { console.error("Delete all participants button missing"); }
+             async function loadAllParticipants() { /* Same logic */ }
+             function renderParticipantList() { /* Same logic */ }
+             async function editParticipant(chestNo, currentName, currentTeam) { /* Logic unchanged, uses prompts */ }
+             async function deleteParticipant(chestNo) { /* Logic unchanged, uses confirm */ }
+             if (participantAddForm) { participantAddForm.addEventListener('submit', async (e) => { /* Same logic + toggleDisabled */ }); } else { console.error("Participant Add Form missing") }
+             async function deleteAllParticipants(promptUser = true) { /* Logic unchanged + toggleDisabled */ }
+             if(deleteAllParticipantsBtn) { deleteAllParticipantsBtn.addEventListener('click', async () => { toggleDisabled(deleteAllParticipantsBtn, true); try { await deleteAllParticipants(true); } catch(err){ console.log("Deletion cancelled or failed"); } finally { toggleDisabled(deleteAllParticipantsBtn, false); } }); } else { console.error("Delete all participants button missing"); }
              if (participantTeamFilter) participantTeamFilter.addEventListener('change', renderParticipantList); else console.error("Participant team filter missing");
              if (participantSearch) participantSearch.addEventListener('input', renderParticipantList); else console.error("Participant search input missing");
              // Event delegation for participant list actions
-             if(participantListContainer){ // Changed to container ID
+             if(participantListContainer){
                  participantListContainer.addEventListener('click', (e) => {
-                     console.log("Clicked inside participant list container");
                      const targetButton = e.target.closest('button');
                      if(!targetButton) return;
                      const id = targetButton.dataset.id;
-                     console.log("Button clicked, ID:", id);
                      if (!id) return;
 
                      if (targetButton.classList.contains('edit-participant-btn')) {
-                         console.log("Edit participant button clicked for:", id);
                          const p = allParticipants[id];
-                         if(p) editParticipant(id, p.name, p.team);
-                         else console.error("Participant not found for edit:", id);
+                         if(p) editParticipant(id, p.name, p.team); else console.error("Participant not found:", id);
                      } else if (targetButton.classList.contains('delete-participant-btn')) {
-                          console.log("Delete participant button clicked for:", id);
                          deleteParticipant(id);
                      }
                  });
-             } else { console.error("Participant list container (#participant-list-container) missing"); }
+             } else { console.error("Participant list container missing"); }
+
 
             // --- Programs & Categories Page Logic ---
-             async function loadCategories() { /* ... */ }
-             if(categoryForm && categoryInput) { /* ... */ } else { console.error("Category form or input missing"); }
-             async function deleteCategory(id) { /* ... */ };
-             async function editCategory(id, currentName) { /* ... */ };
-             async function loadPrograms() { /* ... */ }
-             if(programForm && programNameInput && programCategorySelect && programTypeSelect) { /* ... */ } else { console.error("Program form elements missing"); }
-             async function deleteProgram(id) { /* ... */ };
-             async function editProgram(id, currentName, currentCategory, p1, p2, p3, currentType) { /* ... */ };
+             async function loadCategories() { /* Same logic */ }
+             if(categoryForm && categoryInput) { categoryForm.addEventListener('submit', async (e) => { /* Same logic + toggleDisabled */ }); } else { console.error("Category form or input missing"); }
+             async function deleteCategory(id) { /* Same logic */ };
+             async function editCategory(id, currentName) { /* Same logic */ };
+             async function loadPrograms() { /* Same rendering logic */ }
+             if(programForm && programNameInput && programCategorySelect && programTypeSelect) { programForm.addEventListener('submit', async (e) => { /* Same logic + toggleDisabled */ }); } else { console.error("Program form elements missing"); }
+             async function deleteProgram(id) { /* Same logic */ };
+             async function editProgram(id, currentName, currentCategory, p1, p2, p3, currentType) { /* Same logic */ };
              // Event delegation for category list actions
              if(categoryListContainer){
                  categoryListContainer.addEventListener('click', (e) => {
@@ -334,28 +395,25 @@
                      if(!targetButton) return;
                      const id = targetButton.dataset.id;
                      if (!id) return;
-
                      if (targetButton.classList.contains('edit-category-btn')) {
                          const cat = allCategories.find(c => c.id === id);
-                         if(cat) editCategory(id, cat.name);
-                         else console.error("Category not found for edit:", id);
+                         if(cat) editCategory(id, cat.name); else console.error("Category not found:", id);
                      } else if (targetButton.classList.contains('delete-category-btn')) {
                          deleteCategory(id);
                      }
                  });
              } else { console.error("Category list container missing"); }
              // Event delegation for program list actions
-             if(programListContainer){
+              if(programListContainer){
                  programListContainer.addEventListener('click', (e) => {
                      const targetButton = e.target.closest('button');
                      if(!targetButton) return;
                      const id = targetButton.dataset.id;
                      if (!id) return;
-
                      if (targetButton.classList.contains('edit-program-btn')) {
                          const prog = allPrograms[id];
                          if(prog) { editProgram(id, prog.name, prog.category, prog.points_first, prog.points_second, prog.points_third, prog.programType || 'individual'); }
-                         else { console.error("Program data not found for edit:", id); }
+                         else { console.error("Program not found:", id); }
                      } else if (targetButton.classList.contains('delete-program-btn')) {
                          deleteProgram(id);
                      }
@@ -364,32 +422,32 @@
 
 
             // --- Results Page Logic ---
-             function updateWinnerName(position) { /* ... */ }
+             function updateWinnerName(position) { /* Same logic */ }
              if(resultInputs.first) resultInputs.first.addEventListener('input', () => updateWinnerName('first')); else console.error("Result input 'first' missing");
              if(resultInputs.second) resultInputs.second.addEventListener('input', () => updateWinnerName('second')); else console.error("Result input 'second' missing");
              if(resultInputs.third) resultInputs.third.addEventListener('input', () => updateWinnerName('third')); else console.error("Result input 'third' missing");
-             function clearNamePreviews() { /* ... */ }
-             async function loadCategoriesForResults() { /* ... */ }
-             async function loadProgramsForResults(selectedCategory = null) { /* ... */ }
-             if(resultCategorySelect) { resultCategorySelect.addEventListener('change', (e) => { /* ... */ }); } else { console.error("Result category select missing"); }
-             if(resultProgramSelect) { resultProgramSelect.addEventListener('change', async (e) => { /* ... */ }); } else { console.error("Result program select missing"); }
-             if(resultForm) { resultForm.addEventListener('submit', async (e) => { /* ... */ }); } else { console.error("Result form missing"); }
+             function clearNamePreviews() { /* Same logic */ }
+             async function loadCategoriesForResults() { /* Same logic */ }
+             async function loadProgramsForResults(selectedCategory = null) { /* Same logic */ }
+             if(resultCategorySelect) { resultCategorySelect.addEventListener('change', (e) => { /* Same logic */ }); } else { console.error("Result category select missing"); }
+             if(resultProgramSelect) { resultProgramSelect.addEventListener('change', async (e) => { /* Same logic */ }); } else { console.error("Result program select missing"); }
+             if(resultForm) { resultForm.addEventListener('submit', async (e) => { /* Same logic + toggleDisabled */ }); } else { console.error("Result form missing"); }
 
 
             // --- Teams Page Logic ---
-             async function loadTeamsForAdmin() { /* ... */ }
-             function renderAdminTeamList() { /* Render logic unchanged, event listeners handled by delegation */ }
-             if(teamForm) { teamForm.addEventListener('submit', async (e) => { /* ... */ }); } else { console.error("Team form missing"); }
-             async function handleSaveTeamChanges(event) { /* ... */ }
-             async function deleteTeam(id) { /* ... */ };
-             // Event delegation for team list actions
-             if(teamListAdmin){
+            async function loadTeamsForAdmin() { try { const q = query(collection(db, `artifacts/${appId}/public/data/teams`)); const snapshot = await getDocs(q); allTeamsAdmin = {}; snapshot.docs.forEach(doc => { allTeamsAdmin[doc.id] = { id: doc.id, ...doc.data() }; }); renderAdminTeamList(); const sortedTeamNames = Object.keys(allTeamsAdmin).sort((a,b) => (allTeamsAdmin[a].name || a).localeCompare(allTeamsAdmin[b].name || b)); /* Use name for sorting */ if(participantTeamFilter) { const currentFilterVal = participantTeamFilter.value; participantTeamFilter.innerHTML = '<option value="">All Teams</option>'; sortedTeamNames.forEach(teamId => { const teamName = allTeamsAdmin[teamId]?.name || teamId; participantTeamFilter.innerHTML += `<option value="${teamName}" ${teamName === currentFilterVal ? 'selected' : ''}>${teamName}</option>`; }); } if(participantAddTeam) { participantAddTeam.innerHTML = '<option value="">-- Select Team --</option>'; sortedTeamNames.forEach(teamId => { const teamName = allTeamsAdmin[teamId]?.name || teamId; participantAddTeam.innerHTML += `<option value="${teamName}">${teamName}</option>`; }); } console.log("Teams loaded:", Object.keys(allTeamsAdmin).length); } catch(error) { console.error("Error loading teams:", error); if(teamListAdmin) teamListAdmin.innerHTML = '<p class="text-red-500 p-4">Error loading teams.</p>'; } }
+            function renderAdminTeamList() { if (!teamListAdmin) return; teamListAdmin.innerHTML = ''; if (Object.keys(allTeamsAdmin).length === 0) { teamListAdmin.innerHTML = '<div class="text-center py-5"><p class="text-gray-500 italic">No teams added.</p></div>'; return; } const sortedTeams = Object.values(allTeamsAdmin).sort((a, b) => (a.name || '').localeCompare(b.name || '')); sortedTeams.forEach(team => { const teamElement = d.createElement('div'); teamElement.className = 'border border-gray-200 rounded-lg p-4 mb-4 bg-white shadow-sm team-card'; teamElement.dataset.teamId = team.id; teamElement.innerHTML = ` <div class="team-display-view"> <div class="flex justify-between items-start mb-3"> <h3 class="text-md font-semibold text-gray-800">${team.name || 'Unnamed Team'}</h3> <div class="table-actions"> <button class="btn-icon warning edit-team-btn" title="Edit Team"><i class="fas fa-edit"></i></button> <button class="btn-icon danger delete-team-btn" title="Delete Team"><i class="fas fa-trash-alt"></i></button> </div> </div> <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm"> <div><span class="text-gray-500">Leader:</span> <span class="font-medium text-gray-700">${team.leader || '-'}</span></div> <div><span class="text-gray-500">Asst. Leader:</span> <span class="font-medium text-gray-700">${team.asst || '-'}</span></div> <div class="md:col-span-2"><span class="text-gray-500">Chest No Range:</span> <span class="font-medium text-gray-700">${team.id_from || '?'} - ${team.id_to || '?'}</span></div> </div> </div> <div class="team-edit-view mt-4 hidden"> <form class="space-y-3 team-update-form"> <input type="hidden" class="edit-team-original-name" value="${team.name || ''}"> <!-- Store original name --> <div><label class="form-label text-xs">Team Name</label><input type="text" class="form-input text-sm edit-team-name" value="${team.name || ''}" required></div> <div class="grid grid-cols-1 md:grid-cols-2 gap-3"> <div><label class="form-label text-xs">Leader</label><input type="text" class="form-input text-sm edit-team-leader" value="${team.leader || ''}"></div> <div><label class="form-label text-xs">Asst. Leader</label><input type="text" class="form-input text-sm edit-team-asst" value="${team.asst || ''}"></div> </div> <div class="grid grid-cols-1 md:grid-cols-2 gap-3"> <div><label class="form-label text-xs">ChestNo From</label><input type="number" class="form-input text-sm edit-team-id-from" value="${team.id_from || ''}" required></div> <div><label class="form-label text-xs">ChestNo To</label><input type="number" class="form-input text-sm edit-team-id-to" value="${team.id_to || ''}" required></div> </div> <div class="flex justify-end gap-2 pt-2"> <button type="button" class="btn btn-light btn-sm cancel-edit-team-btn"><i class="fas fa-times"></i>Cancel</button> <button type="submit" class="btn btn-success btn-sm save-team-changes-btn"><i class="fas fa-save"></i>Save</button> </div> </form> </div> `; teamListAdmin.appendChild(teamElement); }); console.log("Team list rendered.");}
+            if(teamForm) { teamForm.addEventListener('submit', async (e) => { e.preventDefault(); /* ... validation ... */ const name = d.getElementById('team-name').value.trim().toUpperCase(); /* Rest of data */ if (!name) { alert("Team Name required."); return; } /* ... more validation ... */ const teamData = { name, /*...*/ }; toggleDisabled(teamForm, true); try { // IMPORTANT: Use team name (UPPERCASE) as the document ID await setDoc(doc(db, `artifacts/${appId}/public/data/teams`, name), teamData); alert(`Team ${name} added!`); teamForm.reset(); await loadTeamsForAdmin(); } catch (error) { alert(`Error adding team: ${error.message}`); } finally { toggleDisabled(teamForm, false); } }); } else { console.error("Team form missing"); }
+            async function handleSaveTeamChanges(event) { event.preventDefault(); const form = event.target; const card = form.closest('.team-card'); const teamId = card?.dataset.teamId; // This is the OLD team name (used as ID) const originalNameInput = form.querySelector('.edit-team-original-name'); const oldName = originalNameInput ? originalNameInput.value : teamId; // Get old name if (!teamId || !oldName) { console.error("Team ID or original name not found for saving."); return; } const updatedData = { name: form.querySelector('.edit-team-name')?.value.trim().toUpperCase() || '', leader: form.querySelector('.edit-team-leader')?.value.trim() || '', asst: form.querySelector('.edit-team-asst')?.value.trim() || '', id_from: parseInt(form.querySelector('.edit-team-id-from')?.value || '0', 10), id_to: parseInt(form.querySelector('.edit-team-id-to')?.value || '0', 10) }; if (!updatedData.name) { alert("Team Name is required."); return; } if (isNaN(updatedData.id_from) || isNaN(updatedData.id_to) || updatedData.id_from <= 0 || updatedData.id_to <= 0 || updatedData.id_from > updatedData.id_to) { alert("Valid Chest No range required."); return; } const nameChanged = oldName.toUpperCase() !== updatedData.name.toUpperCase(); toggleDisabled(form, true); try { if (nameChanged) { // Need to delete old and add new because ID changes console.log(`Team name changed from ${oldName} to ${updatedData.name}. Recreating doc...`); const batch = writeBatch(db); batch.delete(doc(db, `artifacts/${appId}/public/data/teams`, oldName)); batch.set(doc(db, `artifacts/${appId}/public/data/teams`, updatedData.name), updatedData); await batch.commit(); // Update local cache delete allTeamsAdmin[oldName]; allTeamsAdmin[updatedData.name] = { id: updatedData.name, ...updatedData }; console.log(`Updating participants from ${oldName} to ${updatedData.name}...`); updateParticipantTeamNames(oldName, updatedData.name); // Run async } else { // Just update the existing document await updateDoc(doc(db, `artifacts/${appId}/public/data/teams`, teamId), updatedData); allTeamsAdmin[teamId] = { ...allTeamsAdmin[teamId], ...updatedData }; // Update cache } alert(`Team ${updatedData.name} updated!`); await loadTeamsForAdmin(); // Reload list completely } catch (error) { console.error("Error updating team:", error); alert(`Error updating team: ${error.message}`); toggleDisabled(form, false); // Re-enable only on error } /* No finally toggle here, success re-renders */ }
+            async function deleteTeam(id) { const teamToDelete = allTeamsAdmin[id]; if (!teamToDelete) { console.error("Team not found for delete:", id); return; } if (!confirm(`Delete team ${teamToDelete.name}?`)) return; try { await deleteDoc(doc(db, `artifacts/${appId}/public/data/teams`, id)); alert(`Team ${teamToDelete.name} deleted!`); delete allTeamsAdmin[id]; await loadTeamsForAdmin(); } catch (error) { alert(`Error deleting team: ${error.message}`); }};
+            // Event delegation for team list actions
+            if(teamListAdmin){
                  teamListAdmin.addEventListener('click', (e) => {
                      const targetButton = e.target.closest('button');
                      if (!targetButton) return;
                      const card = targetButton.closest('.team-card');
                      const teamId = card?.dataset.teamId;
-                     if(!teamId) return;
+                     if(!teamId) { console.error("Could not find team ID for action."); return; }
 
                      if (targetButton.classList.contains('edit-team-btn')) {
                          handleEditTeamClick(card);
@@ -408,13 +466,14 @@
              } else { console.error("Team list container missing"); }
              function handleEditTeamClick(card) { if (!card) return; const displayView = card.querySelector('.team-display-view'); const editView = card.querySelector('.team-edit-view'); if(displayView) displayView.style.display = 'none'; if(editView) editView.style.display = 'block'; }
              function handleCancelEditTeamClick(card) { if (!card) return; const displayView = card.querySelector('.team-display-view'); const editView = card.querySelector('.team-edit-view'); if(displayView) displayView.style.display = 'block'; if(editView) editView.style.display = 'none'; }
-             async function updateParticipantTeamNames(oldName, newName) { /* ... */ }
+             async function updateParticipantTeamNames(oldName, newName) { /* Same logic */ }
+
 
             // --- Home Page Content (Admin) ---
-             async function loadHomepageContent() { /* ... */ }
-             if(homepageForm) { homepageForm.addEventListener('submit', async (e) => { /* ... */ }); } else { console.error("Homepage form missing"); }
+             async function loadHomepageContent() { /* Same logic */ }
+             if(homepageForm) { homepageForm.addEventListener('submit', async (e) => { /* Same logic + toggleDisabled */ }); } else { console.error("Homepage form missing"); }
 
-            console.log("Event listeners potentially attached. Initial setup complete.");
+            console.log("Event listeners attached and initial setup complete.");
 
         }); // End DOMContentLoaded
     </script>
