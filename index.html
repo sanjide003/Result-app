@@ -1206,8 +1206,8 @@
             const createErrorHandler = (sourceName) => (error) => {
                 console.error(`Error loading ${sourceName}: `, error); // Log the actual error object
                 // Log additional details for permission errors
-                if (error.code === 'permission-denied') {
-                     console.error(`PERMISSION DENIED for ${sourceName}. Check Firestore Security Rules for path: artifacts/${appId}/public/data/${sourceName === 'homepage' ? 'config/homepage' : sourceName}`);
+                if (error.code === 'permission-denied' || error.code === 'unavailable') { // Handle 'unavailable' as well
+                     console.error(`PERMISSION DENIED or UNAVAILABLE for ${sourceName}. Check Firestore Security Rules for path: artifacts/${appId}/public/data/${sourceName === 'homepage' ? 'config/homepage' : sourceName}. Also check network connection.`);
                 }
                 switch (sourceName) { /* Set defaults */
                     case 'results': dbResults = {}; break; case 'programs': dbPrograms = {}; break;
@@ -1279,10 +1279,14 @@
                 // Set team tab active by default within scoreboard page
                 const teamTabButton = d.querySelector('.main-tab-button[onclick*="\'team-tab\'"]');
                 const teamTabContent = d.getElementById('team-tab');
-                d.querySelectorAll('.main-tab-button.active').forEach(b => b.classList.remove('active'));
-                d.querySelectorAll('.main-tab-content.active').forEach(c => c.classList.remove('active'));
-                if(teamTabButton) teamTabButton.classList.add('active');
-                if(teamTabContent) teamTabContent.classList.add('active');
+                if(teamTabButton && teamTabContent) { // Ensure elements exist
+                    d.querySelectorAll('.main-tab-button.active').forEach(b => b.classList.remove('active'));
+                    d.querySelectorAll('.main-tab-content.active').forEach(c => c.classList.remove('active'));
+                    teamTabButton.classList.add('active');
+                    teamTabContent.classList.add('active');
+                } else {
+                     console.warn("Could not set default active tab 'team-tab'.");
+                }
 
                 console.log("Initial page and tab set successfully.");
             } catch(e) {
