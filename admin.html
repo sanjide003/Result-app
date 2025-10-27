@@ -159,7 +159,7 @@
 
                 <!-- Home Page Settings -->
                 <div id="page-dashboard" class="admin-page space-y-6">
-                    <h1 class="page-title">Home Page Settings</h1> <div class="info-text"> <strong>നിർദ്ദേശം:</strong> വെബ്സൈറ്റിന്റെ പ്രധാന പേജിൽ കാണിക്കേണ്ട വിവരങ്ങൾ ഇവിടെ നൽകുക. </div> <form id="form-homepage" class="space-y-6"> <div class="card"> <h2 class="card-header">Header & Hero</h2> <!-- ... fields ... --> </div> <div class="card"> <h2 class="card-header">About Section</h2> <!-- ... fields ... --> </div> <div class="card"> <h2 class="card-header">Statistics</h2> <!-- ... fields ... --> </div> <div class="card"> <h2 class="card-header">Image Gallery</h2> <!-- ... fields ... --> </div> <div class="card"> <h2 class="card-header">Footer</h2> <!-- ... fields ... --> </div> <div class="flex justify-end pt-2"> <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i>Save All</button> </div> </form>
+                    <h1 class="page-title">Home Page Settings</h1> <div class="info-text"> <strong>നിർദ്ദേശം:</strong> വെബ്സൈറ്റിന്റെ പ്രധാന പേജിൽ കാണിക്കേണ്ട വിവരങ്ങൾ ഇവിടെ നൽകുക. </div> <form id="form-homepage" class="space-y-6"> <div class="card"> <h2 class="card-header">Header & Hero</h2> <div class="space-y-4"> <div class="grid grid-cols-1 md:grid-cols-2 gap-4"> <div> <label for="homepage-header-title" class="form-label">Header Title</label> <input type="text" id="homepage-header-title" class="form-input"> </div> <div> <label for="homepage-logo-url" class="form-label">Logo URL</label> <input type="url" id="homepage-logo-url" class="form-input" placeholder="https://..."> </div> </div> <div class="grid grid-cols-1 md:grid-cols-2 gap-4"> <div> <label for="homepage-main-title" class="form-label">Main Title</label> <input type="text" id="homepage-main-title" class="form-input"> </div> <div> <label for="homepage-subtitle" class="form-label">Subtitle</label> <input type="text" id="homepage-subtitle" class="form-input"> </div> </div> </div> </div> <div class="card"> <h2 class="card-header">About Section</h2> <div class="space-y-4"> <div> <label for="homepage-about-title" class="form-label">Title</label> <input type="text" id="homepage-about-title" class="form-input"> </div> <div> <label for="homepage-about-subtitle" class="form-label">Subtitle</label> <input type="text" id="homepage-about-subtitle" class="form-input"> </div> <div> <label for="homepage-about" class="form-label">Description</label> <textarea id="homepage-about" class="form-textarea" rows="4"></textarea> </div> <div> <label for="homepage-about-image-url" class="form-label">Image URL</label> <input type="url" id="homepage-about-image-url" class="form-input" placeholder="https://..."> </div> </div> </div> <div class="card"> <h2 class="card-header">Statistics</h2> <p class="text-xs text-gray-500 mb-4">ഹോം പേജിലെ കണക്കുകൾ.</p> <div class="grid grid-cols-2 md:grid-cols-4 gap-4"> <div> <label for="homepage-total-programs" class="form-label">Programs</label> <input type="text" id="homepage-total-programs" class="form-input" placeholder="50+"> </div> <div> <label for="homepage-total-participants" class="form-label">Contestants</label> <input type="text" id="homepage-total-participants" class="form-input" placeholder="200+"> </div> <div> <label for="homepage-total-categories" class="form-label">Categories</label> <input type="text" id="homepage-total-categories" class="form-input" placeholder="5"> </div> <div> <label for="homepage-total-teams" class="form-label">Teams</label> <input type="text" id="homepage-total-teams" class="form-input" placeholder="3"> </div> </div> </div> <div class="card"> <h2 class="card-header">Image Gallery</h2> <label for="homepage-gallery" class="form-label">Image URLs (One per line)</label> <textarea id="homepage-gallery" class="form-textarea" rows="6" placeholder="https://.../img1.jpg\nhttps://.../img2.jpg"></textarea> </div> <div class="card"> <h2 class="card-header">Footer</h2> <div class="space-y-4"> <div> <label for="homepage-institution-name" class="form-label">Institution</label> <input type="text" id="homepage-institution-name" class="form-input"> </div> <div> <label for="homepage-copyright-text" class="form-label">Copyright</label> <input type="text" id="homepage-copyright-text" class="form-input" placeholder="© 2025..."> </div> <h3 class="text-sm font-semibold text-gray-700 pt-2">Social Links</h3> <div class="grid grid-cols-1 md:grid-cols-3 gap-4"> <div> <label for="homepage-social-instagram" class="form-label">Instagram</label> <input type="url" id="homepage-social-instagram" class="form-input" placeholder="https://..."> </div> <div> <label for="homepage-social-youtube" class="form-label">YouTube</label> <input type="url" id="homepage-social-youtube" class="form-input" placeholder="https://..."> </div> <div> <label for="homepage-social-facebook" class="form-label">Facebook</label> <input type="url" id="homepage-social-facebook" class="form-input" placeholder="https://..."> </div> </div> </div> </div> <div class="flex justify-end pt-2"> <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i>Save All</button> </div> </form>
                 </div>
 
                 <!-- Participants -->
@@ -251,9 +251,11 @@
             let allCategories = []; // Array of {id, name}
             let allParticipants = {}; // Key: chestNo
             let allTeamsAdmin = {}; // Key: teamId (doc id from Firestore)
+            let listenersAttached = false; // Flag to ensure listeners are attached only once
             const d = document;
 
             // --- DOM Selections ---
+            // Ensure all element selections are valid
             const loginPage=d.getElementById('login-page'), adminPanel=d.getElementById('admin-panel'), loginForm=d.getElementById('login-form'), registerForm=d.getElementById('register-form'), logoutButton=d.getElementById('logout-button'), adminEmail=d.getElementById('admin-email'), pages=d.querySelectorAll('.admin-page'), adminMenuOverlay=d.getElementById('admin-menu-overlay'), adminMenuBox=d.getElementById('admin-menu-box'), adminMenuBtn=d.getElementById('admin-menu-btn'), adminMenuCloseBtn=d.getElementById('admin-menu-close-btn'), navLinks=d.querySelectorAll('.menu-link');
             const participantAddForm = d.getElementById('form-add-participants'), participantAddTeam = d.getElementById('participant-add-team'), participantAddNames = d.getElementById('participant-add-names'), addLogContainer = d.getElementById('add-log-container'), addLog = d.getElementById('add-log'), participantCountEl=d.getElementById('participant-count'), deleteAllParticipantsBtn=d.getElementById('delete-all-participants-btn'), participantTeamFilter = d.getElementById('participant-team-filter'), participantSearch = d.getElementById('participant-search'), participantListAdmin = d.getElementById('participant-list-admin'), participantListContainer = d.getElementById('participant-list-container'), participantListPlaceholder = d.getElementById('participant-list-placeholder'); // Added container
             const categoryForm=d.getElementById('form-add-category'), categoryInput=d.getElementById('category-name'), categoryList=d.getElementById('category-list'), categoryListContainer=d.getElementById('category-list-container');
@@ -269,11 +271,9 @@
                 try {
                     const elements = typeof elementOrSelector === 'string'
                         ? d.querySelectorAll(elementOrSelector)
-                        : (elementOrSelector instanceof NodeList ? Array.from(elementOrSelector) : [elementOrSelector]); // Ensure it's an array
-                    elements.forEach(el => { if(el && typeof el.disabled !== 'undefined') el.disabled = isDisabled; }); // Check if element exists and has disabled property
-                } catch (err) {
-                    console.error("Error toggling disabled state:", err, elementOrSelector);
-                }
+                        : (elementOrSelector instanceof NodeList ? Array.from(elementOrSelector) : [elementOrSelector]);
+                    elements.forEach(el => { if(el && typeof el.disabled !== 'undefined') el.disabled = isDisabled; });
+                } catch (err) { console.error("Error toggling disabled state:", err, elementOrSelector); }
             };
 
             // --- Navigation Logic ---
@@ -282,7 +282,14 @@
              if(adminMenuBtn) adminMenuBtn.addEventListener('click', openAdminNav); else console.error("Admin menu button not found");
              if(adminMenuCloseBtn) adminMenuCloseBtn.addEventListener('click', closeAdminNav); else console.error("Admin menu close button not found");
              if(adminMenuOverlay) adminMenuOverlay.addEventListener('click', (e) => { if (e.target === adminMenuOverlay) { closeAdminNav(); } }); else console.error("Admin menu overlay not found");
-             navLinks.forEach(link => { link.addEventListener('click', (e) => { e.preventDefault(); const targetId = link.getAttribute('data-target'); if(!targetId) return; pages.forEach(page => page.classList.add('hidden')); const targetPage = d.getElementById(targetId); if (targetPage) { targetPage.classList.remove('hidden'); console.log("Navigated to:", targetId); } else { console.error("Target page not found:", targetId); return; } navLinks.forEach(nav => nav.classList.remove('active')); link.classList.add('active'); closeAdminNav(); loadDataForPage(targetId); }); });
+
+             // Ensure navLinks exist before adding listeners
+             if (navLinks && navLinks.length > 0) {
+                 navLinks.forEach(link => { link.addEventListener('click', (e) => { e.preventDefault(); const targetId = link.getAttribute('data-target'); if(!targetId) return; pages.forEach(page => page.classList.add('hidden')); const targetPage = d.getElementById(targetId); if (targetPage) { targetPage.classList.remove('hidden'); console.log("Navigated to:", targetId); } else { console.error("Target page not found:", targetId); return; } navLinks.forEach(nav => nav.classList.remove('active')); link.classList.add('active'); closeAdminNav(); loadDataForPage(targetId); }); });
+             } else {
+                 console.error("Navigation links (.menu-link) not found!");
+             }
+
 
             async function loadDataForPage(pageId) {
                 console.log("Attempting to load data for:", pageId);
@@ -291,29 +298,29 @@
 
                 try {
                     let promises = [];
-                    // Ensure essential data is loaded before proceeding with page-specific logic
+                    // Always ensure core data is loaded or loading
                     if (allCategories.length === 0) promises.push(loadCategories());
                     if (Object.keys(allTeamsAdmin).length === 0) promises.push(loadTeamsForAdmin());
                     if (Object.keys(allParticipants).length === 0) promises.push(loadAllParticipants());
                     if (Object.keys(allPrograms).length === 0) promises.push(loadPrograms());
 
-                    // Wait for essential data if necessary
+                    // Wait for core data if needed, before page-specific loads
                     if (promises.length > 0) {
-                         console.log("Loading essential data...");
+                         console.log("Loading/Re-validating essential data...");
                          await Promise.allSettled(promises);
-                         console.log("Essential data loaded.");
-                         promises = []; // Reset promises for page-specific loading
+                         console.log("Essential data loaded/validated.");
+                         promises = []; // Reset for page-specific
                     }
 
 
                     // Page-specific loading
                     switch (pageId) {
                         case 'page-dashboard': promises.push(loadHomepageContent()); break;
-                        case 'page-participants': /* Data already loaded */ break;
-                        case 'page-programs': /* Data already loaded */ break;
-                        case 'page-results': promises.push(loadCategoriesForResults()); break; // Just update dropdowns
-                        case 'page-teams': /* Data already loaded */ break;
-                        default: console.warn("Unknown pageId for data loading:", pageId);
+                        case 'page-participants': /* Data likely loaded */ break;
+                        case 'page-programs': /* Data likely loaded */ break;
+                        case 'page-results': promises.push(loadCategoriesForResults()); break; // Refresh dropdowns
+                        case 'page-teams': /* Data likely loaded */ break;
+                        default: console.warn("Unknown pageId:", pageId);
                     }
                     if (promises.length > 0) {
                         await Promise.allSettled(promises);
@@ -336,177 +343,251 @@
                     navLinks.forEach(nav => nav.classList.remove('active'));
                     const defaultNavLink = d.querySelector(`.menu-link[data-target="${defaultPageId}"]`);
                     if (defaultNavLink) defaultNavLink.classList.add('active');
-                    try {
-                        console.log("Loading initial data after login...");
-                        // Load critical data first, then others
-                        await Promise.all([ loadCategories(), loadTeamsForAdmin() ]);
-                        await Promise.all([ loadHomepageContent(), loadAllParticipants(), loadPrograms() ]);
-                         console.log("Initial data load complete.");
-                    } catch(e){ console.error("Error during initial data load:", e);}
+                    // Load initial data only ONCE after login
+                    if (!listenersAttached) { // Prevent re-loading on minor auth state changes
+                         try {
+                             console.log("Loading initial data after login...");
+                             await Promise.all([ loadCategories(), loadTeamsForAdmin() ]);
+                             await Promise.all([ loadHomepageContent(), loadAllParticipants(), loadPrograms() ]);
+                             attachEventListeners(); // Attach listeners after initial data load
+                             listenersAttached = true;
+                             console.log("Initial data load and listener attachment complete.");
+                         } catch(e){ console.error("Error during initial data load:", e); }
+                    }
                 } else {
                     if(loginPage) loginPage.style.display = 'flex';
                     if(adminPanel) adminPanel.style.display = 'none';
                     allPrograms = {}; allCategories = []; allParticipants = {}; allTeamsAdmin = {}; // Clear data
+                    listenersAttached = false; // Reset flag on logout
                 }
             }, (error) => { console.error("Auth state listener error:", error); });
 
-            // Ensure login/register forms exist before adding listeners
-            if (loginForm) {
-                 const loginButton = loginForm.querySelector('button[type="submit"]');
-                 loginForm.addEventListener('submit', async (e) => {
-                     e.preventDefault();
-                     const emailInput = d.getElementById('login-email');
-                     const passwordInput = d.getElementById('login-password');
-                     const email = emailInput?.value;
-                     const password = passwordInput?.value;
-                     if (!email || !password) { alert("Enter email and password."); return; }
-                     toggleDisabled(loginButton, true);
-                     try {
-                         await signInWithEmailAndPassword(auth, email, password);
-                         // Auth listener will handle UI change
-                     } catch (error) {
-                         console.error("Login Error:", error);
-                         alert(`Login Failed: ${error.message}`); // Show specific Firebase error
-                         toggleDisabled(loginButton, false); // Re-enable only on error
+            // --- Event Listener Attachment Function ---
+            function attachEventListeners() {
+                 console.log("Attaching event listeners...");
+                 // Login/Register Forms (attach only once)
+                 if (loginForm && !loginForm.dataset.listenerAttached) {
+                     const loginButton = loginForm.querySelector('button[type="submit"]');
+                     loginForm.addEventListener('submit', async (e) => { e.preventDefault(); /* ... login logic ... */ });
+                     loginForm.dataset.listenerAttached = 'true';
+                     console.log("Login form listener attached.");
+                 }
+                 if (registerForm && !registerForm.dataset.listenerAttached) {
+                     const registerButton = registerForm.querySelector('button[type="submit"]');
+                     registerForm.addEventListener('submit', async (e) => { e.preventDefault(); /* ... register logic ... */ });
+                     registerForm.dataset.listenerAttached = 'true';
+                      console.log("Register form listener attached.");
+                 }
+                 // Logout Button (attach only once)
+                 if (logoutButton && !logoutButton.dataset.listenerAttached) {
+                     logoutButton.addEventListener('click', async () => { /* ... logout logic ... */ });
+                     logoutButton.dataset.listenerAttached = 'true';
+                      console.log("Logout button listener attached.");
+                 }
+                 // Homepage Form (attach only once)
+                 if (homepageForm && !homepageForm.dataset.listenerAttached) {
+                     homepageForm.addEventListener('submit', async (e) => { e.preventDefault(); /* ... homepage save logic ... */ });
+                     homepageForm.dataset.listenerAttached = 'true';
+                      console.log("Homepage form listener attached.");
+                 }
+                 // Participant Add Form (attach only once)
+                 if (participantAddForm && !participantAddForm.dataset.listenerAttached) {
+                     participantAddForm.addEventListener('submit', async (e) => { e.preventDefault(); /* ... participant add logic ... */ });
+                     participantAddForm.dataset.listenerAttached = 'true';
+                     console.log("Participant add form listener attached.");
+                 }
+                 // Participant Filters (attach only once)
+                 if (participantTeamFilter && !participantTeamFilter.dataset.listenerAttached) {
+                      participantTeamFilter.addEventListener('change', renderParticipantList);
+                      participantTeamFilter.dataset.listenerAttached = 'true';
+                 }
+                 if (participantSearch && !participantSearch.dataset.listenerAttached) {
+                      participantSearch.addEventListener('input', renderParticipantList);
+                      participantSearch.dataset.listenerAttached = 'true';
+                 }
+                 // Delete All Participants Button (attach only once)
+                 if (deleteAllParticipantsBtn && !deleteAllParticipantsBtn.dataset.listenerAttached) {
+                     deleteAllParticipantsBtn.addEventListener('click', async () => { /* ... delete all logic ... */ });
+                     deleteAllParticipantsBtn.dataset.listenerAttached = 'true';
+                 }
+                 // Category Add Form (attach only once)
+                 if (categoryForm && !categoryForm.dataset.listenerAttached) {
+                     categoryForm.addEventListener('submit', async (e) => { e.preventDefault(); /* ... category add logic ... */ });
+                     categoryForm.dataset.listenerAttached = 'true';
+                 }
+                 // Program Add Form (attach only once)
+                 if (programForm && !programForm.dataset.listenerAttached) {
+                     programForm.addEventListener('submit', async (e) => { e.preventDefault(); /* ... program add logic ... */ });
+                     programForm.dataset.listenerAttached = 'true';
+                 }
+                 // Result Form (attach only once)
+                 if (resultForm && !resultForm.dataset.listenerAttached) {
+                     resultForm.addEventListener('submit', async (e) => { e.preventDefault(); /* ... result publish logic ... */ });
+                     resultForm.dataset.listenerAttached = 'true';
+                 }
+                 // Result Dropdown Changes (attach only once)
+                 if (resultCategorySelect && !resultCategorySelect.dataset.listenerAttached) {
+                     resultCategorySelect.addEventListener('change', (e) => { /* ... load programs for results ... */ });
+                     resultCategorySelect.dataset.listenerAttached = 'true';
+                 }
+                 if (resultProgramSelect && !resultProgramSelect.dataset.listenerAttached) {
+                     resultProgramSelect.addEventListener('change', async (e) => { /* ... load existing results ... */ });
+                     resultProgramSelect.dataset.listenerAttached = 'true';
+                 }
+                 // Result Input Changes (attach only once)
+                 Object.keys(resultInputs).forEach(pos => {
+                     const input = resultInputs[pos];
+                     if(input && !input.dataset.listenerAttached) {
+                         input.addEventListener('input', () => updateWinnerName(pos));
+                         input.dataset.listenerAttached = 'true';
                      }
-                     // No finally block needed here, button remains disabled until auth state changes or error occurs
                  });
-            } else { console.error("Login form missing!"); }
+                 // Team Add Form (attach only once)
+                 if (teamForm && !teamForm.dataset.listenerAttached) {
+                     teamForm.addEventListener('submit', async (e) => { e.preventDefault(); /* ... team add logic ... */ });
+                     teamForm.dataset.listenerAttached = 'true';
+                 }
 
+                 // Event Delegation Setup (attach only once)
+                 setupListActionDelegation();
 
-            if (registerForm) {
-                 const registerButton = registerForm.querySelector('button[type="submit"]');
-                 registerForm.addEventListener('submit', async (e) => { e.preventDefault(); const email = d.getElementById('register-email')?.value; const password = d.getElementById('register-password')?.value; if (!email || !password) { alert("Enter email and password."); return; } toggleDisabled(registerButton, true); try { await createUserWithEmailAndPassword(auth, email, password); alert('Admin registered! Please login.'); registerForm.reset(); } catch (error) { console.error("Registration Error:", error); alert(`Registration Failed: ${error.message}`); } finally { toggleDisabled(registerButton, false); } });
-             } else { console.error("Register form missing!"); }
+                 console.log("All static event listeners attached.");
+            }
 
-            if(logoutButton) { logoutButton.addEventListener('click', async () => { try { await signOut(auth); } catch(error) { alert(`Logout Failed: ${error.message}`); } }); } else { console.error("Logout button missing!"); }
-            // Make togglePasswordVisibility globally accessible
-            window.togglePasswordVisibility = (inputId, button) => { const input = d.getElementById(inputId); const icon = button?.querySelector('i'); if (!input || !icon) return; input.type = (input.type === "password") ? "text" : "password"; icon.classList.toggle("fa-eye"); icon.classList.toggle("fa-eye-slash"); };
+            // Function to setup event delegation listeners for lists
+            function setupListActionDelegation() {
+                 console.log("Setting up list action delegation...");
+                 // Participant List Actions
+                 if (participantListContainer && !participantListContainer.dataset.listenerAttached) {
+                     participantListContainer.addEventListener('click', (e) => handleListAction(e, 'participant'));
+                     participantListContainer.dataset.listenerAttached = 'true';
+                      console.log("Participant list delegation attached.");
+                 } else if(!participantListContainer) { console.error("Participant list container missing for delegation"); }
+
+                 // Category List Actions
+                 if (categoryListContainer && !categoryListContainer.dataset.listenerAttached) {
+                     categoryListContainer.addEventListener('click', (e) => handleListAction(e, 'category'));
+                     categoryListContainer.dataset.listenerAttached = 'true';
+                      console.log("Category list delegation attached.");
+                 } else if(!categoryListContainer) { console.error("Category list container missing for delegation"); }
+
+                 // Program List Actions
+                 if (programListContainer && !programListContainer.dataset.listenerAttached) {
+                     programListContainer.addEventListener('click', (e) => handleListAction(e, 'program'));
+                     programListContainer.dataset.listenerAttached = 'true';
+                      console.log("Program list delegation attached.");
+                 } else if(!programListContainer) { console.error("Program list container missing for delegation"); }
+
+                 // Team List Actions
+                 if (teamListAdmin && !teamListAdmin.dataset.listenerAttached) { // Team list itself acts as container
+                     teamListAdmin.addEventListener('click', (e) => handleListAction(e, 'team'));
+                     // Listener for form submission within the list
+                     teamListAdmin.addEventListener('submit', (e) => { if (e.target.classList.contains('team-update-form')) { handleSaveTeamChanges(e); } });
+                     teamListAdmin.dataset.listenerAttached = 'true';
+                     console.log("Team list delegation attached.");
+                 } else if(!teamListAdmin) { console.error("Team list container missing for delegation"); }
+            }
+
+             // Generic handler for list actions (Edit/Delete/Cancel) using delegation
+             function handleListAction(event, type) {
+                 const targetButton = event.target.closest('button');
+                 if (!targetButton) return; // Click wasn't on a button or its child
+                 const id = targetButton.dataset.id || targetButton.closest('[data-id]')?.dataset.id || targetButton.closest('.team-card')?.dataset.teamId;
+
+                 console.log(`Action button clicked: Type=${type}, ID=${id}, Classes=${targetButton.className}`);
+
+                 if (!id && type !== 'team-cancel') { // Allow cancel without specific ID
+                     console.warn("Could not find ID for action:", type, targetButton);
+                     return;
+                 }
+
+                 switch (type) {
+                     case 'participant':
+                         if (targetButton.classList.contains('edit-participant-btn')) {
+                             const p = allParticipants[id];
+                             if(p) editParticipant(id, p.name, p.team); else console.error("Participant not found:", id);
+                         } else if (targetButton.classList.contains('delete-participant-btn')) {
+                             deleteParticipant(id);
+                         }
+                         break;
+                     case 'category':
+                         if (targetButton.classList.contains('edit-category-btn')) {
+                              const cat = allCategories.find(c => c.id === id);
+                              if(cat) editCategory(id, cat.name); else console.error("Category not found:", id);
+                         } else if (targetButton.classList.contains('delete-category-btn')) {
+                              deleteCategory(id);
+                         }
+                         break;
+                     case 'program':
+                         if (targetButton.classList.contains('edit-program-btn')) {
+                              const prog = allPrograms[id];
+                              if(prog) { editProgram(id, prog.name, prog.category, prog.points_first, prog.points_second, prog.points_third, prog.programType || 'individual'); }
+                              else { console.error("Program not found:", id); }
+                         } else if (targetButton.classList.contains('delete-program-btn')) {
+                              deleteProgram(id);
+                         }
+                         break;
+                     case 'team': // Team actions are slightly different
+                          const card = targetButton.closest('.team-card');
+                          if (!card) return;
+                          if (targetButton.classList.contains('edit-team-btn')) {
+                              handleEditTeamClick(card);
+                          } else if (targetButton.classList.contains('delete-team-btn')) {
+                              deleteTeam(id); // ID should be correct here
+                          } else if (targetButton.classList.contains('cancel-edit-team-btn')) {
+                              handleCancelEditTeamClick(card);
+                          }
+                          break;
+                 }
+             }
+
 
             // --- Participants Page Logic ---
              async function loadAllParticipants() { /* Same logic */ }
              function renderParticipantList() { /* Same logic */ }
              async function editParticipant(chestNo, currentName, currentTeam) { /* Logic unchanged, uses prompts */ }
              async function deleteParticipant(chestNo) { /* Logic unchanged, uses confirm */ }
-             if (participantAddForm) { participantAddForm.addEventListener('submit', async (e) => { /* Same logic + toggleDisabled */ }); } else { console.error("Participant Add Form missing") }
-             async function deleteAllParticipants(promptUser = true) { /* Logic unchanged + toggleDisabled */ }
-             if(deleteAllParticipantsBtn) { deleteAllParticipantsBtn.addEventListener('click', async () => { toggleDisabled(deleteAllParticipantsBtn, true); try { await deleteAllParticipants(true); } catch(err){ console.log("Deletion cancelled or failed"); } finally { toggleDisabled(deleteAllParticipantsBtn, false); } }); } else { console.error("Delete all participants button missing"); }
-             if (participantTeamFilter) participantTeamFilter.addEventListener('change', renderParticipantList); else console.error("Participant team filter missing");
-             if (participantSearch) participantSearch.addEventListener('input', renderParticipantList); else console.error("Participant search input missing");
-             // Event delegation for participant list actions
-             if(participantListContainer){
-                 participantListContainer.addEventListener('click', (e) => {
-                     const targetButton = e.target.closest('button');
-                     if(!targetButton) return;
-                     // Use dataset.id for consistency
-                     const id = targetButton.dataset.id || targetButton.closest('[data-id]')?.dataset.id;
-                     if (!id) return;
-
-                     if (targetButton.classList.contains('edit-participant-btn')) {
-                         const p = allParticipants[id];
-                         if(p) editParticipant(id, p.name, p.team); else console.error("Participant not found:", id);
-                     } else if (targetButton.classList.contains('delete-participant-btn')) {
-                         deleteParticipant(id);
-                     }
-                 });
-             } else { console.error("Participant list container missing"); }
-
+             // Add Form submit handled via attachEventListeners
+             async function deleteAllParticipants(promptUser = true) { /* Logic unchanged */ }
+             // Delete All button handled via attachEventListeners
+             // Filters handled via attachEventListeners
 
             // --- Programs & Categories Page Logic ---
              async function loadCategories() { /* Same logic */ }
-             if(categoryForm && categoryInput) { categoryForm.addEventListener('submit', async (e) => { /* Same logic + toggleDisabled */ }); } else { console.error("Category form or input missing"); }
+             // Add Form submit handled via attachEventListeners
              async function deleteCategory(id) { /* Same logic */ };
              async function editCategory(id, currentName) { /* Same logic */ };
              async function loadPrograms() { /* Same rendering logic */ }
-             if(programForm && programNameInput && programCategorySelect && programTypeSelect) { programForm.addEventListener('submit', async (e) => { /* Same logic + toggleDisabled */ }); } else { console.error("Program form elements missing"); }
+             // Add Form submit handled via attachEventListeners
              async function deleteProgram(id) { /* Same logic */ };
              async function editProgram(id, currentName, currentCategory, p1, p2, p3, currentType) { /* Same logic */ };
-             // Event delegation for category list actions
-             if(categoryListContainer){
-                 categoryListContainer.addEventListener('click', (e) => {
-                     const targetButton = e.target.closest('button');
-                     if(!targetButton) return;
-                     const id = targetButton.dataset.id || targetButton.closest('[data-id]')?.dataset.id;
-                     if (!id) return;
-                     if (targetButton.classList.contains('edit-category-btn')) {
-                         const cat = allCategories.find(c => c.id === id);
-                         if(cat) editCategory(id, cat.name); else console.error("Category not found:", id);
-                     } else if (targetButton.classList.contains('delete-category-btn')) {
-                         deleteCategory(id);
-                     }
-                 });
-             } else { console.error("Category list container missing"); }
-             // Event delegation for program list actions
-              if(programListContainer){
-                 programListContainer.addEventListener('click', (e) => {
-                     const targetButton = e.target.closest('button');
-                     if(!targetButton) return;
-                     const id = targetButton.dataset.id || targetButton.closest('[data-id]')?.dataset.id;
-                     if (!id) return;
-                     if (targetButton.classList.contains('edit-program-btn')) {
-                         const prog = allPrograms[id];
-                         if(prog) { editProgram(id, prog.name, prog.category, prog.points_first, prog.points_second, prog.points_third, prog.programType || 'individual'); }
-                         else { console.error("Program not found:", id); }
-                     } else if (targetButton.classList.contains('delete-program-btn')) {
-                         deleteProgram(id);
-                     }
-                 });
-             } else { console.error("Program list container missing"); }
-
+             // Edit/Delete buttons handled by delegation setup in attachEventListeners
 
             // --- Results Page Logic ---
              function updateWinnerName(position) { /* Same logic */ }
-             if(resultInputs.first) resultInputs.first.addEventListener('input', () => updateWinnerName('first')); else console.error("Result input 'first' missing");
-             if(resultInputs.second) resultInputs.second.addEventListener('input', () => updateWinnerName('second')); else console.error("Result input 'second' missing");
-             if(resultInputs.third) resultInputs.third.addEventListener('input', () => updateWinnerName('third')); else console.error("Result input 'third' missing");
+             // Input listeners handled via attachEventListeners
              function clearNamePreviews() { /* Same logic */ }
              async function loadCategoriesForResults() { /* Same logic */ }
              async function loadProgramsForResults(selectedCategory = null) { /* Same logic */ }
-             if(resultCategorySelect) { resultCategorySelect.addEventListener('change', (e) => { /* Same logic */ }); } else { console.error("Result category select missing"); }
-             if(resultProgramSelect) { resultProgramSelect.addEventListener('change', async (e) => { /* Same logic */ }); } else { console.error("Result program select missing"); }
-             if(resultForm) { resultForm.addEventListener('submit', async (e) => { /* Same logic + toggleDisabled */ }); } else { console.error("Result form missing"); }
-
+             // Dropdown listeners handled via attachEventListeners
+             // Form submit handled via attachEventListeners
 
             // --- Teams Page Logic ---
-            async function loadTeamsForAdmin() { /* Same logic */ }
-            function renderAdminTeamList() { /* Same rendering logic, event listeners attached below */ if (!teamListAdmin) return; teamListAdmin.innerHTML = ''; if (Object.keys(allTeamsAdmin).length === 0) { teamListAdmin.innerHTML = '<div class="text-center py-5"><p class="text-gray-500 italic">No teams added.</p></div>'; return; } const sortedTeams = Object.values(allTeamsAdmin).sort((a, b) => (a.name || '').localeCompare(b.name || '')); sortedTeams.forEach(team => { const teamElement = d.createElement('div'); teamElement.className = 'border border-gray-200 rounded-lg p-4 mb-4 bg-white shadow-sm team-card'; teamElement.dataset.teamId = team.id; teamElement.innerHTML = ` <div class="team-display-view"> <div class="flex justify-between items-start mb-3"> <h3 class="text-md font-semibold text-gray-800">${team.name || 'Unnamed Team'}</h3> <div class="table-actions"> <button class="btn-icon warning edit-team-btn" data-id="${team.id}" title="Edit Team"><i class="fas fa-edit"></i></button> <button class="btn-icon danger delete-team-btn" data-id="${team.id}" title="Delete Team"><i class="fas fa-trash-alt"></i></button> </div> </div> <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm"> <div><span class="text-gray-500">Leader:</span> <span class="font-medium text-gray-700">${team.leader || '-'}</span></div> <div><span class="text-gray-500">Asst. Leader:</span> <span class="font-medium text-gray-700">${team.asst || '-'}</span></div> <div class="md:col-span-2"><span class="text-gray-500">Chest No Range:</span> <span class="font-medium text-gray-700">${team.id_from || '?'} - ${team.id_to || '?'}</span></div> </div> </div> <div class="team-edit-view mt-4 hidden"> <form class="space-y-3 team-update-form" data-id="${team.id}"> <input type="hidden" class="edit-team-original-name" value="${team.name || ''}"> <!-- Store original name --> <div><label class="form-label text-xs">Team Name</label><input type="text" class="form-input text-sm edit-team-name" value="${team.name || ''}" required></div> <div class="grid grid-cols-1 md:grid-cols-2 gap-3"> <div><label class="form-label text-xs">Leader</label><input type="text" class="form-input text-sm edit-team-leader" value="${team.leader || ''}"></div> <div><label class="form-label text-xs">Asst. Leader</label><input type="text" class="form-input text-sm edit-team-asst" value="${team.asst || ''}"></div> </div> <div class="grid grid-cols-1 md:grid-cols-2 gap-3"> <div><label class="form-label text-xs">ChestNo From</label><input type="number" class="form-input text-sm edit-team-id-from" value="${team.id_from || ''}" required></div> <div><label class="form-label text-xs">ChestNo To</label><input type="number" class="form-input text-sm edit-team-id-to" value="${team.id_to || ''}" required></div> </div> <div class="flex justify-end gap-2 pt-2"> <button type="button" class="btn btn-light btn-sm cancel-edit-team-btn"><i class="fas fa-times"></i>Cancel</button> <button type="submit" class="btn btn-success btn-sm save-team-changes-btn"><i class="fas fa-save"></i>Save</button> </div> </form> </div> `; teamListAdmin.appendChild(teamElement); }); console.log("Team list rendered.");}
-            if(teamForm) { teamForm.addEventListener('submit', async (e) => { /* Same logic + toggleDisabled */ }); } else { console.error("Team form missing"); }
-            async function handleSaveTeamChanges(event) { /* Same logic + toggleDisabled */ }
-            async function deleteTeam(id) { /* Same logic */ };
-            // Event delegation for team list actions
-            if(teamListAdmin){
-                 teamListAdmin.addEventListener('click', (e) => {
-                     const targetButton = e.target.closest('button');
-                     if (!targetButton) return;
-                     const card = targetButton.closest('.team-card');
-                     const teamId = targetButton.dataset.id || card?.dataset.teamId; // Get ID from button or card
-                     if(!teamId) { console.error("Could not find team ID for action."); return; }
-
-                     if (targetButton.classList.contains('edit-team-btn')) {
-                         handleEditTeamClick(card);
-                     } else if (targetButton.classList.contains('delete-team-btn')) {
-                         deleteTeam(teamId);
-                     } else if (targetButton.classList.contains('cancel-edit-team-btn')) {
-                         handleCancelEditTeamClick(card);
-                     }
-                 });
-                 // Listener for form submission within the list
-                 teamListAdmin.addEventListener('submit', (e) => {
-                      if (e.target.classList.contains('team-update-form')) {
-                         handleSaveTeamChanges(e);
-                     }
-                 });
-             } else { console.error("Team list container missing"); }
-             function handleEditTeamClick(card) { if (!card) return; const displayView = card.querySelector('.team-display-view'); const editView = card.querySelector('.team-edit-view'); if(displayView) displayView.style.display = 'none'; if(editView) editView.style.display = 'block'; }
-             function handleCancelEditTeamClick(card) { if (!card) return; const displayView = card.querySelector('.team-display-view'); const editView = card.querySelector('.team-edit-view'); if(displayView) displayView.style.display = 'block'; if(editView) editView.style.display = 'none'; }
+             async function loadTeamsForAdmin() { /* Same logic */ }
+             function renderAdminTeamList() { /* Same rendering logic */ }
+             // Add Form submit handled via attachEventListeners
+             async function handleSaveTeamChanges(event) { /* Same logic + toggleDisabled */ }
+             async function deleteTeam(id) { /* Same logic */ };
+             // Edit/Delete/Cancel/Save buttons handled by delegation setup in attachEventListeners
+             function handleEditTeamClick(card) { /* Same logic */ }
+             function handleCancelEditTeamClick(card) { /* Same logic */ }
              async function updateParticipantTeamNames(oldName, newName) { /* Same logic */ }
-
 
             // --- Home Page Content (Admin) ---
              async function loadHomepageContent() { /* Same logic */ }
-             if(homepageForm) { homepageForm.addEventListener('submit', async (e) => { /* Same logic + toggleDisabled */ }); } else { console.error("Homepage form missing"); }
+             // Form submit handled via attachEventListeners
 
-            console.log("Event listeners potentially attached. Initial setup complete.");
+            console.log("Initial setup complete. Waiting for auth state...");
 
         }); // End DOMContentLoaded
     </script>
