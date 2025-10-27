@@ -1,420 +1,520 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sadaye Madeena 2k25 - Admin Panel (v5.1)</title> <!-- Version Updated -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/papaparse/5.4.1/papaparse.min.js"></script>
-    <style>
-        /* CSS styles remain the same */
-        :root {
-            --primary-color: #4f46e5; /* Indigo 600 */
-            --primary-hover-color: #4338ca; /* Indigo 700 */
-            --primary-focus-ring: #a5b4fc; /* Indigo 300 lighter ring */
-            --danger-color: #dc2626; /* Red 600 */
-            --danger-hover-color: #b91c1c; /* Red 700 */
-            --danger-focus-ring: #fca5a5; /* Red 300 */
-            --warning-color: #f59e0b; /* Amber 500 */
-            --warning-hover-color: #d97706; /* Amber 600 */
-            --warning-focus-ring: #fcd34d; /* Amber 300 */
-            --success-color: #16a34a; /* Green 600 */
-            --success-hover-color: #15803d; /* Green 700 */
-            --success-focus-ring: #86efac; /* Green 300 */
-            --secondary-color: #4b5563; /* Gray 600 */
-            --secondary-hover-color: #374151; /* Gray 700 */
-            --secondary-focus-ring: #9ca3af; /* Gray 400 */
-            --light-color: #ffffff;
-            --light-text-color: #374151; /* Gray 700 */
-            --light-border-color: #d1d5db; /* Gray 300 */
-            --light-hover-bg: #f9fafb; /* Gray 50 */
-        }
-        body { font-family: 'Inter', sans-serif; background-color: #f3f4f6; /* Gray 100 */ }
-        .btn { @apply inline-flex items-center justify-center px-5 py-2 border border-transparent rounded-lg shadow-sm font-medium text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-opacity-75 transition duration-150 ease-in-out; }
-        .btn:hover:not(:disabled) { @apply shadow-md; }
-        .btn:active:not(:disabled) { @apply shadow-inner; }
-        .btn:disabled { @apply opacity-60 cursor-not-allowed bg-gray-400 border-gray-400 shadow-none; }
-        .btn i:not(.password-toggle-icon) { @apply mr-2 -ml-1 h-5 w-5; }
-        .btn-primary { background-color: var(--primary-color); border-color: var(--primary-color); focus:ring: var(--primary-focus-ring); }
-        .btn-primary:hover:not(:disabled) { background-color: var(--primary-hover-color); border-color: var(--primary-hover-color); }
-        .btn-danger { background-color: var(--danger-color); border-color: var(--danger-color); focus:ring: var(--danger-focus-ring); }
-        .btn-danger:hover:not(:disabled) { background-color: var(--danger-hover-color); border-color: var(--danger-hover-color); }
-        .btn-secondary { background-color: var(--secondary-color); border-color: var(--secondary-color); focus:ring: var(--secondary-focus-ring); }
-        .btn-secondary:hover:not(:disabled) { background-color: var(--secondary-hover-color); border-color: var(--secondary-hover-color); }
-        .btn-success { background-color: var(--success-color); border-color: var(--success-color); focus:ring: var(--success-focus-ring); }
-        .btn-success:hover:not(:disabled) { background-color: var(--success-hover-color); border-color: var(--success-hover-color); }
-        .btn-warning { background-color: var(--warning-color); border-color: var(--warning-color); focus:ring: var(--warning-focus-ring); color: white; }
-        .btn-warning:hover:not(:disabled) { background-color: var(--warning-hover-color); border-color: var(--warning-hover-color); }
-        .btn-light { background-color: var(--light-color); color: var(--light-text-color); border: 1px solid var(--light-border-color); focus:ring: var(--primary-focus-ring); box-shadow: none; }
-        .btn-light:hover:not(:disabled) { background-color: var(--light-hover-bg); }
-        .btn-sm { @apply px-4 py-1.5 text-sm rounded-md; }
-        .btn-icon { @apply inline-flex items-center justify-center p-1.5 rounded-full text-gray-400 hover:text-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-indigo-500 hover:bg-gray-100 transition duration-150 ease-in-out; }
-        .btn-icon:disabled { @apply opacity-50 cursor-not-allowed hover:bg-transparent hover:text-gray-400; }
-        .btn-icon i { @apply h-4 w-4 pointer-events-none; }
-        .btn-icon.danger:hover:not(:disabled) { @apply text-red-600 bg-red-50; focus:ring-red-500; }
-        .btn-icon.warning:hover:not(:disabled) { @apply text-amber-600 bg-amber-50; focus:ring-amber-500; }
-        .btn-icon.success:hover:not(:disabled) { @apply text-green-600 bg-green-50; focus:ring-green-500; }
-        .btn-icon.secondary:hover:not(:disabled) { @apply text-gray-600 bg-gray-100; focus:ring-gray-500; }
-        .form-input, .form-select, .form-textarea { @apply block w-full px-4 py-2 border border-gray-300 rounded-xl bg-gray-50 focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 transition duration-150 ease-in-out shadow-sm text-sm; }
-        .form-label { @apply block text-xs font-medium text-gray-600 mb-1 uppercase tracking-wider; }
-        .card { @apply bg-white shadow-lg rounded-xl p-6 md:p-8; }
-        .card-header { @apply text-lg font-semibold text-gray-700 mb-5 border-b pb-3 border-gray-200; }
-        .password-wrapper { @apply relative; }
-        .password-toggle-btn { @apply absolute inset-y-0 right-0 pr-4 flex items-center text-gray-400 hover:text-gray-600 cursor-pointer focus:outline-none; }
-        .info-text { @apply bg-indigo-50 text-indigo-700 p-4 border border-indigo-200 rounded-lg text-sm mb-6 shadow-sm; }
-        .info-text strong { @apply font-medium text-indigo-800; }
-        .menu-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.6); backdrop-filter: blur(4px); z-index: 1001; display: none; justify-content: center; align-items: flex-start; padding-top: 60px; opacity: 0; transition: opacity 0.3s ease; }
-        .menu-box { background: white; width: 90%; max-width: 300px; border-radius: 1rem; box-shadow: 0 10px 30px rgba(0,0,0,0.2); padding: 15px; transform: translateY(-20px); opacity: 0; transition: all 0.3s ease-out; }
-        .menu-box.open { transform: translateY(0); opacity: 1; }
-        .menu-header { display: flex; justify-content: space-between; align-items: center; padding-bottom: 10px; margin-bottom: 10px; border-bottom: 1px solid #e2e8f0; }
-        .menu-header .header-title { font-weight: 600; font-size: 1em; color: #1e293b; text-transform: uppercase; letter-spacing: 0.05em; }
-        .close-btn { background: none; border: none; font-size: 1.5em; cursor: pointer; color: #64748b; padding: 5px; line-height: 1;}
-        .menu-link { display: flex; align-items: center; padding: 10px 15px; text-decoration: none; color: #334155; font-weight: 500; border-radius: 0.5rem; transition: background-color 0.2s, color 0.2s; font-size: 0.95em; margin-bottom: 4px; }
-        .menu-link:hover { background-color: #f1f5f9; }
-        .menu-link.active { background-color: var(--primary-color); color: white; font-weight: 600; }
-        .menu-link i { @apply w-5 mr-3 text-center text-gray-500; }
-        .menu-link.active i { @apply text-indigo-100; }
-        .file-input-label { @apply btn btn-light text-sm rounded-lg; cursor: pointer; }
-        .file-input-label i { @apply mr-2; }
-        .file-input-filename { @apply text-sm text-gray-500 ml-4 inline-block align-middle; }
-        .table-container { @apply border border-gray-200 rounded-lg overflow-hidden shadow-sm bg-white; }
-        .table-header { @apply grid gap-4 px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-b border-gray-200 bg-gray-50/70; }
-        .table-row { @apply grid gap-4 px-6 py-4 items-center border-b border-gray-200 bg-white hover:bg-gray-50/50 transition-colors duration-150 text-sm; }
-        .table-row:last-child { @apply border-b-0; }
-        .table-cell-primary { @apply font-medium text-gray-800 break-words; }
-        .table-cell-secondary { @apply text-gray-500 block text-xs; }
-        .table-cell-highlight { @apply text-indigo-600 font-medium; }
-        .table-actions { @apply flex justify-end items-center gap-1; }
-        .badge { @apply text-xs font-semibold uppercase tracking-wider px-2 py-0.5 rounded-full inline-block leading-none; }
-        .badge-group { @apply bg-purple-100 text-purple-800; }
-        .badge-individual { @apply bg-blue-100 text-blue-800; }
-        .badge-general { @apply bg-green-100 text-green-800; }
-        .page-title { @apply text-xl font-semibold text-gray-700 mb-6 pb-2 border-b border-gray-300; }
-        #login-page { background: linear-gradient(135deg, #e0e7ff 0%, #ede9fe 50%, #fce7f3 100%); }
-        @media (max-width: 768px) { .hide-md { @apply hidden md:block; } .hide-md-grid { @apply hidden md:grid; } }
-        @media (max-width: 640px) { .btn { @apply px-4 py-2 text-sm; } .card { @apply p-4 rounded-lg; } .card-header { @apply text-base mb-4 pb-2; } .page-title { @apply text-lg mb-4 pb-1; } .table-header, .table-row { @apply px-4 py-3 text-xs grid-cols-2; } .table-actions { @apply col-span-1 mt-1 sm:mt-0 justify-start sm:justify-end; } .table-cell-primary { @apply text-sm; } .hide-sm { @apply hidden sm:block; } .hide-sm-grid { @apply hidden sm:grid; } .form-input, .form-select, .form-textarea { @apply rounded-lg; } }
-    </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sadaye Madeena 2k25 - Admin Panel</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/papaparse/5.4.1/papaparse.min.js"></script>
+    <style>
+        :root {
+            --primary-color: #4f46e5; /* Indigo 600 */
+            --primary-hover-color: #4338ca; /* Indigo 700 */
+            --primary-focus-ring: #6366f1; /* Indigo 500 */
+            --danger-color: #dc2626; /* Red 600 */
+            --danger-hover-color: #b91c1c; /* Red 700 */
+            --danger-focus-ring: #ef4444; /* Red 500 */
+            --warning-color: #f59e0b; /* Amber 500 */
+            --warning-hover-color: #d97706; /* Amber 600 */
+            --warning-focus-ring: #fcd34d; /* Amber 300 */
+            --success-color: #16a34a; /* Green 600 */
+            --success-hover-color: #15803d; /* Green 700 */
+            --success-focus-ring: #22c55e; /* Green 500 */
+            --secondary-color: #4b5563; /* Gray 600 */
+            --secondary-hover-color: #374151; /* Gray 700 */
+            --secondary-focus-ring: #6b7280; /* Gray 500 */
+            --light-color: #ffffff;
+            --light-text-color: #374151; /* Gray 700 */
+            --light-border-color: #d1d5db; /* Gray 300 */
+            --light-hover-bg: #f9fafb; /* Gray 50 */
+        }
+        body { font-family: 'Inter', sans-serif; background-color: #f3f4f6; /* Gray 100 */ }
+
+        /* Updated Contained Button Styles */
+        .btn {
+            @apply inline-flex items-center justify-center px-5 py-2 border border-transparent rounded-md shadow-sm font-medium text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-opacity-75 transition duration-150 ease-in-out;
+        }
+        .btn:hover {
+            @apply shadow-md; /* Subtle shadow on hover */
+        }
+        .btn:active {
+            @apply shadow-inner; /* Inner shadow on click */
+        }
+        .btn i:not(.password-toggle-icon) { @apply mr-2 -ml-1 h-5 w-5; }
+        .btn-primary { background-color: var(--primary-color); border-color: var(--primary-color); focus:ring: var(--primary-focus-ring); }
+        .btn-primary:hover { background-color: var(--primary-hover-color); border-color: var(--primary-hover-color); }
+        .btn-danger { background-color: var(--danger-color); border-color: var(--danger-color); focus:ring: var(--danger-focus-ring); }
+        .btn-danger:hover { background-color: var(--danger-hover-color); border-color: var(--danger-hover-color); }
+        .btn-secondary { background-color: var(--secondary-color); border-color: var(--secondary-color); focus:ring: var(--secondary-focus-ring); }
+        .btn-secondary:hover { background-color: var(--secondary-hover-color); border-color: var(--secondary-hover-color); }
+        .btn-success { background-color: var(--success-color); border-color: var(--success-color); focus:ring: var(--success-focus-ring); }
+        .btn-success:hover { background-color: var(--success-hover-color); border-color: var(--success-hover-color); }
+        .btn-warning { background-color: var(--warning-color); border-color: var(--warning-color); focus:ring: var(--warning-focus-ring); color: white; }
+        .btn-warning:hover { background-color: var(--warning-hover-color); border-color: var(--warning-hover-color); }
+        .btn-light { background-color: var(--light-color); color: var(--light-text-color); border: 1px solid var(--light-border-color); focus:ring: var(--primary-focus-ring); box-shadow: none; }
+        .btn-light:hover { background-color: var(--light-hover-bg); }
+        .btn-sm { @apply px-4 py-1.5 text-sm rounded; } /* Slightly smaller radius for sm buttons */
+
+        /* Icon Button Style (used in tables) */
+        .btn-icon {
+            @apply inline-flex items-center justify-center p-1.5 rounded text-gray-400 hover:text-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-indigo-500 hover:bg-gray-100 transition duration-150 ease-in-out;
+        }
+        .btn-icon i { @apply h-4 w-4; }
+        .btn-icon.danger:hover { @apply text-red-600 bg-red-50; focus:ring-red-500; }
+        .btn-icon.warning:hover { @apply text-amber-600 bg-amber-50; focus:ring-amber-500; }
+
+
+        /* Modern Form & Card Styles */
+        .form-input, .form-select, .form-textarea { @apply block w-full px-4 py-2 border border-gray-300 rounded-md bg-gray-50 focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 transition duration-150 ease-in-out shadow-sm text-sm; }
+        .form-label { @apply block text-xs font-medium text-gray-600 mb-1 uppercase tracking-wider; } /* Updated label style */
+        .card { @apply bg-white shadow-md rounded-lg p-6 md:p-8; }
+        .card-header { @apply text-lg font-semibold text-gray-700 mb-5 border-b pb-3 border-gray-200; }
+        .password-wrapper { @apply relative; }
+        .password-toggle-btn { @apply absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600 cursor-pointer focus:outline-none; }
+
+        /* Instruction Box */
+        .info-text { @apply bg-indigo-50 text-indigo-700 p-4 border border-indigo-200 rounded-md text-sm mb-6 shadow-sm; }
+        .info-text strong { @apply font-medium text-indigo-800; }
+
+        /* Menu Overlay Styles (Slightly adjusted) */
+        .menu-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.6); backdrop-filter: blur(4px); z-index: 1001; display: none; justify-content: center; align-items: flex-start; padding-top: 60px; opacity: 0; transition: opacity 0.3s ease; }
+        .menu-box { background: white; width: 90%; max-width: 300px; border-radius: 10px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); padding: 15px; transform: translateY(-20px); opacity: 0; transition: all 0.3s ease-out; }
+        .menu-box.open { transform: translateY(0); opacity: 1; }
+        .menu-header { display: flex; justify-content: space-between; align-items: center; padding-bottom: 10px; margin-bottom: 10px; border-bottom: 1px solid #e2e8f0; }
+        .menu-header .header-title { font-weight: 600; font-size: 1em; color: #1e293b; text-transform: uppercase; letter-spacing: 0.05em; }
+        .close-btn { background: none; border: none; font-size: 1.5em; cursor: pointer; color: #64748b; padding: 5px; line-height: 1;}
+        .menu-link { display: flex; align-items: center; padding: 10px 15px; text-decoration: none; color: #334155; font-weight: 500; border-radius: 6px; transition: background-color 0.2s, color 0.2s; font-size: 0.95em; margin-bottom: 4px; }
+        .menu-link:hover { background-color: #f1f5f9; }
+        .menu-link.active { background-color: var(--primary-color); color: white; font-weight: 600; }
+        .menu-link i { @apply w-5 mr-3 text-center text-gray-500; }
+        .menu-link.active i { @apply text-indigo-100; }
+
+        /* Custom file input */
+        .file-input-label { @apply btn btn-light text-sm; cursor: pointer; }
+        .file-input-label i { @apply mr-2; }
+        .file-input-filename { @apply text-sm text-gray-500 ml-4 inline-block align-middle; }
+
+        /* --- New Table/List Styles --- */
+        .table-container { @apply border border-gray-200 rounded-lg overflow-hidden shadow-sm; }
+        .table-header { @apply grid gap-4 px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-b border-gray-200 bg-gray-50; }
+        .table-row { @apply grid gap-4 px-6 py-4 items-center border-b border-gray-200 bg-white hover:bg-gray-50/50 transition-colors duration-150 text-sm; }
+        .table-row:last-child { @apply border-b-0; }
+        .table-cell { /* Basic cell style, specific text styles applied below */ }
+        .table-cell-primary { @apply font-medium text-gray-800 break-words; }
+        .table-cell-secondary { @apply text-gray-500 block text-xs; } /* For subtext like category/team */
+        .table-cell-highlight { @apply text-indigo-600 font-medium; } /* For points */
+        .table-actions { @apply flex justify-end items-center gap-2; }
+        /* Badge for Type */
+        .badge { @apply text-xs font-semibold uppercase tracking-wider px-2 py-0.5 rounded-full inline-block leading-none; }
+        .badge-group { @apply bg-purple-100 text-purple-800; }
+        .badge-individual { @apply bg-blue-100 text-blue-800; }
+
+
+        /* Custom Checkbox */
+        .form-checkbox { @apply h-4 w-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500 cursor-pointer shadow-sm; }
+        .checkbox-label { @apply ml-2 text-sm font-medium text-gray-700 cursor-pointer; }
+        .checkbox-container { @apply flex items-center; } /* Wrapper for checkbox + label */
+
+        /* Page title style */
+        .page-title { @apply text-xl font-semibold text-gray-700 mb-6 pb-2 border-b border-gray-300; }
+
+        /* Login page gradient */
+        #login-page { background: linear-gradient(135deg, #eef2ff 0%, #f5f3ff 50%, #fdf2f8 100%); }
+
+         /* Responsive adjustments */
+        @media (max-width: 640px) {
+            .btn { @apply px-4 py-2 text-sm; }
+            .card { @apply p-4; }
+            .card-header { @apply text-base mb-4 pb-2; }
+            .page-title { @apply text-lg mb-4 pb-1; }
+            .table-header, .table-row { @apply px-4 py-2 text-xs grid-cols-2; } /* Simple 2-col on small */
+            .table-actions { @apply col-span-1 mt-2 sm:mt-0 justify-start sm:justify-end; }
+            .table-cell-primary { @apply text-sm; }
+            /* Hide less important columns on small screens if needed */
+            .hide-sm { @apply hidden sm:block; }
+            .hide-sm-grid { @apply hidden sm:grid; }
+        }
+
+    </style>
 </head>
 <body class="bg-gray-100">
 
-    <!-- Login Page -->
-    <div id="login-page" class="min-h-screen flex items-center justify-center p-4">
-         <div class="w-full max-w-sm space-y-6"> <div class="text-center"> <i class="fas fa-user-shield text-4xl text-indigo-600 mb-2"></i> <h1 class="text-2xl font-bold text-gray-800">Admin Panel</h1> <p class="text-sm text-gray-600">Sadaye Madeena 2k25</p> </div> <div class="card"> <h2 class="card-header text-center">Login</h2> <form id="login-form" class="space-y-4"> <div> <label for="login-email" class="form-label">Email</label> <input type="email" id="login-email" class="form-input" required placeholder="your@email.com"> </div> <div> <label for="login-password" class="form-label">Password</label> <div class="password-wrapper"> <input type="password" id="login-password" class="form-input pr-10" required placeholder="••••••••"> <button type="button" aria-label="Show password" class="password-toggle-btn"><i class="fas fa-eye password-toggle-icon"></i></button> </div> </div> <button type="submit" class="btn btn-primary w-full !mt-5"><i class="fas fa-sign-in-alt"></i>Login</button> </form> </div> <div class="card bg-gray-50/50"> <h2 class="card-header text-center"> Register New Admin <span class="block text-xs font-normal text-gray-500 mt-1">(First Use Only)</span> </h2> <form id="register-form" class="space-y-4"> <div> <label for="register-email" class="form-label">Email</label> <input type="email" id="register-email" class="form-input" required placeholder="newadmin@email.com"> </div> <div> <label for="register-password" class="form-label">Password</label> <div class="password-wrapper"> <input type="password" id="register-password" class="form-input pr-10" required placeholder="Choose a strong password"> <button type="button" aria-label="Show password" class="password-toggle-btn"><i class="fas fa-eye password-toggle-icon"></i></button> </div> </div> <button type="submit" class="btn btn-secondary w-full !mt-5"><i class="fas fa-user-plus"></i>Register</button> </form> </div> </div>
-    </div>
+    <!-- Login Page -->
+    <div id="login-page" class="min-h-screen flex items-center justify-center p-4">
+        <div class="w-full max-w-sm space-y-6"> <!-- Reduced max-width -->
+            <div class="text-center">
+                 <i class="fas fa-user-shield text-4xl text-indigo-600 mb-2"></i> <!-- Slightly smaller icon -->
+                 <h1 class="text-2xl font-bold text-gray-800">Admin Panel</h1>
+                 <p class="text-sm text-gray-600">Sadaye Madeena 2k25</p>
+            </div>
+            <!-- Login Card -->
+            <div class="card">
+                <h2 class="card-header text-center">Login</h2>
+                <form id="login-form" class="space-y-4"> <!-- Reduced spacing -->
+                    <div>
+                        <label for="login-email" class="form-label">Email</label>
+                        <input type="email" id="login-email" class="form-input" required placeholder="your@email.com">
+                    </div>
+                    <div>
+                        <label for="login-password" class="form-label">Password</label>
+                        <div class="password-wrapper">
+                            <input type="password" id="login-password" class="form-input pr-10" required placeholder="••••••••">
+                            <button type="button" aria-label="Show password" class="password-toggle-btn" onclick="togglePasswordVisibility('login-password', this)">
+                                <i class="fas fa-eye password-toggle-icon"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-full !mt-5"><i class="fas fa-sign-in-alt"></i>Login</button> <!-- Added !mt-5 -->
+                </form>
+            </div>
+            <!-- Register Card -->
+            <div class="card bg-gray-50/50"> <!-- Slightly transparent bg -->
+                <h2 class="card-header text-center">
+                    Register New Admin
+                    <span class="block text-xs font-normal text-gray-500 mt-1">(First Use Only)</span>
+                </h2>
+                 <form id="register-form" class="space-y-4">
+                    <div>
+                        <label for="register-email" class="form-label">Email</label>
+                        <input type="email" id="register-email" class="form-input" required placeholder="newadmin@email.com">
+                    </div>
+                    <div>
+                        <label for="register-password" class="form-label">Password</label>
+                         <div class="password-wrapper">
+                            <input type="password" id="register-password" class="form-input pr-10" required placeholder="Choose a strong password">
+                            <button type="button" aria-label="Show password" class="password-toggle-btn" onclick="togglePasswordVisibility('register-password', this)">
+                                <i class="fas fa-eye password-toggle-icon"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-secondary w-full !mt-5"><i class="fas fa-user-plus"></i>Register</button>
+                </form>
+            </div>
+        </div>
+    </div>
 
-    <!-- Admin Panel -->
-    <div id="admin-panel" class="hidden min-h-screen">
-        <!-- Menu Overlay -->
-        <div id="admin-menu-overlay" class="menu-overlay">
-             <div id="admin-menu-box" class="menu-box"> <div class="menu-header"> <span class="header-title">Admin Menu</span> <button id="admin-menu-close-btn" class="close-btn">&times;</button> </div> <a href="#dashboard" data-target="page-dashboard" class="menu-link active"><i class="fas fa-home fa-fw"></i>Home Page</a> <a href="#participants" data-target="page-participants" class="menu-link"><i class="fas fa-id-card fa-fw"></i>Participants</a> <a href="#programs" data-target="page-programs" class="menu-link"><i class="fas fa-calendar-alt fa-fw"></i>Programs</a> <a href="#teams" data-target="page-teams" class="menu-link"><i class="fas fa-users fa-fw"></i>Teams</a> <a href="#results" data-target="page-results" class="menu-link"><i class="fas fa-poll fa-fw"></i>Results</a> <div class="mt-5 border-t border-gray-200 pt-3"> <button id="logout-button" class="w-full btn btn-danger btn-sm"><i class="fas fa-sign-out-alt"></i>Logout</button> </div> </div>
-        </div>
+    <!-- Admin Panel (Hidden by default) -->
+    <div id="admin-panel" class="hidden min-h-screen">
 
-        <!-- Main Content -->
-        <div id="main-content">
-            <!-- Top Bar -->
-             <header class="bg-white shadow sticky top-0 z-10"> <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8"> <div class="flex justify-between items-center h-14"> <div class="flex items-center"> <button id="admin-menu-btn" aria-label="Open menu" class="text-gray-500 focus:outline-none focus:text-gray-700 mr-3 p-2 rounded-full hover:bg-gray-100 md:mr-4"> <i class="fas fa-bars text-lg"></i> </button> <h1 class="text-md md:text-lg font-semibold text-gray-800">Admin Panel</h1> </div> <div class="text-xs sm:text-sm text-gray-500 font-medium truncate" id="admin-email"></div> </div> </div> </header>
+        <!-- Menu Overlay -->
+        <div id="admin-menu-overlay" class="menu-overlay">
+            <div id="admin-menu-box" class="menu-box">
+                 <div class="menu-header"> <span class="header-title">Admin Menu</span> <button id="admin-menu-close-btn" class="close-btn">&times;</button> </div>
+                 <a href="#dashboard" data-target="page-dashboard" class="menu-link active"><i class="fas fa-home fa-fw"></i>Home Page</a> <!-- Added fa-fw -->
+                 <a href="#participants" data-target="page-participants" class="menu-link"><i class="fas fa-id-card fa-fw"></i>Participants</a>
+                 <a href="#programs" data-target="page-programs" class="menu-link"><i class="fas fa-calendar-alt fa-fw"></i>Programs</a>
+                 <a href="#teams" data-target="page-teams" class="menu-link"><i class="fas fa-users fa-fw"></i>Teams</a>
+                 <a href="#results" data-target="page-results" class="menu-link"><i class="fas fa-poll fa-fw"></i>Results</a>
+                 <div class="mt-5 border-t border-gray-200 pt-3"> <button id="logout-button" class="w-full btn btn-danger btn-sm"><i class="fas fa-sign-out-alt"></i>Logout</button> </div>
+            </div>
+        </div>
 
-            <!-- Page Content Area -->
-            <main class="p-4 md:p-6 lg:p-8 max-w-5xl mx-auto space-y-6">
+        <!-- Main Content -->
+        <div id="main-content">
+            <!-- Top Bar -->
+            <header class="bg-white shadow sticky top-0 z-10">
+                 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                     <div class="flex justify-between items-center h-14"> <!-- Reduced height -->
+                         <div class="flex items-center">
+                             <button id="admin-menu-btn" aria-label="Open menu" class="text-gray-500 focus:outline-none focus:text-gray-700 mr-3 p-2 rounded-full hover:bg-gray-100 md:mr-4"> <i class="fas fa-bars text-lg"></i> </button>
+                             <h1 class="text-md md:text-lg font-semibold text-gray-800">Admin Panel</h1>
+                         </div>
+                         <div class="text-xs sm:text-sm text-gray-500 font-medium truncate" id="admin-email"></div>
+                     </div>
+                 </div>
+            </header>
 
-                <!-- Home Page Settings -->
-                <div id="page-dashboard" class="admin-page space-y-6">
-                    <h1 class="page-title">Home Page Settings</h1> <div class="info-text"> <strong>നിർദ്ദേശം:</strong> വെബ്സൈറ്റിന്റെ പ്രധാന പേജിൽ കാണിക്കേണ്ട വിവരങ്ങൾ ഇവിടെ നൽകുക. </div> <form id="form-homepage" class="space-y-6"> <div class="card"> <h2 class="card-header">Header & Hero</h2> <!-- ... fields ... --> </div> <div class="card"> <h2 class="card-header">About Section</h2> <!-- ... fields ... --> </div> <div class="card"> <h2 class="card-header">Statistics</h2> <!-- ... fields ... --> </div> <div class="card"> <h2 class="card-header">Image Gallery</h2> <!-- ... fields ... --> </div> <div class="card"> <h2 class="card-header">Footer</h2> <!-- ... fields ... --> </div> <div class="flex justify-end pt-2"> <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i>Save All</button> </div> </form>
-                </div>
+            <!-- Page Content Area -->
+            <main class="p-4 md:p-6 lg:p-8 max-w-5xl mx-auto space-y-6">
 
-                <!-- Participants -->
-                <div id="page-participants" class="admin-page hidden space-y-6">
-                    <h1 class="page-title">Manage Participants</h1> <div class="info-text"> <strong>നിർദ്ദേശം:</strong> മത്സരാർത്ഥികളെ ചേർക്കാം... </div> <div class="card"> <h2 class="card-header">Add by Team</h2> <form id="form-add-participants" class="space-y-4"> <div> <label for="participant-add-team" class="form-label">Team</label> <select id="participant-add-team" class="form-select" required> <option value="">-- Select --</option> </select> </div> <div> <label for="participant-add-names" class="form-label">Names (One per line)</label> <textarea id="participant-add-names" class="form-textarea" rows="6" required></textarea> </div> <div class="flex justify-end"> <button type="submit" id="add-participants-btn" class="btn btn-success"><i class="fas fa-plus"></i>Add Participants</button> </div> </form> <div id="add-log-container" class="mt-5 hidden"> <h3 class="font-medium text-sm text-gray-700 mb-2">Log:</h3> <pre id="add-log" class="bg-gray-800 text-white rounded-md p-3 max-h-40 overflow-y-auto text-xs"></pre> </div> </div> <div class="card"> <h2 class="card-header">Current Participants</h2> <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4"> <select id="participant-team-filter" class="form-select"> <option value="">All Teams</option> </select> <input type="text" id="participant-search" class="form-input" placeholder="Search..."> </div> <div id="participant-list-container" class="table-container"> <div class="table-header" style="grid-template-columns: 1.5fr 1fr 1fr 100px;"> <span>Name</span> <span>Chest No</span> <span>Team</span> <span class="text-right">Actions</span> </div> <div id="participant-list-admin" class="max-h-[60vh] overflow-y-auto"> <div class="table-row"> <p id="participant-list-placeholder" class="text-gray-500 col-span-4 text-center py-5">Loading...</p> </div> </div> </div> <div class="mt-5 pt-5 border-t border-gray-200 flex flex-col sm:flex-row justify-between items-center gap-3"> <p class="text-sm text-gray-600">Displayed: <strong id="participant-count" class="text-base text-gray-900 font-semibold">0</strong></p> <button id="delete-all-participants-btn" class="btn btn-danger btn-sm w-full sm:w-auto"> <i class="fas fa-exclamation-triangle"></i> Delete All </button> </div> </div>
-                </div>
+                <!-- Home Page Settings -->
+                <div id="page-dashboard" class="admin-page space-y-6">
+                    <h1 class="page-title">Home Page Settings</h1>
+                     <div class="info-text"> <strong>നിർദ്ദേശം:</strong> വെബ്സൈറ്റിന്റെ പ്രധാന പേജിൽ (ഹോം പേജ്) കാണിക്കേണ്ട വിവരങ്ങൾ ഇവിടെ നൽകുക... </div>
+                     <form id="form-homepage" class="space-y-6">
+                        <div class="card"> <h2 class="card-header">Header & Hero Content</h2> <div class="space-y-4"> <div class="grid grid-cols-1 md:grid-cols-2 gap-4"> <div> <label for="homepage-header-title" class="form-label">Header Title</label> <input type="text" id="homepage-header-title" class="form-input" placeholder="e.g., Sadaye Madeena 2k25"> </div> <div> <label for="homepage-logo-url" class="form-label">Logo Image URL</label> <input type="url" id="homepage-logo-url" class="form-input" placeholder="https://..."> </div> </div> <div class="grid grid-cols-1 md:grid-cols-2 gap-4"> <div> <label for="homepage-main-title" class="form-label">Main Title</label> <input type="text" id="homepage-main-title" class="form-input" placeholder="e.g., Sadaye Madeena 2k25"> </div> <div> <label for="homepage-subtitle" class="form-label">Subtitle</label> <input type="text" id="homepage-subtitle" class="form-input" placeholder="e.g., Inter-Madrasa Art Fest"> </div> </div> </div> </div>
+                        <div class="card"> <h2 class="card-header">About Section</h2> <div class="space-y-4"> <div> <label for="homepage-about-title" class="form-label">About Title</label> <input type="text" id="homepage-about-title" class="form-input" placeholder="e.g., About The Fest"> </div> <div> <label for="homepage-about-subtitle" class="form-label">About Subtitle</label> <input type="text" id="homepage-about-subtitle" class="form-input" placeholder="e.g., Thirunoor'25"> </div> <div> <label for="homepage-about" class="form-label">Description</label> <textarea id="homepage-about" class="form-textarea" rows="5" placeholder="Write something..."></textarea> </div> <div> <label for="homepage-about-image-url" class="form-label">About Image URL</label> <input type="url" id="homepage-about-image-url" class="form-input" placeholder="https://..."> </div> </div> </div>
+                        <div class="card"> <h2 class="card-header">Statistics Texts</h2> <p class="text-xs text-gray-500 mb-4">ഹോം പേജിൽ കാണിക്കുന്ന സ്റ്റാറ്റിസ്റ്റിക്സ് (കണക്കുകൾ) ഇവിടെ നൽകാം.</p> <div class="grid grid-cols-2 md:grid-cols-4 gap-4"> <div> <label for="homepage-total-programs" class="form-label">Programs</label> <input type="text" id="homepage-total-programs" class="form-input" placeholder="e.g., 50+"> </div> <div> <label for="homepage-total-participants" class="form-label">Contestants</label> <input type="text" id="homepage-total-participants" class="form-input" placeholder="e.g., 200+"> </div> <div> <label for="homepage-total-categories" class="form-label">Categories</label> <input type="text" id="homepage-total-categories" class="form-input" placeholder="e.g., 5"> </div> <div> <label for="homepage-total-teams" class="form-label">Teams</label> <input type="text" id="homepage-total-teams" class="form-input" placeholder="e.g., 3"> </div> </div> </div>
+                        <div class="card"> <h2 class="card-header">Image Gallery URLs</h2> <label for="homepage-gallery" class="form-label">Image URLs (One per line)</label> <textarea id="homepage-gallery" class="form-textarea" rows="6" placeholder="https://.../image1.jpg&#10;https://.../image2.jpg"></textarea> </div>
+                        <div class="card"> <h2 class="card-header">Footer Settings</h2> <div class="space-y-4"> <div> <label for="homepage-institution-name" class="form-label">Institution Name</label> <input type="text" id="homepage-institution-name" class="form-input" placeholder="Institution Name"> </div> <div> <label for="homepage-copyright-text" class="form-label">Copyright Text</label> <input type="text" id="homepage-copyright-text" class="form-input" placeholder="© 2025 ..."> </div> <h3 class="text-sm font-semibold text-gray-700 pt-2">Social Media Links</h3> <div class="grid grid-cols-1 md:grid-cols-3 gap-4"> <div> <label for="homepage-social-instagram" class="form-label">Instagram</label> <input type="url" id="homepage-social-instagram" class="form-input" placeholder="https://instagram.com/..."> </div> <div> <label for="homepage-social-youtube" class="form-label">YouTube</label> <input type="url" id="homepage-social-youtube" class="form-input" placeholder="https://youtube.com/..."> </div> <div> <label for="homepage-social-facebook" class="form-label">Facebook</label> <input type="url" id="homepage-social-facebook" class="form-input" placeholder="https://facebook.com/..."> </div> </div> </div> </div>
+                        <div class="flex justify-end pt-2"> <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i>Save All Settings</button> </div>
+                    </form>
+                </div>
 
-                <!-- Programs & Categories -->
-                <div id="page-programs" class="admin-page hidden space-y-6">
-                    <h1 class="page-title">Manage Programs & Categories</h1>
-                     <div class="info-text"> <strong>നിർദ്ദേശം:</strong> കാറ്റഗറികളും പ്രോഗ്രാമുകളും ചേർക്കുക/എഡിറ്റ് ചെയ്യുക. പ്രോഗ്രാമിന്റെ തരം (Individual/Group/General) തിരഞ്ഞെടുക്കുക. </div>
-                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                        <div class="lg:col-span-1">
-                            <div class="card">
-                                <h2 class="card-header">Manage Categories</h2>
-                                <form id="form-add-category" class="mb-5 flex items-end gap-2">
-                                    <div class="flex-grow"> <label for="category-name" class="form-label">New Category</label> <input type="text" id="category-name" class="form-input" placeholder="e.g., Junior" required> </div>
-                                    <button type="submit" class="btn btn-success btn-sm flex-shrink-0"><i class="fas fa-plus"></i>Add</button>
-                                </form>
-                                <div>
-                                    <h3 class="text-xs font-semibold text-gray-500 mb-2 uppercase tracking-wider">Existing Categories</h3>
-                                    <div id="category-list-container" class="table-container">
-                                        <div class="table-header" style="grid-template-columns: 1fr auto;"> <span>Name</span> <span class="text-right">Actions</span> </div>
-                                        <div id="category-list" class="max-h-[40vh] overflow-y-auto">
-                                            <div class="table-row"><p class="text-gray-500 col-span-2 text-center py-3">Loading...</p></div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="lg:col-span-2">
-                            <div class="card">
-                                <h2 class="card-header">Add New Program</h2>
-                                <form id="form-add-program" class="space-y-4">
-                                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4"> <div> <label for="program-name" class="form-label">Program Name</label> <input type="text" id="program-name" class="form-input" placeholder="e.g., പ്രസംഗം" required> </div> <div> <label for="program-category" class="form-label">Category</label> <select id="program-category" class="form-select" required> <option value="">Select Category</option> </select> </div> </div>
-                                     <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 items-end"> <div> <label for="program-points-first" class="form-label">1st Pts</label> <input type="number" id="program-points-first" class="form-input" value="5" required> </div> <div> <label for="program-points-second" class="form-label">2nd Pts</label> <input type="number" id="program-points-second" class="form-input" value="3" required> </div> <div> <label for="program-points-third" class="form-label">3rd Pts</label> <input type="number" id="program-points-third" class="form-input" value="1" required> </div> <div> <label for="program-type" class="form-label">Type</label> <select id="program-type" class="form-select" required> <option value="individual">Individual</option> <option value="group">Group</option> <option value="general">General</option> </select> </div> </div>
-                                     <div class="flex justify-end pt-2"> <button type="submit" class="btn btn-success"><i class="fas fa-plus"></i>Add Program</button> </div>
-                                </form>
-                            </div>
-                             <div class="card mt-6">
-                                 <h2 class="card-header">Existing Programs</h2>
-                                 <div id="program-list-container" class="table-container">
-                                     <div class="table-header" style="grid-template-columns: 1.5fr 1fr 0.8fr 100px;"> <span>Program (Category)</span> <span>Points</span> <span>Type</span> <span class="text-right">Actions</span> </div>
-                                     <div id="program-list" class="max-h-[60vh] overflow-y-auto"> <div class="table-row"><p class="text-gray-500 col-span-4 text-center py-5">Loading...</p></div> </div>
-                                 </div>
-                             </div>
-                        </div>
-                    </div>
-                </div>
+                <!-- Participants -->
+                <div id="page-participants" class="admin-page hidden space-y-6">
+                    <h1 class="page-title">Manage Participants</h1>
+                    <div class="info-text">
+                        <strong>നിർദ്ദേശം:</strong> ഇവിടെ മത്സരാർത്ഥികളെ ചേർക്കാം...
+                    </div>
+                    <div class="card">
+                        <h2 class="card-header">Add Participants by Team</h2>
+                        <form id="form-add-participants" class="space-y-4">
+                            <div> <label for="participant-add-team" class="form-label">Select Team</label> <select id="participant-add-team" class="form-select" required> <option value="">-- Select a Team --</option> </select> </div>
+                            <div> <label for="participant-add-names" class="form-label">Enter Names (One per line)</label> <textarea id="participant-add-names" class="form-textarea" rows="6" placeholder="Participant 1 Name&#10;Participant 2 Name&#10;..." required></textarea> </div>
+                            <div class="flex justify-end"> <button type="submit" id="add-participants-btn" class="btn btn-success"><i class="fas fa-plus"></i>Add Participants</button> </div>
+                        </form>
+                        <div id="add-log-container" class="mt-5 hidden"> <h3 class="font-medium text-sm text-gray-700 mb-2">Process Log:</h3> <pre id="add-log" class="bg-gray-800 text-white rounded-md p-3 max-h-40 overflow-y-auto text-xs"></pre> </div>
+                    </div>
+                    <div class="card">
+                        <h2 class="card-header">Current Participants</h2>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                            <select id="participant-team-filter" class="form-select"> <option value="">All Teams</option> </select>
+                            <input type="text" id="participant-search" class="form-input" placeholder="Search by Name or Chest No...">
+                        </div>
+                        <div class="table-container">
+                            <div class="table-header" style="grid-template-columns: 1.5fr 1fr 1fr 100px;">
+                                <span>Name</span> <span>Chest No</span> <span>Team</span> <span class="text-right">Actions</span>
+                            </div>
+                            <div id="participant-list-admin" class="max-h-[60vh] overflow-y-auto">
+                                <div class="table-row"> <p id="participant-list-placeholder" class="text-gray-500 col-span-4 text-center py-5">Loading participants...</p> </div>
+                            </div>
+                        </div>
+                        <div class="mt-5 pt-5 border-t border-gray-200 flex flex-col sm:flex-row justify-between items-center gap-3">
+                             <p class="text-sm text-gray-600">Total Displayed: <strong id="participant-count" class="text-base text-gray-900 font-semibold">0</strong></p>
+                             <button id="delete-all-participants-btn" class="btn btn-danger btn-sm w-full sm:w-auto"> <i class="fas fa-exclamation-triangle"></i> Delete All Participants </button>
+                        </div>
+                    </div>
+                </div>
 
-                <!-- Manage Teams -->
-                <div id="page-teams" class="admin-page hidden space-y-6">
-                    <h1 class="page-title">Manage Teams</h1> <div class="info-text"> <strong>നിർദ്ദേശം:</strong> ടീമുകളെ ചേർക്കുക, എഡിറ്റ് ചെയ്യുക... </div>
-                    <div class="card"> <h2 class="card-header">Add New Team</h2> <form id="form-add-team" class="space-y-4"> <div> <label for="team-name" class="form-label">Team Name</label> <input type="text" id="team-name" class="form-input" placeholder="e.g., BURAQ" required> </div> <div class="grid grid-cols-1 md:grid-cols-2 gap-4"> <div> <label for="team-leader" class="form-label">Leader</label> <input type="text" id="team-leader" class="form-input"> </div> <div> <label for="team-asst" class="form-label">Asst. Leader</label> <input type="text" id="team-asst" class="form-input"> </div> </div> <div class="grid grid-cols-1 md:grid-cols-2 gap-4"> <div> <label for="team-id-from" class="form-label">Chest No From</label> <input type="number" id="team-id-from" class="form-input" placeholder="e.g., 101" required> </div> <div> <label for="team-id-to" class="form-label">Chest No To</label> <input type="number" id="team-id-to" class="form-input" placeholder="e.g., 199" required> </div> </div> <div class="flex justify-end pt-2"> <button type="submit" class="btn btn-success"><i class="fas fa-plus"></i>Add Team</button> </div> </form> </div>
-                    <div class="card"> <h2 class="card-header">Edit Existing Teams</h2> <div id="team-list-admin" class="space-y-5"> <div class="text-center py-5"><p class="text-gray-500">Loading...</p></div> </div> </div>
-                </div>
+                <!-- Programs & Categories -->
+                <div id="page-programs" class="admin-page hidden space-y-6">
+                    <h1 class="page-title">Manage Programs & Categories</h1>
+                     <div class="info-text"> <strong>നിർദ്ദേശം:</strong> കാറ്റഗറികളും പ്രോഗ്രാമുകളും ചേർക്കുക/എഡിറ്റ് ചെയ്യുക. ഗ്രൂപ്പ് ഇനങ്ങൾക്ക് "Is Group Event?" ടിക്ക് ചെയ്യുക. </div>
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <div class="card">
+                            <h2 class="card-header">Manage Categories</h2>
+                            <form id="form-add-category" class="mb-5 flex items-end gap-3">
+                                <div class="flex-grow"> <label for="category-name" class="form-label">New Category Name</label> <input type="text" id="category-name" class="form-input" placeholder="e.g., Junior" required> </div>
+                                <button type="submit" class="btn btn-success btn-sm flex-shrink-0"><i class="fas fa-plus"></i>Add</button>
+                            </form>
+                            <div>
+                                <h3 class="text-sm font-semibold text-gray-600 mb-2 uppercase tracking-wider">Existing Categories</h3>
+                                <div class="table-container">
+                                     <div class="table-header" style="grid-template-columns: 2fr 100px;">
+                                        <span>Name</span> <span class="text-right">Actions</span>
+                                     </div>
+                                     <div id="category-list" class="max-h-[40vh] overflow-y-auto">
+                                        <div class="table-row"><p class="text-gray-500 col-span-2 text-center py-3">Loading categories...</p></div>
+                                     </div>
+                                </div>
+                            </div>
+                        </div>
 
-                <!-- Publish Results -->
-                 <div id="page-results" class="admin-page hidden space-y-6">
-                    <h1 class="page-title">Publish & Update Results</h1> <div class="info-text"> <strong>നിർദ്ദേശം:</strong> കാറ്റഗറിയും പ്രോഗ്രാമും തിരഞ്ഞെടുക്കുക... </div> <div class="card"> <h2 class="card-header">Publish / Edit Result</h2> <form id="form-publish-result"> <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-5"> <div> <label for="result-category" class="form-label">Category</label> <select id="result-category" class="form-select" required> <option value="">-- Select --</option> </select> </div> <div> <label for="result-program" class="form-label">Program</label> <select id="result-program" class="form-select" required disabled> <option value="">-- Select Category --</option> </select> </div> </div> <div class="space-y-3"> <div class="grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-1 items-start"> <div> <label for="result-first" class="form-label">1st Place (ChestNo/Team)</label> <input type="text" id="result-first" class="form-input" placeholder="e.g., 101 or TEAM A"> </div> <div class="pt-1 md:pt-6"> <span id="name-first" class="text-xs font-medium text-indigo-700 block min-h-[1rem]"></span> </div> </div> <div class="grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-1 items-start"> <div> <label for="result-second" class="form-label">2nd Place</label> <input type="text" id="result-second" class="form-input" placeholder="e.g., 202"> </div> <div class="pt-1 md:pt-6"> <span id="name-second" class="text-xs font-medium text-indigo-700 block min-h-[1rem]"></span> </div> </div> <div class="grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-1 items-start"> <div> <label for="result-third" class="form-label">3rd Place</label> <input type="text" id="result-third" class="form-input" placeholder="e.g., 301, 305"> </div> <div class="pt-1 md:pt-6"> <span id="name-third" class="text-xs font-medium text-indigo-700 block min-h-[1rem]"></span> </div> </div> </div> <div class="flex justify-end mt-6"> <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i>Publish Result</button> </div> </form> </div>
-                </div>
+                        <div class="card">
+                            <h2 class="card-header">Add New Program</h2>
+                            <form id="form-add-program" class="space-y-4">
+                                 <div> <label for="program-name" class="form-label">Program Name</label> <input type="text" id="program-name" class="form-input" placeholder="e.g., പ്രസംഗം" required> </div>
+                                 <div> <label for="program-category" class="form-label">Category</label> <select id="program-category" class="form-select" required> <option value="">Select Category</option> </select> </div>
+                                 <div class="grid grid-cols-3 gap-3">
+                                    <div> <label for="program-points-first" class="form-label">1st Pts</label> <input type="number" id="program-points-first" class="form-input" value="5" required> </div>
+                                    <div> <label for="program-points-second" class="form-label">2nd Pts</label> <input type="number" id="program-points-second" class="form-input" value="3" required> </div>
+                                    <div> <label for="program-points-third" class="form-label">3rd Pts</label> <input type="number" id="program-points-third" class="form-input" value="1" required> </div>
+                                </div>
+                                <div class="checkbox-container pt-1">
+                                    <input id="program-is-group" type="checkbox" class="form-checkbox">
+                                    <label for="program-is-group" class="checkbox-label">Is Group Event?</label>
+                                 </div>
+                                 <div class="flex justify-end pt-2"> <button type="submit" class="btn btn-success"><i class="fas fa-plus"></i>Add Program</button> </div>
+                            </form>
+                        </div>
+                    </div>
+                     <div class="card">
+                         <h2 class="card-header">Existing Programs</h2>
+                         <div class="table-container">
+                             <div class="table-header" style="grid-template-columns: 1.5fr 1fr 0.8fr 100px;">
+                                <span>Program (Category)</span>
+                                <span>Points (1/2/3)</span>
+                                <span>Type</span>
+                                <span class="text-right">Actions</span>
+                            </div>
+                            <div id="program-list" class="max-h-[60vh] overflow-y-auto">
+                                <div class="table-row"><p class="text-gray-500 col-span-4 text-center py-5">Loading programs...</p></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
-            </main>
-        </div>
-    </div>
+                <!-- Manage Teams -->
+                <div id="page-teams" class="admin-page hidden space-y-6">
+                    <h1 class="page-title">Manage Teams</h1>
+                    <div class="info-text"> <strong>നിർദ്ദേശം:</strong> ടീമുകളെ ചേർക്കുക, എഡിറ്റ് ചെയ്യുക... </div>
+                    <div class="card">
+                        <h2 class="card-header">Add New Team</h2>
+                        <form id="form-add-team" class="space-y-4">
+                            <div> <label for="team-name" class="form-label">Team Name</label> <input type="text" id="team-name" class="form-input" placeholder="e.g., BURAQ" required> </div>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4"> <div> <label for="team-leader" class="form-label">Leader Name</label> <input type="text" id="team-leader" class="form-input" placeholder="Leader's name"> </div> <div> <label for="team-asst" class="form-label">Asst. Leader Name</label> <input type="text" id="team-asst" class="form-input" placeholder="Assistant's name"> </div> </div>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4"> <div> <label for="team-id-from" class="form-label">Chest No From</label> <input type="number" id="team-id-from" class="form-input" placeholder="e.g., 101" required> </div> <div> <label for="team-id-to" class="form-label">Chest No To</label> <input type="number" id="team-id-to" class="form-input" placeholder="e.g., 199" required> </div> </div>
+                            <div class="flex justify-end pt-2"> <button type="submit" class="btn btn-success"><i class="fas fa-plus"></i>Add Team</button> </div>
+                        </form>
+                    </div>
+                    <div class="card">
+                        <h2 class="card-header">Edit Existing Teams</h2>
+                        <div id="team-list-admin" class="space-y-5"> <div class="text-center py-5"><p class="text-gray-500">Loading teams...</p></div> </div>
+                    </div>
+                </div>
 
-    <!-- Firebase SDK & Admin Logic -->
-    <script type="module">
-        // Firebase Imports
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js";
-        import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-auth.js";
-        import { getFirestore, doc, setDoc, addDoc, getDoc, getDocs, deleteDoc, collection, onSnapshot, query, writeBatch, updateDoc, where } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-firestore.js";
+                <!-- Publish Results -->
+                 <div id="page-results" class="admin-page hidden space-y-6">
+                    <h1 class="page-title">Publish & Update Results</h1>
+                    <div class="info-text"> <strong>നിർദ്ദേശം:</strong> കാറ്റഗറിയും പ്രോഗ്രാമും തിരഞ്ഞെടുക്കുക. ശേഷം, വിജയികളുടെ ചെസ്റ്റ് നമ്പർ/ടീം പേര് നൽകുക... </div>
+                    <div class="card">
+                        <h2 class="card-header">Publish / Edit Result</h2>
+                        <form id="form-publish-result">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-5">
+                                <div> <label for="result-category" class="form-label">Select Category</label> <select id="result-category" class="form-select" required> <option value="">-- Select Category --</option> </select> </div>
+                                <div> <label for="result-program" class="form-label">Select Program</label> <select id="result-program" class="form-select" required disabled> <option value="">-- Select Category First --</option> </select> </div>
+                            </div>
+                            <div class="space-y-3">
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-1 items-start">
+                                    <div> <label for="result-first" class="form-label">1st Place (ChestNo/Team)</label> <input type="text" id="result-first" class="form-input" placeholder="e.g., 101 or TEAM A or 105, 110"> </div>
+                                    <div class="pt-1 md:pt-6"> <span id="name-first" class="text-xs font-medium text-indigo-700 block min-h-[1rem]"></span> </div>
+                                </div>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-1 items-start">
+                                    <div> <label for="result-second" class="form-label">2nd Place (ChestNo/Team)</label> <input type="text" id="result-second" class="form-input" placeholder="e.g., 202"> </div>
+                                    <div class="pt-1 md:pt-6"> <span id="name-second" class="text-xs font-medium text-indigo-700 block min-h-[1rem]"></span> </div>
+                                </div>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-1 items-start">
+                                    <div> <label for="result-third" class="form-label">3rd Place (ChestNo/Team)</label> <input type="text" id="result-third" class="form-input" placeholder="e.g., 301, 305"> </div>
+                                    <div class="pt-1 md:pt-6"> <span id="name-third" class="text-xs font-medium text-indigo-700 block min-h-[1rem]"></span> </div>
+                                </div>
+                            </div>
+                            <div class="flex justify-end mt-6"> <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i>Publish Result</button> </div>
+                        </form>
+                    </div>
+                </div>
 
-        // Firebase Config & Init
-        const firebaseConfig = { apiKey: "AIzaSyDBfnce5gtJhW9u1xwU2FVPQGx2KvG1vw8", authDomain: "result25.firebaseapp.com", projectId: "result25", storageBucket: "result25.firebasestorage.app", messagingSenderId: "1099340945335", appId: "1:1099340945335:web:4fdc63db6bf6b40a30ba32", measurementId: "G-S4BJW3N642" };
-        const appId = typeof __app_id !== 'undefined' ? __app_id : firebaseConfig.projectId;
-        const finalFirebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : firebaseConfig;
-        finalFirebaseConfig.projectId = appId;
+            </main>
+        </div>
+    </div>
 
+    <!-- Firebase SDK & Admin Logic -->
+    <script type="module">
+        // Firebase Config & Init (Version 12.4.0)
+        // (Firebase config remains the same)
+        const firebaseConfig = { apiKey: "AIzaSyDBfnce5gtJhW9u1xwU2FVPQGx2KvG1vw8", authDomain: "result25.firebaseapp.com", projectId: "result25", storageBucket: "result25.firebasestorage.app", messagingSenderId: "1099340945335", appId: "1:1099340945335:web:4fdc63db6bf6b40a30ba32", measurementId: "G-S4BJW3N642" };
+        const appId = typeof __app_id !== 'undefined' ? __app_id : firebaseConfig.projectId;
+        const finalFirebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : firebaseConfig;
+        finalFirebaseConfig.projectId = appId;
 
-        const app = initializeApp(finalFirebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js";
+        import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-auth.js";
+        import { getFirestore, doc, setDoc, addDoc, getDoc, getDocs, deleteDoc, collection, onSnapshot, query, writeBatch, updateDoc } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-firestore.js";
 
-        // --- [JavaScript Logic - v5.1 - Listener Attachment Fix] ---
-        document.addEventListener('DOMContentLoaded', () => {
-            console.log("Admin script loaded (v5.1)");
-            let allPrograms = {}; // Key: programId
-            let allCategories = []; // Array of {id, name}
-            let allParticipants = {}; // Key: chestNo
-            let allTeamsAdmin = {}; // Key: teamId (doc id from Firestore)
-            let listenersAttached = false; // Flag to ensure listeners are attached only once after login
-            let dataLoaded = { categories: false, teams: false, participants: false, programs: false, homepage: false }; // Track data loading status
-            const d = document;
+        const app = initializeApp(finalFirebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
 
-            // --- DOM Selections ---
-            const loginPage=d.getElementById('login-page'), adminPanel=d.getElementById('admin-panel'), loginForm=d.getElementById('login-form'), registerForm=d.getElementById('register-form'), logoutButton=d.getElementById('logout-button'), adminEmail=d.getElementById('admin-email'), pages=d.querySelectorAll('.admin-page'), adminMenuOverlay=d.getElementById('admin-menu-overlay'), adminMenuBox=d.getElementById('admin-menu-box'), adminMenuBtn=d.getElementById('admin-menu-btn'), adminMenuCloseBtn=d.getElementById('admin-menu-close-btn'), navLinks=d.querySelectorAll('.menu-link');
-            const participantAddForm = d.getElementById('form-add-participants'), participantAddTeam = d.getElementById('participant-add-team'), participantAddNames = d.getElementById('participant-add-names'), addLogContainer = d.getElementById('add-log-container'), addLog = d.getElementById('add-log'), participantCountEl=d.getElementById('participant-count'), deleteAllParticipantsBtn=d.getElementById('delete-all-participants-btn'), participantTeamFilter = d.getElementById('participant-team-filter'), participantSearch = d.getElementById('participant-search'), participantListAdmin = d.getElementById('participant-list-admin'), participantListContainer = d.getElementById('participant-list-container'), participantListPlaceholder = d.getElementById('participant-list-placeholder');
-            const categoryForm=d.getElementById('form-add-category'), categoryInput=d.getElementById('category-name'), categoryList=d.getElementById('category-list'), categoryListContainer=d.getElementById('category-list-container');
-            const programForm=d.getElementById('form-add-program'), programNameInput=d.getElementById('program-name'), programCategorySelect=d.getElementById('program-category'), programList=d.getElementById('program-list'), programListContainer=d.getElementById('program-list-container');
-            const programPointsFirst = d.getElementById('program-points-first'), programPointsSecond = d.getElementById('program-points-second'), programPointsThird = d.getElementById('program-points-third');
-            const programTypeSelect = d.getElementById('program-type');
-            const resultForm=d.getElementById('form-publish-result'), resultCategorySelect=d.getElementById('result-category'), resultProgramSelect=d.getElementById('result-program'), resultInputs={'first':d.getElementById('result-first'), 'second':d.getElementById('result-second'), 'third':d.getElementById('result-third')}, nameSpans={'first':d.getElementById('name-first'), 'second':d.getElementById('name-second'), 'third':d.getElementById('name-third')};
-            const teamForm=d.getElementById('form-add-team'), teamListAdmin=d.getElementById('team-list-admin');
-            const homepageForm=d.getElementById('form-homepage');
+        // --- [JavaScript Logic - Updated] ---
+        document.addEventListener('DOMContentLoaded', () => {
+            let allPrograms = {}; // Use object for O(1) lookup by ID
+            let allCategories = [];
+            let allParticipants = {};
+            let allTeamsAdmin = {}; // Stores { TEAM_NAME_UPPERCASE: { id: 'TEAM_NAME', ...data } }
 
-             // --- Helper: Get Homepage Fields ---
-             function getHomepageFields() { /* ... */ }
-            const homepageFields = getHomepageFields();
+            const d = document; // Shortcut
 
-            // Helper function to disable/enable forms/buttons
-            const toggleDisabled = (elementOrSelector, isDisabled) => { /* ... */ };
+            // --- DOM Element Selections (Mostly unchanged, added checkbox) ---
+            const loginPage=d.getElementById('login-page'), adminPanel=d.getElementById('admin-panel'), loginForm=d.getElementById('login-form'), registerForm=d.getElementById('register-form'), logoutButton=d.getElementById('logout-button'), adminEmail=d.getElementById('admin-email'), pages=d.querySelectorAll('.admin-page'), adminMenuOverlay=d.getElementById('admin-menu-overlay'), adminMenuBox=d.getElementById('admin-menu-box'), adminMenuBtn=d.getElementById('admin-menu-btn'), adminMenuCloseBtn=d.getElementById('admin-menu-close-btn'), navLinks=d.querySelectorAll('.menu-link');
+            const participantAddForm = d.getElementById('form-add-participants'), participantAddTeam = d.getElementById('participant-add-team'), participantAddNames = d.getElementById('participant-add-names'), addLogContainer = d.getElementById('add-log-container'), addLog = d.getElementById('add-log'), participantCountEl=d.getElementById('participant-count'), deleteAllParticipantsBtn=d.getElementById('delete-all-participants-btn'), participantTeamFilter = d.getElementById('participant-team-filter'), participantSearch = d.getElementById('participant-search'), participantListAdmin = d.getElementById('participant-list-admin'), participantListPlaceholder = d.getElementById('participant-list-placeholder');
+            const categoryForm=d.getElementById('form-add-category'), categoryInput=d.getElementById('category-name'), categoryList=d.getElementById('category-list'), programForm=d.getElementById('form-add-program'), programNameInput=d.getElementById('program-name'), programCategorySelect=d.getElementById('program-category'), programList=d.getElementById('program-list'), programPointsFirst = d.getElementById('program-points-first'), programPointsSecond = d.getElementById('program-points-second'), programPointsThird = d.getElementById('program-points-third');
+            const programIsGroupCheckbox = d.getElementById('program-is-group'); // Checkbox element
+            const resultForm=d.getElementById('form-publish-result'), resultCategorySelect=d.getElementById('result-category'), resultProgramSelect=d.getElementById('result-program'), resultInputs={'first':d.getElementById('result-first'), 'second':d.getElementById('result-second'), 'third':d.getElementById('result-third')}, nameSpans={'first':d.getElementById('name-first'), 'second':d.getElementById('name-second'), 'third':d.getElementById('name-third')};
+            const teamForm=d.getElementById('form-add-team'), teamListAdmin=d.getElementById('team-list-admin');
+            const homepageForm=d.getElementById('form-homepage'), homepageFields={'header_title':d.getElementById('homepage-header-title'), 'logo_url':d.getElementById('homepage-logo-url'), 'main_title':d.getElementById('homepage-main-title'), 'subtitle':d.getElementById('homepage-subtitle'), 'about_title':d.getElementById('homepage-about-title'), 'about_subtitle':d.getElementById('homepage-about-subtitle'), 'about':d.getElementById('homepage-about'), 'about_image_url':d.getElementById('homepage-about-image-url'), 'gallery':d.getElementById('homepage-gallery'), 'total_programs':d.getElementById('homepage-total-programs'), 'total_participants':d.getElementById('homepage-total-participants'), 'total_categories':d.getElementById('homepage-total-categories'), 'total_teams':d.getElementById('homepage-total-teams'), 'institution_name':d.getElementById('homepage-institution-name'), 'copyright_text':d.getElementById('homepage-copyright-text'), 'social_instagram':d.getElementById('homepage-social-instagram'), 'social_youtube':d.getElementById('homepage-social-youtube'), 'social_facebook':d.getElementById('homepage-social-facebook')};
 
-            // --- Navigation Logic ---
-             function openAdminNav() { if(adminMenuOverlay && adminMenuBox) { adminMenuOverlay.style.display = 'flex'; setTimeout(() => { adminMenuOverlay.style.opacity = '1'; adminMenuBox.classList.add('open'); }, 10); } }
-             function closeAdminNav() { if(adminMenuOverlay && adminMenuBox) { adminMenuOverlay.style.opacity = '0'; adminMenuBox.classList.remove('open'); setTimeout(() => { adminMenuOverlay.style.display = 'none'; }, 300); } }
-             if(adminMenuBtn) adminMenuBtn.addEventListener('click', openAdminNav); else console.error("Admin menu button missing");
-             if(adminMenuCloseBtn) adminMenuCloseBtn.addEventListener('click', closeAdminNav); else console.error("Admin menu close button missing");
-             if(adminMenuOverlay) adminMenuOverlay.addEventListener('click', (e) => { if (e.target === adminMenuOverlay) { closeAdminNav(); } }); else console.error("Admin menu overlay missing");
-             if (navLinks && navLinks.length > 0) { navLinks.forEach(link => { link.addEventListener('click', (e) => { e.preventDefault(); const targetId = link.getAttribute('data-target'); if(!targetId) return; pages.forEach(page => page.classList.add('hidden')); const targetPage = d.getElementById(targetId); if (targetPage) { targetPage.classList.remove('hidden'); console.log("Navigated to:", targetId); } else { console.error("Target page missing:", targetId); return; } navLinks.forEach(nav => nav.classList.remove('active')); link.classList.add('active'); closeAdminNav(); loadDataForPage(targetId); }); }); } else { console.error("Nav links missing!"); }
+            // --- Navigation Logic (Unchanged) ---
+            function openAdminNav() { if(adminMenuOverlay && adminMenuBox) { adminMenuOverlay.style.display = 'flex'; setTimeout(() => { adminMenuOverlay.style.opacity = '1'; adminMenuBox.classList.add('open'); }, 10); } }
+            function closeAdminNav() { if(adminMenuOverlay && adminMenuBox) { adminMenuOverlay.style.opacity = '0'; adminMenuBox.classList.remove('open'); setTimeout(() => { adminMenuOverlay.style.display = 'none'; }, 300); } }
+            if(adminMenuBtn) adminMenuBtn.addEventListener('click', openAdminNav);
+            if(adminMenuCloseBtn) adminMenuCloseBtn.addEventListener('click', closeAdminNav);
+            if(adminMenuOverlay) adminMenuOverlay.addEventListener('click', (e) => { if (e.target === adminMenuOverlay) { closeAdminNav(); } });
+            navLinks.forEach(link => { link.addEventListener('click', (e) => { e.preventDefault(); const targetId = link.getAttribute('data-target'); pages.forEach(page => page.classList.add('hidden')); const targetPage = d.getElementById(targetId); if (targetPage) targetPage.classList.remove('hidden'); navLinks.forEach(nav => nav.classList.remove('active')); link.classList.add('active'); closeAdminNav(); setTimeout(() => loadDataForPage(targetId), 0); }); });
+            function loadDataForPage(pageId) { console.log("Loading data for:", pageId); if (pageId === 'page-dashboard') loadHomepageContent(); if (pageId === 'page-participants') { loadTeamsForAdmin(); loadAllParticipants(); } if (pageId === 'page-programs') { loadCategories(); loadPrograms(); } if (pageId === 'page-results') { loadCategoriesForResults(); loadPrograms(); loadAllParticipants(); loadTeamsForAdmin(); } if (pageId === 'page-teams') loadTeamsForAdmin(); }
 
-            async function loadDataForPage(pageId) { /* ... */ }
+            // --- Authentication (Unchanged) ---
+            onAuthStateChanged(auth, (user) => { if (user) { if(loginPage) loginPage.style.display = 'none'; if(adminPanel) adminPanel.style.display = 'block'; if(adminEmail) adminEmail.textContent = user.email; const defaultPageId = 'page-dashboard'; pages.forEach(page => page.classList.add('hidden')); const defaultPageElement = d.getElementById(defaultPageId); if (defaultPageElement) defaultPageElement.classList.remove('hidden'); navLinks.forEach(nav => nav.classList.remove('active')); const defaultNavLink = d.querySelector(`.menu-link[data-target="${defaultPageId}"]`); if (defaultNavLink) defaultNavLink.classList.add('active'); setTimeout(() => { loadDataForPage(defaultPageId); loadAllParticipants(); loadTeamsForAdmin(); loadCategories(); loadPrograms(); }, 0); } else { if(loginPage) loginPage.style.display = 'flex'; if(adminPanel) adminPanel.style.display = 'none'; } });
+            if(loginForm) { loginForm.addEventListener('submit', async (e) => { e.preventDefault(); const emailEl = d.getElementById('login-email'); const passwordEl = d.getElementById('login-password'); if (!emailEl || !passwordEl) return; const email = emailEl.value; const password = passwordEl.value; if (!email || !password) { alert("Please enter both email and password."); return; } try { await signInWithEmailAndPassword(auth, email, password); } catch (error) { alert(`Login Failed: ${error.message}`); } }); } else { console.error("Login form not found!"); }
+            if(registerForm) { registerForm.addEventListener('submit', async (e) => { e.preventDefault(); const emailEl = d.getElementById('register-email'); const passwordEl = d.getElementById('register-password'); if (!emailEl || !passwordEl) return; const email = emailEl.value; const password = passwordEl.value; if (!email || !password) { alert("Please enter both email and password."); return; } try { await createUserWithEmailAndPassword(auth, email, password); alert('Admin user registered! Please login.'); registerForm.reset(); } catch (error) { alert(`Registration Failed: ${error.message}`); } }); } else { console.error("Register form not found!"); }
+            if(logoutButton) { logoutButton.addEventListener('click', async () => { try { await signOut(auth); } catch(error) { alert(`Logout Failed: ${error.message}`); } }); } else { console.error("Logout button not found!"); }
+            window.togglePasswordVisibility = function(inputId, button) { const input = d.getElementById(inputId); const icon = button.querySelector('i'); if (!input || !icon) return; if (input.type === "password") { input.type = "text"; icon.classList.remove("fa-eye"); icon.classList.add("fa-eye-slash"); } else { input.type = "password"; icon.classList.remove("fa-eye-slash"); icon.classList.add("fa-eye"); } }
 
-            // --- Authentication ---
-            onAuthStateChanged(auth, async (user) => {
-                console.log("Auth state changed. User:", user ? user.email : 'None');
-                if (user) {
-                    // Show Admin Panel, hide Login
-                    if(loginPage) loginPage.style.display = 'none';
-                    if(adminPanel) adminPanel.style.display = 'block';
-                    if(adminEmail) adminEmail.textContent = user.email;
+            // --- Participants Page Logic (Unchanged) ---
+            async function loadAllParticipants() { /* ... */ onSnapshot(collection(db, `artifacts/${appId}/public/data/participants`), (snapshot) => { allParticipants = {}; snapshot.docs.forEach(doc => { allParticipants[doc.id] = { ...doc.data(), chestNo: doc.id }; }); renderParticipantList(); console.log('Participants updated:', Object.keys(allParticipants).length); }, (error) => { console.error("Error loading participants:", error); }); }
+            function renderParticipantList() { if (!participantListAdmin) return; const teamFilter = participantTeamFilter ? participantTeamFilter.value : ''; const searchFilter = participantSearch ? participantSearch.value.toLowerCase() : ''; participantListAdmin.innerHTML = ''; const participantValues = Object.values(allParticipants); let filteredParticipants = participantValues; if (teamFilter) { filteredParticipants = filteredParticipants.filter(p => p.team === teamFilter); } if (searchFilter) { filteredParticipants = filteredParticipants.filter(p => p.name.toLowerCase().includes(searchFilter) || p.chestNo.includes(searchFilter)); } filteredParticipants.sort((a,b) => parseInt(a.chestNo, 10) - parseInt(b.chestNo, 10)); if(participantCountEl) participantCountEl.textContent = filteredParticipants.length; if (filteredParticipants.length === 0) { participantListAdmin.innerHTML = `<div class="table-row"><p class="text-gray-500 italic col-span-4 text-center py-5">No participants found matching criteria.</p></div>`; if (participantListPlaceholder) participantListPlaceholder.style.display = 'none'; return; } if (participantListPlaceholder) participantListPlaceholder.style.display = 'none'; filteredParticipants.forEach(p => { const item = d.createElement('div'); item.className = 'table-row'; item.style.gridTemplateColumns = '1.5fr 1fr 1fr 100px'; item.innerHTML = `<div class="table-cell table-cell-primary">${p.name}</div> <div class="table-cell text-gray-500">${p.chestNo}</div> <div class="table-cell text-gray-500">${p.team}</div> <div class="table-actions"> <button class="btn-icon warning" onclick="editParticipant('${p.chestNo}', \`${p.name}\`, '${p.team}')" title="Edit"><i class="fas fa-edit"></i></button> <button class="btn-icon danger" onclick="deleteParticipant('${p.chestNo}')" title="Delete"><i class="fas fa-trash-alt"></i></button> </div>`; participantListAdmin.appendChild(item); }); }
+            window.editParticipant = async (chestNo, currentName, currentTeam) => { /* ... */ };
+            window.deleteParticipant = async (chestNo) => { /* ... */ };
+            if (participantAddForm) { /* ... Add multiple participants ... */ }
+            async function deleteAllParticipants(promptUser = true) { /* ... */ }
+            if(deleteAllParticipantsBtn) deleteAllParticipantsBtn.addEventListener('click', () => deleteAllParticipants(true));
+            if (participantTeamFilter) participantTeamFilter.addEventListener('change', renderParticipantList);
+            if (participantSearch) participantSearch.addEventListener('input', renderParticipantList);
 
-                    // Set default page visibility
-                    const defaultPageId = 'page-dashboard';
-                    pages.forEach(page => { if (page.id !== defaultPageId) page.classList.add('hidden'); else page.classList.remove('hidden'); });
-                    navLinks.forEach(nav => nav.classList.remove('active'));
-                    const defaultNavLink = d.querySelector(`.menu-link[data-target="${defaultPageId}"]`);
-                    if (defaultNavLink) defaultNavLink.classList.add('active');
+            // --- Programs & Categories Page Logic (Updated rendering) ---
+            async function loadCategories() { try { const q = query(collection(db, `artifacts/${appId}/public/data/categories`)); const snapshot = await getDocs(q); allCategories = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })).sort((a,b)=>a.name.localeCompare(b.name)); if (categoryList) categoryList.innerHTML = ''; if (programCategorySelect) programCategorySelect.innerHTML = '<option value="">Select Category</option>'; if (allCategories.length === 0) { if (categoryList) categoryList.innerHTML = '<div class="table-row"><p class="text-gray-500 italic col-span-2 text-center py-3">No categories added yet.</p></div>'; } else { allCategories.forEach(cat => { if (categoryList) { categoryList.innerHTML += ` <div class="table-row" style="grid-template-columns: 2fr 100px;"> <div class="table-cell table-cell-primary">${cat.name}</div> <div class="table-actions"> <button class="btn-icon warning" onclick="editCategory('${cat.id}', \`${cat.name}\`)"><i class="fas fa-edit"></i></button> <button class="btn-icon danger" onclick="deleteCategory('${cat.id}')"><i class="fas fa-trash-alt"></i></button> </div> </div>`; } if (programCategorySelect) programCategorySelect.innerHTML += `<option value="${cat.name}">${cat.name}</option>`; }); } } catch(error) { console.error("Error loading categories:", error); if (categoryList) categoryList.innerHTML = '<div class="table-row"><p class="text-red-500 col-span-2 text-center py-3">Error loading.</p></div>';} }
+            if(categoryForm && categoryInput) categoryForm.addEventListener('submit', async (e) => { e.preventDefault(); const name = categoryInput.value.trim(); if (!name) return; try { await addDoc(collection(db, `artifacts/${appId}/public/data/categories`), { name }); categoryInput.value = ''; await loadCategories(); } catch (error) { alert(`Error: ${error.message}`); }});
+            window.deleteCategory = async (id) => { if (!confirm('Are you sure you want to delete this category?')) return; try { await deleteDoc(doc(db, `artifacts/${appId}/public/data/categories`, id)); await loadCategories(); } catch (error) { alert(`Error: ${error.message}`); }};
+            window.editCategory = async (id, currentName) => { const newName = prompt("Enter new name:", currentName); if (newName && newName.trim() !== '' && newName.trim() !== currentName) { try { await updateDoc(doc(db, `artifacts/${appId}/public/data/categories`, id), { name: newName.trim() }); alert('Category updated!'); await loadCategories(); await loadPrograms(); } catch (error) { alert(`Error: ${error.message}`); } } };
 
-                    // Load initial data and attach listeners ONCE after login
-                    if (!listenersAttached) { // Check flag
-                         try {
-                             console.log("Loading initial data after login...");
-                             await Promise.all([ loadCategories(), loadTeamsForAdmin() ]); // Load essentials first
-                             await Promise.all([ loadHomepageContent(), loadAllParticipants(), loadPrograms() ]); // Load rest
-                             dataLoaded = { categories: true, teams: true, participants: true, programs: true, homepage: true };
-                             attachAdminListeners(); // Attach listeners for admin panel elements
-                             console.log("Initial data load and ADMIN listener attachment complete.");
-                         } catch(e){ console.error("Error during initial data load:", e);}
-                    } else {
-                         console.log("Initial data/listeners already handled.");
-                    }
-                } else {
-                    // Show Login, hide Admin Panel
-                    if(loginPage) loginPage.style.display = 'flex';
-                    if(adminPanel) adminPanel.style.display = 'none';
-                    // Clear data and reset flags
-                    allPrograms = {}; allCategories = []; allParticipants = {}; allTeamsAdmin = {};
-                    dataLoaded = { categories: false, teams: false, participants: false, programs: false, homepage: false };
-                    listenersAttached = false; // Reset admin listener flag
-                }
-            }, (error) => { console.error("Auth state listener error:", error); });
+            async function loadPrograms() { try { const q = query(collection(db, `artifacts/${appId}/public/data/programs`)); const snapshot = await getDocs(q); allPrograms = {}; snapshot.docs.forEach(docSnap => { allPrograms[docSnap.id] = { id: docSnap.id, ...docSnap.data() }; }); const sortedPrograms = Object.values(allPrograms).sort((a,b)=>a.name.localeCompare(b.name)); if (programList) programList.innerHTML = ''; if (sortedPrograms.length === 0) { if (programList) programList.innerHTML = '<div class="table-row"><p class="text-gray-500 italic col-span-4 text-center py-5">No programs added yet.</p></div>'; } else { sortedPrograms.forEach(prog => { if (programList) { const typeText = prog.isGroupEvent ? 'Group' : 'Individual'; const typeClass = prog.isGroupEvent ? 'badge-group' : 'badge-individual'; programList.innerHTML += ` <div class="table-row" style="grid-template-columns: 1.5fr 1fr 0.8fr 100px;"> <div class="table-cell"> <span class="table-cell-primary">${prog.name}</span> <span class="table-cell-secondary">${prog.category}</span> </div> <div class="table-cell table-cell-secondary"> ${prog.points_first || 0}, ${prog.points_second || 0}, ${prog.points_third || 0} </div> <div class="table-cell"> <span class="badge ${typeClass}">${typeText}</span> </div> <div class="table-actions"> <button class="btn-icon warning" onclick="editProgram('${prog.id}', \`${prog.name}\`, '${prog.category}', '${prog.points_first || 0}', '${prog.points_second || 0}', '${prog.points_third || 0}', ${prog.isGroupEvent || false})"><i class="fas fa-edit"></i></button> <button class="btn-icon danger" onclick="deleteProgram('${prog.id}')"><i class="fas fa-trash-alt"></i></button> </div> </div>`; } }); } } catch(error) { console.error("Error loading programs:", error); if (programList) programList.innerHTML = '<div class="table-row"><p class="text-red-500 col-span-4 text-center py-5">Error loading.</p></div>';} }
 
-            // --- Event Listener Attachment Functions ---
-            // Attach listeners for Login/Register immediately
-             function attachAuthListeners() {
-                 console.log("Attaching AUTH listeners...");
-                 if (loginForm && !loginForm.dataset.listenerAttached) {
-                     const loginButton = loginForm.querySelector('button[type="submit"]');
-                     loginForm.addEventListener('submit', async (e) => {
-                         e.preventDefault();
-                         const emailInput = d.getElementById('login-email');
-                         const passwordInput = d.getElementById('login-password');
-                         const email = emailInput?.value;
-                         const password = passwordInput?.value;
-                         if (!email || !password) { alert("Enter email and password."); return; }
-                         toggleDisabled(loginButton, true);
-                         try { await signInWithEmailAndPassword(auth, email, password); }
-                         catch (error) { console.error("Login Error:", error); alert(`Login Failed: ${error.message}`); toggleDisabled(loginButton, false); }
-                     });
-                     loginForm.dataset.listenerAttached = 'true'; // Mark as attached
-                     const loginToggleBtn = loginForm.querySelector('.password-toggle-btn');
-                     if (loginToggleBtn) { loginToggleBtn.addEventListener('click', () => window.togglePasswordVisibility('login-password', loginToggleBtn)); }
-                     console.log("Login form listeners attached.");
-                 }
+            if(programForm && programNameInput && programCategorySelect && programIsGroupCheckbox) {
+                programForm.addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    const name = programNameInput.value.trim();
+                    const category = programCategorySelect.value;
+                    const points_first = parseInt(programPointsFirst.value, 10);
+                    const points_second = parseInt(programPointsSecond.value, 10);
+                    const points_third = parseInt(programPointsThird.value, 10);
+                    const isGroupEvent = programIsGroupCheckbox.checked;
+                    if (!name || !category || isNaN(points_first) || isNaN(points_second) || isNaN(points_third)) { alert('Please fill in all fields correctly.'); return; }
+                    try { await addDoc(collection(db, `artifacts/${appId}/public/data/programs`), { name, category, points_first, points_second, points_third, isGroupEvent }); programForm.reset(); programIsGroupCheckbox.checked = false; await loadPrograms(); }
+                    catch (error) { alert(`Error: ${error.message}`); }
+                });
+            }
+            window.deleteProgram = async (id) => { if (!confirm('Are you sure? This also deletes results.')) return; try { const batch = writeBatch(db); batch.delete(doc(db, `artifacts/${appId}/public/data/programs`, id)); batch.delete(doc(db, `artifacts/${appId}/public/data/results`, id)); await batch.commit(); delete allPrograms[id]; await loadPrograms(); } catch (error) { alert(`Error: ${error.message}`); }};
+            window.editProgram = async (id, currentName, currentCategory, p1, p2, p3, currentIsGroup) => {
+                const newName = prompt("New program name:", currentName);
+                let categoryOptions = allCategories.map((cat, index) => `${index + 1}: ${cat.name}`).join('\n');
+                let categoryPromptMsg = `Enter number for new category (current: '${currentCategory}'):\n${categoryOptions}`;
+                const categoryChoiceIndex = prompt(categoryPromptMsg);
+                let newCategory = currentCategory;
+                if (categoryChoiceIndex && !isNaN(categoryChoiceIndex)) { let index = parseInt(categoryChoiceIndex) - 1; if (index >= 0 && index < allCategories.length) { newCategory = allCategories[index].name; } else { alert("Invalid category number. Keeping original."); } }
+                const newP1 = prompt("New 1st points:", p1); const newP2 = prompt("New 2nd points:", p2); const newP3 = prompt("New 3rd points:", p3);
+                const changeGroupStatus = confirm(`Marked as: ${currentIsGroup ? 'GROUP' : 'INDIVIDUAL'}.\nChange status?`);
+                const newIsGroup = changeGroupStatus ? !currentIsGroup : currentIsGroup;
+                const dataToUpdate = { name: (newName && newName.trim() !== '') ? newName.trim() : currentName, category: newCategory, points_first: (newP1 && !isNaN(newP1)) ? parseInt(newP1, 10) : parseInt(p1, 10), points_second: (newP2 && !isNaN(newP2)) ? parseInt(newP2, 10) : parseInt(p2, 10), points_third: (newP3 && !isNaN(newP3)) ? parseInt(newP3, 10) : parseInt(p3, 10), isGroupEvent: newIsGroup };
+                if (dataToUpdate.name === currentName && dataToUpdate.category === currentCategory && dataToUpdate.points_first === parseInt(p1, 10) && dataToUpdate.points_second === parseInt(p2, 10) && dataToUpdate.points_third === parseInt(p3, 10) && dataToUpdate.isGroupEvent === currentIsGroup) { alert("No changes made."); return; }
+                try { await updateDoc(doc(db, `artifacts/${appId}/public/data/programs`, id), dataToUpdate); alert('Program updated!'); allPrograms[id] = { ...allPrograms[id], ...dataToUpdate }; await loadPrograms(); } catch (error) { alert(`Error: ${error.message}`); }
+            };
 
-                 if (registerForm && !registerForm.dataset.listenerAttached) {
-                     const registerButton = registerForm.querySelector('button[type="submit"]');
-                     registerForm.addEventListener('submit', async (e) => {
-                        e.preventDefault(); const emailInput = d.getElementById('register-email'); const passwordInput = d.getElementById('register-password'); const email = emailInput?.value; const password = passwordInput?.value; if (!email || !password) { alert("Enter email and password."); return; } toggleDisabled(registerButton, true); try { await createUserWithEmailAndPassword(auth, email, password); alert('Admin registered! Please login.'); registerForm.reset(); } catch (error) { console.error("Registration Error:", error); alert(`Registration Failed: ${error.message}`); } finally { toggleDisabled(registerButton, false); }
-                     });
-                     registerForm.dataset.listenerAttached = 'true'; // Mark as attached
-                     const registerToggleBtn = registerForm.querySelector('.password-toggle-btn');
-                     if (registerToggleBtn) { registerToggleBtn.addEventListener('click', () => window.togglePasswordVisibility('register-password', registerToggleBtn)); }
-                      console.log("Register form listeners attached.");
-                 }
-                  // Make togglePasswordVisibility globally accessible IMMEDIATELY
-                 window.togglePasswordVisibility = (inputId, button) => { const input = d.getElementById(inputId); const icon = button?.querySelector('i'); if (!input || !icon) return; input.type = (input.type === "password") ? "text" : "password"; icon.classList.toggle("fa-eye"); icon.classList.toggle("fa-eye-slash"); };
-             }
+            // --- Results Page Logic (Unchanged logic, just ensure functions are called) ---
+            function updateWinnerName(position) { /* ... Logic unchanged ... */ const inputElement = resultInputs[position]; const spanElement = nameSpans[position]; if (!inputElement || !spanElement) return; const chestNoInput = inputElement.value.trim(); const chestNos = chestNoInput.split(',').map(s => s.trim().toUpperCase()).filter(Boolean); const names = chestNos.map(cn => { if (allParticipants[cn]) { return `${allParticipants[cn].name} (${allParticipants[cn].team})`; } const teamMatch = Object.keys(allTeamsAdmin).find(teamName => teamName.toUpperCase() === cn); if (teamMatch) { return `Team: ${teamMatch}`; } return `${cn} (Unknown)`; }).join(', '); spanElement.textContent = names; }
+            if(resultInputs.first) resultInputs.first.addEventListener('input', () => updateWinnerName('first'));
+            if(resultInputs.second) resultInputs.second.addEventListener('input', () => updateWinnerName('second'));
+            if(resultInputs.third) resultInputs.third.addEventListener('input', () => updateWinnerName('third'));
+            function clearNamePreviews() { if(nameSpans.first) nameSpans.first.textContent = ''; if(nameSpans.second) nameSpans.second.textContent = ''; if(nameSpans.third) nameSpans.third.textContent = ''; }
+            async function loadCategoriesForResults() { await loadCategories(); if (!resultCategorySelect) return; resultCategorySelect.innerHTML = '<option value="">-- Select Category --</option>'; allCategories.forEach(cat => { resultCategorySelect.innerHTML += `<option value="${cat.name}">${cat.name}</option>`; }); }
+            async function loadProgramsForResults(selectedCategory = null) { if (!allPrograms || Object.keys(allPrograms).length === 0) await loadPrograms(); if (!resultProgramSelect) return; resultProgramSelect.innerHTML = '<option value="">-- Select Program --</option>'; const filteredPrograms = selectedCategory ? Object.values(allPrograms).filter(p => p.category === selectedCategory) : []; filteredPrograms.sort((a,b) => a.name.localeCompare(b.name)); if (filteredPrograms.length > 0) { filteredPrograms.forEach(program => { resultProgramSelect.innerHTML += `<option value="${program.id}">${program.name}</option>`; }); resultProgramSelect.disabled = false; } else { resultProgramSelect.innerHTML = `<option value="">${selectedCategory ? 'No programs' : '-- Select Category --'}</option>`; resultProgramSelect.disabled = true; } }
+            if(resultCategorySelect) { resultCategorySelect.addEventListener('change', (e) => { const selectedCategory = e.target.value; if(resultForm) resultForm.reset(); clearNamePreviews(); d.getElementById('result-category').value = selectedCategory; loadProgramsForResults(selectedCategory); resultProgramSelect.disabled = !selectedCategory; }); }
+            if(resultProgramSelect) { resultProgramSelect.addEventListener('change', async (e) => { const programId = e.target.value; if(resultInputs.first) resultInputs.first.value = ''; if(resultInputs.second) resultInputs.second.value = ''; if(resultInputs.third) resultInputs.third.value = ''; clearNamePreviews(); if (!programId) return; try { const docSnap = await getDoc(doc(db, `artifacts/${appId}/public/data/results`, programId)); if (docSnap.exists()) { const data = docSnap.data(); if(resultInputs.first) resultInputs.first.value = data.first ? data.first.map(w => w.chest).join(', ') : ''; if(resultInputs.second) resultInputs.second.value = data.second ? data.second.map(w => w.chest).join(', ') : ''; if(resultInputs.third) resultInputs.third.value = data.third ? data.third.map(w => w.chest).join(', ') : ''; updateWinnerName('first'); updateWinnerName('second'); updateWinnerName('third'); } } catch(error){ console.error("Error fetching result:", error);} }); }
+            if(resultForm) { resultForm.addEventListener('submit', async (e) => { e.preventDefault(); const programId = resultProgramSelect ? resultProgramSelect.value : null; if (!programId) { alert('Please select a program.'); return; } if (!allPrograms[programId]) { alert('Selected program data not found.'); return; } const mapToWinnerData = (inputId) => { const inputElement = d.getElementById(inputId); if (!inputElement) return []; const inputString = inputElement.value.trim().toUpperCase(); const items = inputString.split(',').map(s => s.trim()).filter(Boolean); return items.map(item => { let winnerName = 'Unknown'; let winnerTeam = null; if (allParticipants[item]) { winnerName = allParticipants[item].name; winnerTeam = allParticipants[item].team; } else { const teamMatch = Object.keys(allTeamsAdmin).find(teamName => teamName.toUpperCase() === item); if (teamMatch) { winnerName = `Team: ${teamMatch}`; winnerTeam = teamMatch; } else { winnerName = `${item} (Unknown)`; } } return { chest: item, name: winnerName, team: winnerTeam }; }); }; const resultData = { first: mapToWinnerData('result-first'), second: mapToWinnerData('result-second'), third: mapToWinnerData('result-third') }; let validationPassed = true; ['first', 'second', 'third'].forEach(pos => { resultData[pos].forEach(winner => { if (winner.team === null && !allPrograms[programId]?.isGroupEvent) { const isLikelyTeamName = Object.keys(allTeamsAdmin).find(tName => tName.toUpperCase() === winner.chest); if(!isLikelyTeamName){ console.error(`Validation Error: No team for ${winner.chest} in ${pos}.`); validationPassed = false; } else { winner.team = isLikelyTeamName; } } else if (winner.team === null && allPrograms[programId]?.isGroupEvent) { const teamMatch = Object.keys(allTeamsAdmin).find(tName => tName.toUpperCase() === winner.chest); if (teamMatch) { winner.team = teamMatch; winner.name = `Team: ${teamMatch}`; } else { console.error(`Validation Error: Team name ${winner.chest} not verified for group event in ${pos}.`); validationPassed = false; } } }); }); if (!validationPassed) { alert('Error: Could not verify team/participant. Check inputs.'); return; } try { await setDoc(doc(db, `artifacts/${appId}/public/data/results`, programId), resultData); alert('Result published/updated!'); } catch (error) { alert(`Error: ${error.message}`); } }); }
 
-            // Attach listeners for Admin Panel elements (called after login)
-            function attachAdminListeners() {
-                if (listenersAttached) {
-                     console.log("Admin listeners already attached.");
-                     return; // Prevent attaching multiple times
-                }
-                 console.log("Attaching ADMIN listeners...");
+            // --- Teams Page Logic (Admin - Updated rendering) ---
+            async function loadTeamsForAdmin() { try { const q = query(collection(db, `artifacts/${appId}/public/data/teams`)); const snapshot = await getDocs(q); allTeamsAdmin = {}; snapshot.docs.forEach(doc => { allTeamsAdmin[doc.id] = { id: doc.id, ...doc.data() }; }); renderAdminTeamList(); const sortedTeamNames = Object.keys(allTeamsAdmin).sort(); if(participantTeamFilter) { participantTeamFilter.innerHTML = '<option value="">All Teams</option>'; sortedTeamNames.forEach(teamName => { participantTeamFilter.innerHTML += `<option value="${teamName}">${teamName}</option>`; }); } if(participantAddTeam) { participantAddTeam.innerHTML = '<option value="">-- Select a Team --</option>'; sortedTeamNames.forEach(teamName => { participantAddTeam.innerHTML += `<option value="${teamName}">${teamName}</option>`; }); } } catch(error) { console.error("Error loading teams:", error); if(teamListAdmin) teamListAdmin.innerHTML = '<p class="text-red-500 p-4">Error loading.</p>'; } }
+            function renderAdminTeamList() { if (!teamListAdmin) return; teamListAdmin.innerHTML = ''; if (Object.keys(allTeamsAdmin).length === 0) { teamListAdmin.innerHTML = '<div class="text-center py-5"><p class="text-gray-500 italic">No teams added yet.</p></div>'; return; } const sortedTeams = Object.values(allTeamsAdmin).sort((a, b) => a.name.localeCompare(b.name)); sortedTeams.forEach(team => { const teamElement = d.createElement('div'); teamElement.className = 'border border-gray-200 rounded-lg p-4 mb-4 bg-white shadow-sm'; teamElement.innerHTML = ` <h3 class="text-md font-semibold text-gray-800 mb-3">${team.name}</h3> <form class="space-y-3" data-team-id="${team.id}"> <div class="grid grid-cols-1 md:grid-cols-2 gap-3"> <div><label class="form-label text-xs">Leader</label><input type="text" class="form-input text-sm" value="${team.leader || ''}" data-field="leader"></div> <div><label class="form-label text-xs">Asst. Leader</label><input type="text" class="form-input text-sm" value="${team.asst || ''}" data-field="asst"></div> </div> <div class="grid grid-cols-1 md:grid-cols-2 gap-3"> <div><label class="form-label text-xs">Chest No From</label><input type="number" class="form-input text-sm" value="${team.id_from || ''}" data-field="id_from"></div> <div><label class="form-label text-xs">Chest No To</label><input type="number" class="form-input text-sm" value="${team.id_to || ''}" data-field="id_to"></div> </div> <div class="flex justify-end gap-2 pt-2"> <button type="button" class="btn-icon danger" onclick="deleteTeam('${team.id}')" title="Delete Team"><i class="fas fa-trash-alt"></i></button> <button type="submit" class="btn btn-secondary btn-sm" title="Update Team"><i class="fas fa-sync-alt"></i>Update</button> </div> </form>`; teamListAdmin.appendChild(teamElement); const updateForm = teamElement.querySelector('form'); if(updateForm) updateForm.addEventListener('submit', handleUpdateTeam); }); }
+            if(teamForm) teamForm.addEventListener('submit', async (e) => { e.preventDefault(); const nameInput = d.getElementById('team-name'); const leaderInput = d.getElementById('team-leader'); const asstInput = d.getElementById('team-asst'); const idFromInput = d.getElementById('team-id-from'); const idToInput = d.getElementById('team-id-to'); if (!nameInput || !leaderInput || !asstInput || !idFromInput || !idToInput) return; const name = nameInput.value.trim().toUpperCase(); const leader = leaderInput.value.trim(); const asst = asstInput.value.trim(); const id_from = idFromInput.value; const id_to = idToInput.value; if (!name) { alert("Team Name required."); return; } if (!id_from || !id_to) { alert("Chest No range required."); return; } const teamData = { name, leader, asst, id_from: parseInt(id_from, 10), id_to: parseInt(id_to, 10) }; try { await setDoc(doc(db, `artifacts/${appId}/public/data/teams`, name), teamData); alert(`Team ${name} added!`); teamForm.reset(); loadTeamsForAdmin(); } catch (error) { alert(`Error: ${error.message}`); } });
+            async function handleUpdateTeam(e) { e.preventDefault(); const form = e.target; const teamId = form.dataset.teamId; if (!teamId) return; const updatedData = { name: teamId }; let hasError = false; form.querySelectorAll('input[data-field]').forEach(input => { const field = input.dataset.field; let value = input.value.trim(); if (field === 'id_from' || field === 'id_to') { if (value === '') { alert(`${field === 'id_from' ? 'Chest No From' : 'Chest No To'} required.`); hasError = true; return; } value = parseInt(value, 10); if (isNaN(value)) { alert(`${field === 'id_from' ? 'Chest No From' : 'Chest No To'} must be number.`); hasError = true; return; } } updatedData[field] = value; }); if(hasError) return; try { await setDoc(doc(db, `artifacts/${appId}/public/data/teams`, teamId), updatedData); alert(`Team ${teamId} updated!`); allTeamsAdmin[teamId] = { id: teamId, ...updatedData }; } catch (error) { alert(`Error: ${error.message}`); } }
+            window.deleteTeam = async (id) => { if (!confirm(`Delete team ${id}?`)) return; try { await deleteDoc(doc(db, `artifacts/${appId}/public/data/teams`, id)); alert(`Team ${id} deleted!`); delete allTeamsAdmin[id]; renderAdminTeamList(); loadTeamsForAdmin(); } catch (error) { alert(`Error: ${error.message}`); }};
 
-                 // Attach listeners only if elements exist
-                 if (logoutButton) { logoutButton.addEventListener('click', handleLogout); } else { console.error("Logout button missing!"); }
-                 if (homepageForm) { homepageForm.addEventListener('submit', handleHomepageSave); } else { console.error("Homepage form missing"); }
-                 if (participantAddForm) { participantAddForm.addEventListener('submit', handleAddParticipants); } else { console.error("Participant Add Form missing"); }
-                 if (participantTeamFilter) { participantTeamFilter.addEventListener('change', renderParticipantList); } else { console.error("Participant team filter missing"); }
-                 if (participantSearch) { participantSearch.addEventListener('input', renderParticipantList); } else { console.error("Participant search input missing"); }
-                 if (deleteAllParticipantsBtn) { deleteAllParticipantsBtn.addEventListener('click', handleDeleteAllParticipants); } else { console.error("Delete all participants button missing"); }
-                 if (categoryForm) { categoryForm.addEventListener('submit', handleAddCategory); } else { console.error("Category form missing"); }
-                 if (programForm) { programForm.addEventListener('submit', handleAddProgram); } else { console.error("Program form missing"); }
-                 if (resultForm) { resultForm.addEventListener('submit', handlePublishResult); } else { console.error("Result form missing"); }
-                 if (resultCategorySelect) { resultCategorySelect.addEventListener('change', handleResultCategoryChange); } else { console.error("Result category select missing"); }
-                 if (resultProgramSelect) { resultProgramSelect.addEventListener('change', handleResultProgramChange); } else { console.error("Result program select missing"); }
-                 Object.keys(resultInputs).forEach(pos => { const input = resultInputs[pos]; if(input) { input.addEventListener('input', () => updateWinnerName(pos)); } });
-                 if (teamForm) { teamForm.addEventListener('submit', handleAddTeam); } else { console.error("Team form missing"); }
+            // --- Home Page Content (Admin - Unchanged) ---
+            async function loadHomepageContent() { try { const docRef = doc(db, `artifacts/${appId}/public/data/config`, 'homepage'); const docSnap = await getDoc(docRef); if (docSnap.exists()) { const data = docSnap.data(); Object.keys(homepageFields).forEach(key => { const fieldElement = homepageFields[key]; if (fieldElement) { if (key === 'gallery') { fieldElement.value = (data[key] || []).join('\n'); } else { fieldElement.value = data[key] || ''; } } }); } else { console.log("Homepage config doc missing!"); } } catch(error) { console.error("Error loading homepage:", error); alert("Could not load settings."); } }
+            if(homepageForm) homepageForm.addEventListener('submit', async (e) => { e.preventDefault(); const galleryArray = homepageFields.gallery ? homepageFields.gallery.value.split('\n').map(url => url.trim()).filter(Boolean) : []; const dataToSave = {}; Object.keys(homepageFields).forEach(key => { const fieldElement = homepageFields[key]; if (fieldElement) { if (key === 'gallery') { dataToSave[key] = galleryArray; } else { dataToSave[key] = fieldElement.value.trim(); } } }); try { await setDoc(doc(db, `artifacts/${appId}/public/data/config`, 'homepage'), dataToSave); alert('Homepage settings saved!'); } catch (error) { alert(`Error: ${error.message}`); } });
 
-                 // Event Delegation Setup for lists
-                 setupListActionDelegation();
-
-                 listenersAttached = true;
-                 console.log("All ADMIN event listeners attached.");
-            }
-
-            // --- Logout Handler ---
-            async function handleLogout() { /* ... */ }
-
-            // Function to setup event delegation listeners for lists
-            function setupListActionDelegation() { /* ... */ }
-
-            // Generic handler for list actions
-            function handleListAction(event, type) { /* ... */ }
-
-
-            // --- Participants Page Logic ---
-             async function loadAllParticipants() { /* ... */ }
-             function renderParticipantList() { /* ... */ }
-             async function editParticipant(chestNo, currentName, currentTeam) { /* ... */ }
-             async function deleteParticipant(chestNo) { /* ... */ }
-             async function handleAddParticipants(e) { /* ... */ }
-             async function deleteAllParticipants(promptUser = true) { /* ... */ }
-             async function handleDeleteAllParticipants() { /* ... */ }
-
-
-            // --- Programs & Categories Page Logic ---
-             async function loadCategories() { /* ... */ }
-             async function handleAddCategory(e) { /* ... */ }
-             async function deleteCategory(id) { /* ... */ }
-             async function editCategory(id, currentName) { /* ... */ }
-             async function loadPrograms() { /* ... */ }
-             async function handleAddProgram(e) { /* ... */ }
-             async function deleteProgram(id) { /* ... */ }
-             async function editProgram(id, currentName, currentCategory, p1, p2, p3, currentType) { /* ... */ }
-
-
-            // --- Results Page Logic ---
-             function updateWinnerName(position) { /* ... */ }
-             function clearNamePreviews() { /* ... */ }
-             async function loadCategoriesForResults() { /* ... */ }
-             async function loadProgramsForResults(selectedCategory = null) { /* ... */ }
-             function handleResultCategoryChange(e) { /* ... */ }
-             async function handleResultProgramChange(e) { /* ... */ }
-             async function handlePublishResult(e) { /* ... */ }
-
-
-            // --- Teams Page Logic ---
-             async function loadTeamsForAdmin() { /* ... */ }
-             function renderAdminTeamList() { /* ... */ }
-             async function handleAddTeam(e) { /* ... */ }
-             async function handleSaveTeamChanges(event) { /* ... */ }
-             async function deleteTeam(id) { /* ... */ }
-             function handleEditTeamClick(card) { /* ... */ }
-             function handleCancelEditTeamClick(card) { /* ... */ }
-             async function updateParticipantTeamNames(oldName, newName) { /* ... */ }
-
-
-            // --- Home Page Content (Admin) ---
-             async function loadHomepageContent() { /* ... */ }
-             async function handleHomepageSave(e) { /* ... */ }
-
-            // Attach listeners for Login/Register immediately
-            attachAuthListeners();
-
-            console.log("Initial setup complete. Waiting for Auth state...");
-
-        }); // End DOMContentLoaded
-    </script>
+        }); // End DOMContentLoaded
+    </script>
 </body>
-</html>
+</html> 
 
