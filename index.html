@@ -3,161 +3,639 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Team Status & Results 2025</title>
-    <!-- ഫോണ്ടുകളും ഐക്കണുകളും ലോഡ് ചെയ്യുന്നു -->
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Malayalam:wght@400;700&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Saira:wght@700&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <title>മദ്രസ അഡ്മിഷൻ ഫോം ജനറേറ്റർ</title>
+    <!-- Tailwind CSS for Styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- jsPDF & html2canvas for PDF Generation -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <!-- PapaParse for CSV Parsing -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
     
-    <!-- എക്സ്റ്റേണൽ CSS ഫയൽ -->
-    <link rel="stylesheet" href="style.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Manjari:wght@400;700&family=Noto+Sans+Malayalam:wght@400;600;700&display=swap');
+        
+        body {
+            font-family: 'Noto Sans Malayalam', sans-serif;
+            background-color: #f3f4f6;
+        }
+
+        /* A4 Size Print Container Settings */
+        .a4-container {
+            width: 210mm;
+            min-height: 297mm;
+            background: white;
+            padding: 12mm;
+            margin: 0 auto;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            position: relative;
+        }
+
+        /* Form Table Specific Styles */
+        .form-table {
+            width: 100%;
+            border-collapse: collapse;
+            border: 2px solid #000;
+            font-size: 13px;
+        }
+        .form-table th, .form-table td {
+            border: 1px solid #000;
+            padding: 4px 6px;
+            vertical-align: middle;
+        }
+        .form-table .col-num {
+            width: 25px;
+            text-align: center;
+            font-weight: bold;
+        }
+        .form-table .col-label {
+            width: 45%;
+            line-height: 1.4;
+        }
+        .form-table .col-value {
+            font-family: 'Courier New', Courier, monospace;
+            font-weight: bold;
+            color: #1e3a8a; /* Dark blue for filled text */
+        }
+        
+        /* Phone Number Boxes */
+        .phone-grid {
+            display: inline-flex;
+            border-top: 1px solid #000;
+            border-left: 1px solid #000;
+        }
+        .phone-box {
+            width: 22px;
+            height: 22px;
+            border-bottom: 1px solid #000;
+            border-right: 1px solid #000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-family: 'Courier New', Courier, monospace;
+            color: #1e3a8a;
+        }
+
+        /* Signature Lines */
+        .dotted-line {
+            border-bottom: 1px dotted #000;
+            display: inline-block;
+        }
+
+        /* Hide elements during PDF generation */
+        .pdf-hide {
+            display: none !important;
+        }
+
+        /* Tab active state */
+        .tab-active {
+            border-bottom: 3px solid #059669;
+            color: #059669;
+            font-weight: bold;
+        }
+    </style>
 </head>
-<body>
+<body class="text-gray-900 min-h-screen">
 
-    <!-- ലോഡിംഗ് ഓവർലേ -->
-    <div id="loading-overlay">
-        <div class="spinner"></div>
-        <p>Loading Live Data...</p>
-    </div>
-
-    <!-- ഹെഡർ -->
-    <div class="sticky-header">
-        <span class="header-title" id="dynamic-header-title">Sadaye Madeena 2k25</span> 
-        <button class="menu-btn" onclick="openNav()" aria-label="Open menu"><i class="fas fa-bars"></i></button>
-    </div>
-    
-    <!-- മെനു -->
-    <div id="menu-overlay" class="menu-overlay">
-        <div class="menu-box">
-            <div class="menu-header"> <span class="header-title">MENU</span> <button class="close-btn" onclick="closeNav()" aria-label="Close menu">&times;</button> </div>
-            <a href="javascript:void(0)" class="menu-link" data-target="home-page" onclick="showPage('home-page'); closeNav();">HOME</a>
-            <a href="javascript:void(0)" class="menu-link" data-target="program-tab" onclick="showPage('scoreboard-page'); showMainTab('program-tab'); closeNav();">RESULT</a>
-            <a href="javascript:void(0)" class="menu-link" data-target="scoreboard-tab" onclick="showPage('scoreboard-page'); showMainTab('scoreboard-tab'); closeNav();">SCOREBOARD</a>
-            <a href="javascript:void(0)" class="menu-link" data-target="team-tab" onclick="showPage('scoreboard-page'); showMainTab('team-tab'); closeNav();">TEAM</a>
-            <a href="javascript:void(0)" class="menu-link" data-target="talent-tab" onclick="showPage('scoreboard-page'); showMainTab('talent-tab'); closeNav();">TALENT</a>
+    <!-- Navbar / Header -->
+    <div class="bg-emerald-700 text-white shadow-md">
+        <div class="max-w-7xl mx-auto px-4 py-4 sm:px-6 lg:px-8 flex justify-between items-center">
+            <h1 class="text-xl md:text-2xl font-bold">സമസ്ത അഡ്മിഷൻ സിസ്റ്റം</h1>
+            <div class="text-sm bg-emerald-800 px-3 py-1 rounded-full border border-emerald-600">CSV to PDF Generator</div>
         </div>
     </div>
-    
-    <!-- പ്രധാന ഉള്ളടക്കം -->
-    <main id="main-content" style="visibility: hidden;">
-        <!-- ഹോം പേജ് -->
-        <div id="home-page">
-            <!-- ഹീറോ സെക്ഷൻ -->
-            <div class="hero-section">
-                <img src="https://placehold.co/150x150/FFFFFF/EFEFEF?text=Logo" alt="Art Fest Logo" class="logo" id="hero-logo" onerror="this.onerror=null;this.src='https://placehold.co/150x150/FFFFFF/EFEFEF?text=Logo';">
-                <h1 id="hero-main-title">Loading...</h1>
-                <p id="hero-subtitle">...</p>
-                <button class="primary-btn" onclick="showPage('scoreboard-page'); showMainTab('program-tab');">View Results</button>
-                <div class="home-nav">
-                    <a href="#about">About</a>
-                    <a href="#leaders">Leaders</a>
-                    <a href="#gallery">Gallery</a>
-                </div>
-            </div>
 
-            <!-- എബൗട്ട് സെക്ഷൻ -->
-            <section id="about" class="home-section">
-                <h2 id="about-section-title">About The Fest</h2>
-                <p class="section-subtitle" id="about-section-subtitle">Thirunoor'25</p>
-                <p id="about-text" class="text-left text-lg leading-relaxed">Loading...</p>
-                <img src="https://placehold.co/800x400/EFEFEF/CCCCCC?text=Event+Image" alt="About Fest Image" id="about-image" onerror="this.onerror=null;this.src='https://placehold.co/800x400/EFEFEF/CCCCCC?text=Event+Image';">
-                <div class="stats-grid">
-                    <div class="stat-item"><div class="value" id="stats-programs-public">...</div><div class="label">Programs</div></div>
-                    <div class="stat-item"><div class="value" id="stats-participants-public">...</div><div class="label">Contestants</div></div>
-                    <div class="stat-item"><div class="value" id="stats-categories-public">...</div><div class="label">Categories</div></div>
-                    <div class="stat-item"><div class="value" id="stats-teams-public">...</div><div class="label">Teams</div></div>
-                </div>
-            </section>
-
-            <!-- ലീഡേഴ്സ് സെക്ഷൻ -->
-            <section id="leaders" class="home-section">
-                <h2>Team Leaders</h2>
-                <p class="section-subtitle">Meet the leaders of our teams</p>
-                <div id="leader-cards-container">
-                    <p id="leader-placeholder" class="text-gray-500">Loading team leaders...</p>
-                </div>
-            </section>
-
-            <!-- ഗാലറി സെക്ഷൻ -->
-            <section id="gallery" class="home-section">
-                <h2>Image Gallery</h2>
-                <p class="section-subtitle">Discover and share beautiful moments</p>
-                <div id="gallery-rows-container">
-                    <div class="gallery-row" id="gallery-row-0"></div>
-                    <div class="gallery-row" id="gallery-row-1"></div>
-                    <div class="gallery-row" id="gallery-row-2"></div>
-                    <p id="gallery-placeholder" class="text-gray-500">Loading gallery...</p>
-                </div>
-            </section>
+    <!-- Main Content -->
+    <div class="max-w-7xl mx-auto px-4 py-6 sm:px-6 lg:px-8">
+        
+        <!-- Tab Navigation -->
+        <div class="flex border-b border-gray-300 mb-6 bg-white rounded-t-lg px-2 pt-2">
+            <button onclick="switchTab('upload')" id="tab-btn-upload" class="px-6 py-3 tab-active hover:bg-gray-50 transition-colors focus:outline-none rounded-t-md">
+                1. ഡാറ്റ അപ്‌ലോഡ് (Upload CSV)
+            </button>
+            <button onclick="switchTab('preview')" id="tab-btn-preview" class="px-6 py-3 text-gray-500 hover:bg-gray-50 transition-colors focus:outline-none rounded-t-md hidden">
+                2. പ്രിവ്യൂ & ഡൗൺലോഡ് (Review)
+            </button>
         </div>
 
-        <!-- സ്കോർബോർഡ് പേജ് -->
-        <div id="scoreboard-page">
-             <div class="container">
-                <!-- ടാബ് ബട്ടണുകൾ -->
-                <div class="main-tab-buttons-wrapper">
-                    <div class="main-tab-buttons">
-                        <button class="main-tab-button" onclick="showMainTab('program-tab')">RESULT</button>
-                        <button class="main-tab-button" onclick="showMainTab('scoreboard-tab')">SCOREBOARD</button>
-                        <button class="main-tab-button active" onclick="showMainTab('team-tab')">TEAM</button>
-                        <button class="main-tab-button" onclick="showMainTab('talent-tab')">TALENT</button>
-                    </div>
+        <!-- System Messages -->
+        <div id="messageBox" class="hidden p-4 rounded-lg font-semibold text-center transition-all mb-4"></div>
+
+        <!-- ========================================== -->
+        <!-- TAB 1: UPLOAD SECTION -->
+        <!-- ========================================== -->
+        <div id="tab-upload" class="bg-white p-6 rounded-b-lg shadow-sm border border-gray-200 block">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <!-- Instructions -->
+                <div>
+                    <h2 class="text-lg font-bold text-gray-800 mb-4">നിർദ്ദേശങ്ങൾ:</h2>
+                    <ul class="list-disc list-inside text-gray-600 space-y-2 mb-6 text-sm">
+                        <li>നിങ്ങളുടെ ഗൂഗിൾ ഫോം റെസ്പോൺസുകൾ CSV ഫോർമാറ്റിൽ ഡൗൺലോഡ് ചെയ്യുക.</li>
+                        <li>താഴെ നൽകിയിരിക്കുന്ന സാമ്പിൾ ഫയലിലെ അതേ തലക്കെട്ടുകൾ (Headers) തന്നെയാണോ നിങ്ങളുടെ ഫയലിലും ഉള്ളതെന്ന് ഉറപ്പുവരുത്തുക.</li>
+                        <li>CSV ഫയൽ അപ്‌ലോഡ് ചെയ്ത ശേഷം അടുത്ത ടാബിൽ പ്രിവ്യൂ കാണാവുന്നതാണ്.</li>
+                    </ul>
+                    <button onclick="downloadSampleCSV()" class="bg-blue-50 text-blue-700 border border-blue-200 hover:bg-blue-100 font-semibold py-2 px-4 rounded transition-colors text-sm flex items-center">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                        സാമ്പിൾ CSV ഡൗൺലോഡ് ചെയ്യുക
+                    </button>
                 </div>
-                <!-- ടീം ടാബ് -->
-                <div id="team-tab" class="main-tab-content active">
-                    <h2 style="text-align: center; color: var(--heading-color); font-family: 'Saira', sans-serif;">Live Team Point Status</h2>
-                    <p id="team-results-count" style="text-align: center; margin-top: -10px; margin-bottom: 20px; color: var(--subtle-text);"></p>
-                    <div class="card-container" id="team-cards-container"></div>
-                    <div class="detailed-rankings-container" id="detailed-rankings">
-                        <!-- Detailed rankings table will be built by JS -->
-                    </div>
-                </div>
-                <!-- റിസൾട്ട് ടാബ് -->
-                <div id="program-tab" class="main-tab-content">
-                     <div class="filter-controls">
-                         <input type="text" id="search-input" class="search-bar" onkeyup="filterResults()" placeholder="Search programs or participants...">
-                         <div class="filter-buttons" id="program-filter-buttons"><p class="text-gray-500">Loading filters...</p></div>
-                     </div>
-                     <div id="program-results-grid"></div>
-                </div>
-                <!-- സ്കോർബോർഡ് ടാബ് -->
-                <div id="scoreboard-tab" class="main-tab-content">
-                    <div class="filter-controls">
-                         <div class="filter-buttons" id="scoreboard-filter-buttons"><p class="text-gray-500">Loading filters...</p></div>
-                     </div>
-                    <div id="scoreboard-container">
-                        <div id="scoreboard-table-content"></div>
-                        <p id="scoreboard-placeholder" style="text-align: center; color: var(--subtle-text); padding: 20px; display: none;"></p>
-                    </div>
-                </div>
-                <!-- ടാലന്റ് ടാബ് -->
-                <div id="talent-tab" class="main-tab-content">
-                    <div id="talent-list-container"></div>
+
+                <!-- Upload Box -->
+                <div class="border-2 border-dashed border-emerald-300 bg-emerald-50 rounded-lg p-8 text-center flex flex-col items-center justify-center transition-colors hover:bg-emerald-100 relative">
+                    <svg class="w-12 h-12 text-emerald-500 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path></svg>
+                    <h3 class="font-bold text-gray-700 mb-2">CSV ഫയൽ ഇവിടെ അപ്‌ലോഡ് ചെയ്യുക</h3>
+                    <p class="text-sm text-gray-500 mb-4" id="csvFileName">(.csv files only)</p>
+                    
+                    <input type="file" id="csvFile" accept=".csv" class="hidden" onchange="handleCSVUpload(event)">
+                    <button onclick="document.getElementById('csvFile').click()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2 px-6 rounded-full shadow transition-all">
+                        ഫയൽ തിരഞ്ഞെടുക്കുക
+                    </button>
                 </div>
             </div>
         </div>
-    </main>
-    
-    <!-- ഫൂട്ടർ -->
-    <footer>
-        <div class="footer-content">
-            <div class="social-icons" id="footer-social-icons">
-                <a href="#" target="_blank" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
-                <a href="#" target="_blank" aria-label="YouTube"><i class="fab fa-youtube"></i></a>
-                <a href="#" target="_blank" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+
+        <!-- ========================================== -->
+        <!-- TAB 2: PREVIEW & DOWNLOAD SECTION -->
+        <!-- ========================================== -->
+        <div id="tab-preview" class="hidden">
+            
+            <!-- Controls Toolbar -->
+            <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-200 mb-6 flex flex-col md:flex-row justify-between items-center gap-4">
+                
+                <div class="flex items-center gap-3 w-full md:w-auto">
+                    <label class="font-bold text-gray-700 whitespace-nowrap">വിദ്യാർത്ഥി:</label>
+                    <select id="studentSelector" onchange="renderStudentPreview()" class="w-full md:w-64 border border-gray-300 rounded p-2 bg-gray-50 focus:outline-none focus:border-emerald-500 text-sm">
+                        <!-- Options populated via JS -->
+                    </select>
+                    <span id="recordCount" class="text-sm text-gray-500 ml-2 whitespace-nowrap"></span>
+                </div>
+
+                <div class="flex flex-wrap gap-3 w-full md:w-auto justify-end">
+                    <button onclick="generateSinglePDF()" class="bg-white border border-emerald-600 text-emerald-700 hover:bg-emerald-50 font-semibold py-2 px-4 rounded shadow-sm transition-colors text-sm flex items-center">
+                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                        ഈ ഫോം മാത്രം ഡൗൺലോഡ് ചെയ്യുക
+                    </button>
+                    <button onclick="generateBulkPDF()" id="bulkDownloadBtn" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2 px-6 rounded shadow transition-colors flex items-center">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                        എല്ലാ ഫോമുകളും PDF ആക്കുക
+                    </button>
+                </div>
             </div>
-            <p class="institution-name" id="footer-institution-name">Institution Name</p>
-            <p class="copyright" id="footer-copyright">© Year Org Name. All rights reserved.</p>
+
+            <!-- Progress Bar for Bulk Download -->
+            <div id="progressContainer" class="hidden bg-white p-4 rounded-lg shadow-sm border border-emerald-200 mb-6">
+                <div class="flex justify-between text-sm mb-1">
+                    <span class="font-bold text-emerald-700">PDF തയ്യാറാക്കുന്നു...</span>
+                    <span id="progressText" class="font-bold text-emerald-700">0%</span>
+                </div>
+                <div class="w-full bg-gray-200 rounded-full h-2.5">
+                    <div id="progressBar" class="bg-emerald-600 h-2.5 rounded-full transition-all duration-300" style="width: 0%"></div>
+                </div>
+                <p class="text-xs text-gray-500 mt-2 text-center">ദയവായി ബ്രൗസർ ക്ലോസ് ചെയ്യരുത്.</p>
+            </div>
+
+            <!-- The HTML A4 Template (Preview Container) -->
+            <div class="overflow-x-auto pb-8">
+                <div id="form-template" class="a4-container scale-[0.9] md:scale-100 origin-top">
+                    
+                    <!-- Form Header -->
+                    <div class="flex justify-between text-sm mb-2">
+                        <div>ഫോറം നമ്പർ: <span class="dotted-line w-32"></span></div>
+                        <div>തിയ്യതി: <span class="dotted-line w-32" data-field="DateTop"></span></div>
+                    </div>
+
+                    <div class="text-center mb-4">
+                        <h2 class="text-2xl font-bold">സമസ്ത കേരള ഇസ്‌ലാം മത വിദ്യാഭ്യാസ ബോർഡ്</h2>
+                        <p class="text-[13px] font-semibold">സമസ്താലയം, ചേളാരി, പി.ഒ. തേഞ്ഞിപ്പലം - 673636</p>
+                        <h2 class="text-[18px] font-bold mt-1 uppercase tracking-wide">Samastha Kerala Islam-Matha Vidyabhyasa Board</h2>
+                        <p class="text-[12px] uppercase">Samasthalayam, Chelari, P.O. Thenhipalam, Malappuram - 673636</p>
+                        <p class="text-[11px] mt-1">Phone: 0494-2400256, 2401262, 2401263</p>
+                        <p class="text-[11px]">www.samastha.info, email: samasthalayam@gmail.com</p>
+                    </div>
+
+                    <div class="absolute top-28 right-12 border border-black p-1 text-center text-[10px] w-24">
+                        <div class="border-b border-black font-bold mb-1">SKIMVB</div>
+                        <div>ID No</div>
+                    </div>
+
+                    <div class="text-center font-bold text-base mb-2 border-b-2 border-black inline-block px-4 mx-auto w-full">
+                        മദ്‌റസയിൽ ചേർക്കാനുള്ള അപേക്ഷാഫോറം (APPLICATION FOR MADRASA ADMISSION)
+                    </div>
+
+                    <!-- Form Data Table -->
+                    <table class="form-table mt-4">
+                        <tbody>
+                            <tr>
+                                <td class="col-num">1</td>
+                                <td class="col-label">മദ്‌റസയുടെ പേര്, അംഗീകരണ നമ്പർ <br><span class="text-[11px] font-normal">(Name & Recog. No. of Madrasa)</span></td>
+                                <td class="col-value" colspan="2" data-field="MadrasaName"></td>
+                            </tr>
+                            <tr>
+                                <td class="col-num">2</td>
+                                <td class="col-label">വിദ്യാർത്ഥിയുടെ പേരും, ഇനീഷ്യലും <br><span class="text-[11px] font-normal">(Name of Student with initials)</span></td>
+                                <td class="col-value" colspan="2" data-field="StudentName"></td>
+                            </tr>
+                            <tr>
+                                <td class="col-num">3</td>
+                                <td class="col-label h-16">വീട്ടുപേര്, വിലാസം <br><span class="text-[11px] font-normal">(House Name & Address)</span></td>
+                                <td class="col-value h-16" colspan="2" data-field="Address"></td>
+                            </tr>
+                            <tr>
+                                <td class="col-num">4</td>
+                                <td class="col-label">ആധാർ നമ്പർ <span class="text-[11px] font-normal">(Adhaar No)</span></td>
+                                <td class="col-value" colspan="2" data-field="Aadhaar"></td>
+                            </tr>
+                            <tr>
+                                <td class="col-num">5</td>
+                                <td class="col-label">ജനന തിയ്യതി <span class="text-[11px] font-normal">(Date of Birth)</span></td>
+                                <td class="col-value" data-field="DOB"></td>
+                                <td class="col-value w-1/4">6. ലിംഗം (Sex) <span class="ml-2 font-bold text-[#1e3a8a]" data-field="Gender"></span></td>
+                            </tr>
+                            <tr>
+                                <td class="col-num">7</td>
+                                <td class="col-label">പിതാവിൻ്റെ പേര് <span class="text-[11px] font-normal">(Name of Father)</span></td>
+                                <td class="col-value" colspan="2" data-field="FatherName"></td>
+                            </tr>
+                            <tr>
+                                <td class="col-num" rowspan="2">8</td>
+                                <td class="col-label h-12">രക്ഷാകർത്താവിൻ്റെ പേര്, വിലാസം <br><span class="text-[11px] font-normal">(Name of guardian & Address)</span></td>
+                                <td class="col-value h-12" colspan="2" data-field="GuardianNameAddr"></td>
+                            </tr>
+                            <tr>
+                                <!-- Phone Box Sub Row -->
+                                <td colspan="3" class="p-0 border-t-0">
+                                    <div class="flex items-center justify-end px-2 py-1 bg-gray-50/50">
+                                        <span class="mr-2 text-[12px]">ഫോൺ നമ്പർ (Phone No)</span>
+                                        <div class="phone-grid" id="phoneBoxContainer">
+                                            <div class="phone-box" data-idx="0"></div>
+                                            <div class="phone-box" data-idx="1"></div>
+                                            <div class="phone-box" data-idx="2"></div>
+                                            <div class="phone-box" data-idx="3"></div>
+                                            <div class="phone-box" data-idx="4"></div>
+                                            <div class="phone-box" data-idx="5"></div>
+                                            <div class="phone-box" data-idx="6"></div>
+                                            <div class="phone-box" data-idx="7"></div>
+                                            <div class="phone-box" data-idx="8"></div>
+                                            <div class="phone-box" data-idx="9"></div>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="col-num">9</td>
+                                <td class="col-label">രക്ഷാകർത്താവിനു വിദ്യാർത്ഥിയുമായുള്ള ബന്ധം <br><span class="text-[11px] font-normal">(Relation with Student)</span></td>
+                                <td class="col-value" colspan="2" data-field="Relation"></td>
+                            </tr>
+                            <tr>
+                                <td class="col-num">10</td>
+                                <td class="col-label">രക്ഷാകർത്താവിൻ്റെ പ്രവൃത്തി <span class="text-[11px] font-normal">(Occupation of guardian)</span></td>
+                                <td class="col-value" colspan="2" data-field="Occupation"></td>
+                            </tr>
+                            <tr>
+                                <td class="col-num">11</td>
+                                <td class="col-label h-12">തിരിച്ചറിയുന്നതിനുള്ള അടയാളങ്ങൾ <br><span class="text-[11px] font-normal">(Identification Marks)</span></td>
+                                <td class="col-value h-12" colspan="2" data-field="IdentificationMarks"></td>
+                            </tr>
+                            <tr>
+                                <td class="col-num">12</td>
+                                <td class="col-label">ചേർന്ന തിയ്യതി <span class="text-[11px] font-normal">(Date of Admission)</span></td>
+                                <td class="col-value" colspan="2" data-field="AdmissionDate"></td>
+                            </tr>
+                            <tr>
+                                <td class="col-num">13</td>
+                                <td class="col-label">ചേരുന്ന ക്ലാസ് <span class="text-[11px] font-normal">(Standard to which admitted)</span></td>
+                                <td class="col-value" colspan="2" data-field="Standard"></td>
+                            </tr>
+                            <tr>
+                                <td class="col-num">14</td>
+                                <td class="col-label h-12">മറ്റു മദ്‌റസയിൽ നിന്നു വരുന്നതെങ്കിൽ മദ്‌റസയുടെ പേരും, അംഗീകരണ നമ്പറും <span class="text-[11px] font-normal">(Name&No. of former Madrasa, if any)</span></td>
+                                <td class="col-value h-12" colspan="2" data-field="FormerMadrasa"></td>
+                            </tr>
+                            <tr>
+                                <td class="col-num">15</td>
+                                <td class="col-label h-12">മദ്‌റസ പൊതുപരീക്ഷ പാസ്സായ ക്ലാസും സർട്ടിഫിക്കറ്റ് നമ്പറും <br><span class="text-[11px] font-normal">(Certificate Number & Class of public exam)</span></td>
+                                <td class="col-value h-12" colspan="2" data-field="CertificateDetails"></td>
+                            </tr>
+                            <tr>
+                                <td class="col-num">16</td>
+                                <td class="col-label">ടി.സി. നമ്പർ <span class="text-[11px] font-normal">(T.C. No.)</span></td>
+                                <td class="col-value" colspan="2" data-field="TCNumber"></td>
+                            </tr>
+                            <tr>
+                                <td class="col-num">17</td>
+                                <td class="col-label">യോഗ്യതാ പരീക്ഷാ നമ്പർ <span class="text-[11px] font-normal">(യോഗ്യതാ പരീക്ഷ മുഖേന പ്രവേശനം നേടിയവർ)</span></td>
+                                <td class="col-value" colspan="2" data-field="QualifyingExamNo"></td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <!-- Declaration Section -->
+                    <div class="mt-4 text-[13px] leading-relaxed text-justify">
+                        ബഹു. സമസ്ത കേരള ജംഇയ്യത്തുൽ ഉലമായുടെ സംഘടനാ നേതൃത്വവും സമസ്ത കേരള ഇസ്‌ലാം മത വിദ്യാഭ്യാസ ബോർഡിൻ്റെ പാഠ്യപദ്ധതിയും, നിയമ - നിർദ്ദേശങ്ങളും അംഗീകരിച്ചും, അനുസരിച്ചും, മദ്‌റസയുടെ എല്ലാ നിയമങ്ങൾക്കും വിധേയമായി കൃത്യമായും, നിത്യമായും മേൽ വിദ്യാർത്ഥിയെ മദ്‌റസയിൽ അയച്ചു പഠിപ്പിച്ചു കൊള്ളാമെന്നു സത്യബോദ്ധ്യപ്പെടുത്തുന്നതോടൊപ്പം പ്രസ്തുത വിദ്യാർത്ഥിയെ മദ്‌റസയിൽ ചേർക്കുവാൻ അപേക്ഷിക്കുന്നു.
+                    </div>
+                    
+                    <div class="mt-2 text-[13px] text-center w-full">എന്ന്</div>
+
+                    <div class="flex justify-between mt-4 text-[13px]">
+                        <div>രക്ഷാകർത്താവിൻ്റെ പേര് <span class="col-value ml-2" data-field="GuardianNameBottom"></span> <span class="dotted-line w-48 border-b-2"></span></div>
+                        <div>ഒപ്പ് <span class="dotted-line w-32 border-b-2"></span></div>
+                    </div>
+
+                    <!-- Office Use Box -->
+                    <div class="mt-6 border border-black relative pt-4 pb-6 px-4 bg-gray-50/20">
+                        <div class="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-black text-white px-4 py-1 text-[12px] font-bold">
+                            ഓഫീസ് ഉപയോഗത്തിന്
+                        </div>
+                        
+                        <div class="mt-4 text-[13px] leading-loose">
+                            <span class="dotted-line w-48"></span> വിദ്യാർത്ഥിയെ <span class="dotted-line w-32"></span> തിയ്യതിക്ക് <br>
+                            <span class="dotted-line w-32"></span> നമ്പറായി <span class="dotted-line w-32"></span> ക്ലാസിൽ ചേർത്തിരിക്കുന്നു.
+                        </div>
+                        <div class="text-[13px] mt-2 mb-4">എന്ന്,</div>
+
+                        <div class="flex justify-between items-center text-[13px] mt-4">
+                            <div>സദ്ർ മുഅല്ലിമിൻ്റെ പേര് <span class="dotted-line w-48"></span></div>
+                            <div>ഒപ്പ് <span class="dotted-line w-20"></span></div>
+                            <div>സീൽ</div>
+                        </div>
+                        <div class="flex justify-between items-center text-[13px] mt-4">
+                            <div>മാനേജിംഗ് കമ്മിറ്റി സെക്രട്ടറിയുടെ പേര് <span class="dotted-line w-40"></span></div>
+                            <div>ഒപ്പ് <span class="dotted-line w-20"></span></div>
+                            <div>സീൽ</div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
         </div>
-    </footer>
 
-    <!-- മുകളിലേക്ക് പോകാനുള്ള ബട്ടൺ -->
-    <button id="scrollTopBtn" title="Go to top" onclick="scrollToTop()">
-        <i class="fas fa-arrow-up"></i>
-    </button>
+    </div>
 
-    <!-- എക്സ്റ്റേണൽ JavaScript ഫയൽ -->
-    <script type="module" src="script.js"></script>
+    <script>
+        let parsedCSVData = [];
+        
+        // CSV Headers required in the file
+        const requiredHeaders = [
+            "MadrasaName", "StudentName", "Address", "Aadhaar", "DOB", 
+            "Gender", "FatherName", "GuardianName", "GuardianAddress", "Phone", "Relation", 
+            "Occupation", "IdentificationMarks", "AdmissionDate", "Standard", 
+            "FormerMadrasa", "CertificateDetails", "TCNumber", "QualifyingExamNo"
+        ];
+
+        // System Messages
+        function showMessage(msg, type = 'error') {
+            const msgBox = document.getElementById('messageBox');
+            msgBox.innerHTML = msg;
+            msgBox.className = `p-4 rounded-lg font-semibold text-center transition-all block mb-4 ${type === 'error' ? 'bg-red-100 text-red-700 border border-red-300' : 'bg-emerald-100 text-emerald-800 border border-emerald-300'}`;
+            setTimeout(() => { msgBox.classList.add('hidden'); }, 5000);
+        }
+
+        // Tab Switching Logic
+        function switchTab(tabName) {
+            const uploadTab = document.getElementById('tab-upload');
+            const previewTab = document.getElementById('tab-preview');
+            const btnUpload = document.getElementById('tab-btn-upload');
+            const btnPreview = document.getElementById('tab-btn-preview');
+
+            if (tabName === 'upload') {
+                uploadTab.classList.remove('hidden');
+                previewTab.classList.add('hidden');
+                btnUpload.classList.add('tab-active');
+                btnUpload.classList.remove('text-gray-500');
+                btnPreview.classList.remove('tab-active');
+                btnPreview.classList.add('text-gray-500');
+            } else if (tabName === 'preview') {
+                if (parsedCSVData.length === 0) {
+                    showMessage("ആദ്യം ഡാറ്റ അടങ്ങിയ CSV ഫയൽ അപ്‌ലോഡ് ചെയ്യുക.");
+                    return;
+                }
+                uploadTab.classList.add('hidden');
+                previewTab.classList.remove('hidden');
+                btnPreview.classList.add('tab-active');
+                btnPreview.classList.remove('text-gray-500');
+                btnUpload.classList.remove('tab-active');
+                btnUpload.classList.add('text-gray-500');
+                btnPreview.classList.remove('hidden'); // Ensure button is visible
+                
+                // Render first student if not rendered
+                if(document.getElementById('studentSelector').options.length > 0){
+                   renderStudentPreview();
+                }
+            }
+        }
+
+        // Download Sample CSV
+        function downloadSampleCSV() {
+            const sampleData = "Darul Uloom Madrasa (Reg No: 1234),Muhammed Ali,Kallungal House Chelari PO,1234 5678 9012,01/01/2015,Male,Abdul Rahiman,Abdul Rahiman,Kallungal House Chelari PO,9876543210,Father,Business,A black mole on left cheek,01/06/2026,5th Standard,-,-,-,-";
+            const csvContent = "data:text/csv;charset=utf-8," + requiredHeaders.join(",") + "\n" + sampleData;
+            
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", "Sample_Admission_Data.csv");
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        // Handle CSV Upload
+        function handleCSVUpload(event) {
+            const file = event.target.files[0];
+            if (file) {
+                document.getElementById('csvFileName').textContent = file.name;
+
+                Papa.parse(file, {
+                    header: true,
+                    skipEmptyLines: true,
+                    complete: function(results) {
+                        if(results.data && results.data.length > 0) {
+                            parsedCSVData = results.data;
+                            populateSelector();
+                            showMessage(`${parsedCSVData.length} വിദ്യാർത്ഥികളുടെ വിവരങ്ങൾ ലഭിച്ചു. പ്രിവ്യൂ ടാബ് തുറക്കുന്നു...`, 'success');
+                            setTimeout(() => { switchTab('preview'); }, 1500);
+                        } else {
+                            showMessage("CSV ഫയലിൽ ഡാറ്റയൊന്നും കണ്ടെത്താനായില്ല.");
+                        }
+                    },
+                    error: function(err) {
+                        showMessage("CSV ഫയൽ വായിക്കുന്നതിൽ പിശക്: " + err.message);
+                    }
+                });
+            }
+        }
+
+        // Populate Dropdown in Preview Tab
+        function populateSelector() {
+            const selector = document.getElementById('studentSelector');
+            selector.innerHTML = '';
+            parsedCSVData.forEach((student, index) => {
+                const option = document.createElement('option');
+                option.value = index;
+                // Show name, fallback to row number if name is missing
+                option.text = `${index + 1}. ${student['StudentName'] || 'Unknown'}`; 
+                selector.appendChild(option);
+            });
+            document.getElementById('recordCount').textContent = `(Total: ${parsedCSVData.length})`;
+        }
+
+        // Fill HTML Template with Student Data
+        function renderStudentPreview() {
+            const index = document.getElementById('studentSelector').value;
+            const student = parsedCSVData[index];
+            if(!student) return;
+
+            // Simple text fields mapping
+            const fieldMappings = {
+                'MadrasaName': student['MadrasaName'],
+                'StudentName': student['StudentName'],
+                'Address': student['Address'],
+                'Aadhaar': student['Aadhaar'],
+                'DOB': student['DOB'],
+                'Gender': student['Gender'],
+                'FatherName': student['FatherName'],
+                'Relation': student['Relation'],
+                'Occupation': student['Occupation'],
+                'IdentificationMarks': student['IdentificationMarks'],
+                'AdmissionDate': student['AdmissionDate'],
+                'Standard': student['Standard'],
+                'FormerMadrasa': student['FormerMadrasa'],
+                'CertificateDetails': student['CertificateDetails'],
+                'TCNumber': student['TCNumber'],
+                'QualifyingExamNo': student['QualifyingExamNo'],
+                'GuardianNameBottom': student['GuardianName'] // For bottom signature line
+            };
+
+            // Combine Guardian Name and Address
+            const guardianName = student['GuardianName'] || '';
+            const guardianAddr = student['GuardianAddress'] || '';
+            fieldMappings['GuardianNameAddr'] = guardianName + (guardianName && guardianAddr ? ', ' : '') + guardianAddr;
+
+            // Current date for top Date field
+            const today = new Date();
+            fieldMappings['DateTop'] = student['AdmissionDate'] || `${today.getDate()}/${today.getMonth()+1}/${today.getFullYear()}`;
+
+            // Map standard fields
+            for (const [key, value] of Object.entries(fieldMappings)) {
+                const elements = document.querySelectorAll(`[data-field="${key}"]`);
+                elements.forEach(el => {
+                    el.textContent = value || '';
+                });
+            }
+
+            // Handle Phone Number Boxes
+            const phoneStr = (student['Phone'] || '').toString().replace(/\D/g, ''); // Extract only numbers
+            for (let i = 0; i < 10; i++) {
+                const box = document.querySelector(`.phone-box[data-idx="${i}"]`);
+                if (box) {
+                    box.textContent = phoneStr[i] || '';
+                }
+            }
+        }
+
+        // Capture HTML to Image (Core PDF Logic)
+        async function captureFormImage() {
+            const formElement = document.getElementById('form-template');
+            
+            // Temporarily remove scaling for high-quality capture
+            const originalTransform = formElement.style.transform;
+            formElement.style.transform = 'scale(1)';
+            
+            const canvas = await html2canvas(formElement, {
+                scale: 2, // High resolution
+                useCORS: true,
+                logging: false,
+                width: formElement.offsetWidth,
+                height: formElement.offsetHeight
+            });
+            
+            // Restore scaling
+            formElement.style.transform = originalTransform;
+            
+            return canvas.toDataURL('image/jpeg', 0.95);
+        }
+
+        // Generate Single PDF
+        async function generateSinglePDF() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+            
+            const btn = event.currentTarget;
+            const originalText = btn.innerHTML;
+            btn.innerHTML = "Processing...";
+            btn.disabled = true;
+
+            try {
+                const imgData = await captureFormImage();
+                doc.addImage(imgData, 'JPEG', 0, 0, 210, 297);
+                
+                const studentName = parsedCSVData[document.getElementById('studentSelector').value]['StudentName'] || 'Student';
+                doc.save(`Madrasa_Admission_${studentName}.pdf`);
+            } catch(e) {
+                showMessage("PDF ജനറേറ്റ് ചെയ്യുന്നതിൽ പിശക്: " + e.message);
+            } finally {
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            }
+        }
+
+        // Generate Bulk PDF (Loop through all)
+        async function generateBulkPDF() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+            
+            const btn = document.getElementById('bulkDownloadBtn');
+            const progressContainer = document.getElementById('progressContainer');
+            const progressBar = document.getElementById('progressBar');
+            const progressText = document.getElementById('progressText');
+            const selector = document.getElementById('studentSelector');
+            
+            // UI State
+            btn.disabled = true;
+            btn.classList.add('opacity-50');
+            progressContainer.classList.remove('hidden');
+            
+            const total = parsedCSVData.length;
+            const originalIndex = selector.value; // Remember user's selection
+
+            try {
+                for (let i = 0; i < total; i++) {
+                    // Update UI and trigger render
+                    selector.value = i;
+                    renderStudentPreview();
+                    
+                    // Small delay to allow DOM to update rendering
+                    await new Promise(r => setTimeout(r, 50)); 
+
+                    const imgData = await captureFormImage();
+                    
+                    if (i > 0) doc.addPage();
+                    doc.addImage(imgData, 'JPEG', 0, 0, 210, 297);
+
+                    // Update Progress
+                    const percent = Math.round(((i + 1) / total) * 100);
+                    progressBar.style.width = percent + '%';
+                    progressText.textContent = `${i + 1} / ${total} (${percent}%)`;
+                }
+
+                doc.save('All_Madrasa_Admissions_Batch.pdf');
+                showMessage(`വിജയകരം! ${total} ഫോമുകളുടെ PDF ഡൗൺലോഡ് ആരംഭിച്ചു.`, 'success');
+
+            } catch (error) {
+                console.error(error);
+                showMessage("പ്രോസസ്സിംഗിൽ തകരാർ: " + error.message);
+            } finally {
+                // Restore UI
+                btn.disabled = false;
+                btn.classList.remove('opacity-50');
+                progressContainer.classList.add('hidden');
+                progressBar.style.width = '0%';
+                
+                // Restore user's original selection
+                selector.value = originalIndex;
+                renderStudentPreview();
+            }
+        }
+    </script>
 </body>
 </html>
